@@ -1,64 +1,63 @@
-# bg3-mod-helper README
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BG3 Mod Helper Extension</title>
+</head>
+<body>
+    <h1>BG3 Mod Helper Extension</h1>
+    <p>This Visual Studio Code extension aids in modding Baldur's Gate 3 by speeding up various tasks. It offers a wide range of functionalities aimed at improving mod development efficiency.</p>
 
-This is the README for the "bg3-mod-helper" extension, designed to assist with mod development for Baldur's Gate 3. This extension simplifies the process of generating UUIDs and handles, as well as providing easy navigation to instances of these identifiers across your project.
+    <h2>General Features:</h2>
+    <ul>
+        <li>Generate UUIDs/Handles via right-click menu.
+            <ul>
+                <li>Auto-create a handle in your localization file upon spawning a handle.</li>
+                <li>Auto-highlight for quick copy on UUID/Handle generation.</li>
+            </ul>
+        </li>
+        <li>Hover over UUIDs/Handles to find related UUIDs/Handles in your mod's root folder.
+            <ul>
+                <li>Click the hover to move directly to that file/line.</li>
+            </ul>
+        </li>
+        <li>Right-click in the editor to access tools like the stats/lsx validator and search tool via the export tools menu option (Internet connection required).</li>
+        <li>Right-click in the file tree to create a BG3 file from the menu (Ctrl+Shift+Q).</li>
+        <li>Convert .DDS or .png files to the opposite format by right-clicking on them.</li>
+        <li>Resize .DDS/.png files to a custom size or standard sizes for icons.</li>
+        <li>Enhanced function definitions and parameters for BG3, including stats functions and progressions. Future updates may include SE functions.</li>
+    </ul>
 
-Install the extension by opening Visual Studio Code, clicking the View button on the top ribbon, clicking the ... button, and choosing Install from VSIX....
+    <h2>Data Provider Features:</h2>
+    <ul>
+        <li>Pack Mod: Automatically packs your mod and sends the new .pak to the Mods folder.
+            <ul>
+                <li>Auto-creates meta.lsx if it's missing and prompts you for details.</li>
+                <li>Automatically launches the game if selected in settings.</li>
+                <li>Converts all merged.lsx to merged.lsf for packing.</li>
+                <li>Converts all .xml localization folders in your Localization (supports multiple languages).</li>
+            </ul>
+        </li>
+        <li>Launch Game: Launch the most recent save on game start.</li>
+        <li>Xml To Loca: Converts XML files to LOCA files, with options for mass or single file conversion.</li>
+        <li>Generate Folder Structure: Helps in creating a basic mod folder structure based on user selection.</li>
+    </ul>
 
-## Features
+    <h2>Installation & Download Options:</h2>
+    <ul>
+        <li><a href="https://www.nexusmods.com/baldursgate3/mods/6574">Nexus Mods</a></li>
+        <li><a href="https://marketplace.visualstudio.com/items?itemName=ghostboats.bg3-mod-helper">VS Code Marketplace</a></li>
+        <li>Directly from inside VS Code (search in extensions 'bg3_mod_helper').</li>
+        <li>Github: Coming soon!</li>
+        <li>VSIX (less frequently updated): Install via VS Code.</li>
+    </ul>
 
-bg3-mod-helper includes several features to streamline the modding process:
+    <p>Dependencies include Python, PythonNet, Image Magick, lslib, divine.exe. The extension will guide you through the download and installation if these are not found.</p>
 
-- **UUID and Handle Generation**: Quickly generate UUIDs and handles via right clicking, directly within your workspace.
-- **Instance Finder**: Hover over a UUID or handle to see a tooltip showing where it's used in your workspace.
-- **Quick Navigation**: Right-click on a UUID or handle and use the "Go to UUID/Handle" option to open a list of files where it's used, allowing you to jump directly to any occurrence.
-- **Instant .loca.xml Updating**: If a new handle is generated and you have a .loca.xml file, it will generate a blank entry for you with that new handle.
-- **In Editor Export Tools**: If you have an internet connection, rigth click in the editor and hover over the export tools to access the the stats/lsx validator tools and search tool in visual studio. (If you click it while having text highlighted it will autocopy the text so you can easily paste as well)
-- **BG3 File Creation**: Right click and press Create BG3 File (or control shift q) to open a filterable dropdown of baulders gate 3 lsx files to use as a template for mods.
-- **Dynamic Copying**: By specifying "< !--press control shift a to quick spawn a line below" and "end custom attribute lines-->" as well as "< !--press control shift 2 to quick spawn a line below" and "end ctrl shift 2 clipboard-->" (remove the space before the !), you can use their respective commands to quickly get a dropdown of items between the rows, which helps quick add lines. Some templates come with it, looking to the community for help fillign them all out with all their respective attribute lines. Control shift 2 is just there for fun, maybe you can find use for it.
-- **Side Bar Options**: On the left side you will see a new icon. If you click it you can see a menu that lets you pack your mod, convert xml to loca files, and launch the game, right from inside visual studio code. You will need the export tools (specfically the divine.exe and lslib.dll) and make sure they are in their correct default spot. Your bg3 file needs to be in the starnard bin location. Ensure your mod destination path is provided to be able to pack and auto send to mods, a mod needs to be acviated in mod manager at least once before you can launch from visual studio straight
-> Tip: Ignore this, gunna add screenshots on full release.
+    <h2>Contribution & Feedback:</h2>
+    <p>If you have any feature requests or encounter bugs, please feel free to reach out. Contributions and suggestions are highly appreciated to enhance this tool.</p>
 
-## Requirements
-
-bg3-mod-helper does not have any specific requirements outside of Visual Studio Code.
-
-## Extension Settings
-
-This extension contributes the following settings:
-
-- `bg3ModHelper.enable`: Enable/disable this extension.
-- `bg3ModHelper.customHandleFormat`: Set your custom format for handle generation.
-
-## Known Issues
-
-- May not work in large workspaces due to too many files to search.
-
-## Release Notes
-
-Beta Release. Need to see if this something people want, bugs, and future updates.
-
-### 0.9.930
-
-- Beta release of bg3-mod-helper.
-- Features include UUID and handle generation, instance finder, and quick navigation.
-
-### [Future releases]
-
-- Unsure, contact me on discord if you have a feature you would like implemented.
-
----
-
-## Working with bg3-mod-helper
-
-- Install the extension through Visual Studio Code (View -> Extensions -> `...` -> Install from VSIX).
-- Access commands via the command palette or context menu in the editor.
-- Right click to spawn new UUID's and Handles.
-- Hover over or right click to find the location of linked UUID's/handles.
-- Use the stats/lsx validator tools and search engine tool in a visual studio tab
-
-## For more information
-
-- [My bg3 modders wiki](https://github.com/ghostboats/bg3_modders_guide/wiki)
-
-
-**Enjoy your modding journey with bg3-mod-helper!**
+    <p>A special thanks to the BG3 community, especially Norbyte, LaughingLeader, and Kaz, whose documentation and efforts provided significant assistance in the development of this extension.</p>
+</body>
+</html>
