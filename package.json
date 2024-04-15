@@ -1,0 +1,348 @@
+{
+    "name": "bg3-mod-helper",
+    "displayName": "bg3_mod_helper",
+    "publisher": "ghostboats",
+    "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
+    "version": "1.2.101",
+    "icon": "media/marketplace_icon.png",
+    "engines": {
+        "vscode": "^1.86.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onLanguage:xml",
+        "onLanguage:plaintext"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "bg3-mod-helper.goToHandleUUID",
+                "title": "Go to UUID/Handle"
+            },
+            {
+                "command": "bg3-mod-helper.insertUUID",
+                "title": "Generate UUID"
+            },
+            {
+                "command": "bg3-mod-helper.insertHandle",
+                "title": "Generate Handle"
+            },
+            {
+                "command": "bg3-mod-helper.openStatsValidator",
+                "title": "Stats Validator",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openLSXValidator",
+                "title": "LSX Validator",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openBG3SearchEngine",
+                "title": "BG3 Search Engine",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.createFileFromTemplate",
+                "title": "Create BG3 File",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.insertAttribute",
+                "title": "Insert Attribute"
+            },
+            {
+                "command": "bg3-mod-helper.insertClipboard",
+                "title": "Insert Clipboard"
+            },
+            {
+                "command": "bg3-mod-helper.xmlToLoca",
+                "title": "Convert xml file to loca file (or vice versa)",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.DDSToPNG",
+                "title": "Convert To PNG"
+            },
+            {
+                "command": "bg3-mod-helper.PNGToDDS",
+                "title": "Convert To DDS"
+            },
+            {
+                "command": "bg3-mod-helper.resizeImageTooltip",
+                "title": "Resize Image to Tooltip (380x380)"
+            },
+            {
+                "command": "bg3-mod-helper.resizeImageController",
+                "title": "Resize Image to Controller (144x144)"
+            },
+            {
+                "command": "bg3-mod-helper.resizeImageHotbar",
+                "title": "Resize Image to Hotbar (64x64)"
+            },
+            {
+                "command": "bg3-mod-helper.resizeImageCustom",
+                "title": "Resize Image Custom"
+            },
+            {
+                "command": "extension.addIconBackground",
+                "title": "Add Icon Background"
+            },
+            {
+                "command": "bg3-mod-helper.createAtlas",
+                "title": "Create Icons_{modName}.lsx, Icon_{modName}.dds, and merged.lsx. Need to supply a folder of icons you wish to add to the .dds"
+            },
+            {
+                "command": "bg3-mod-helper.createModTemplate",
+                "title": "Create folders/files for mod templates"
+            },
+            {
+                "command": "bg3-mod-helper.getAttributes",
+                "title": "View attributes and an example value for the currently opened file"
+            },
+            {
+                "command": "bg3-mod-helper.debugCommand",
+                "title": "For dev use, dont press the button"
+            }
+        ],
+        "configuration": {
+            "title": "BG3 Mod Helper",
+            "properties": {
+                "bg3ModHelper.singleFileConversion": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Allows you to select what xml file to convert to loca instead of all files in the localization folder."
+                },
+                "bg3ModHelper.maxCacheSize": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "Maximum number of items to store in the cache."
+                },
+                "bg3ModHelper.hover.maxFiles": {
+                    "type": "number",
+                    "default": 10,
+                    "description": "Maximum number of file instances to show on hover."
+                },
+                "bg3ModHelper.hover.enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable or disable hover feature."
+                },
+                "bg3ModHelper.hover.showPath": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Toggle file path in hover message (not working in current update)."
+                },
+                "bg3ModHelper.rootModPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "DO NOT ALTER THIS GLOBAL SETTING, RATHER CHANGE IN WORKSPACE SETTING IF YOU NEED TO, PROBABLY DONT NEED TO SINCE ITS AUTOSET (WORKSPACE SETTING FOUND ABOVE, NEXT TO USER). Root mod folder path. The folder that will get packed when you run the Pack Current Mod command."
+                },
+                "bg3ModHelper.modDestPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Mod destination folder path (Where your games mods are held)"
+                },
+                "bg3ModHelper.divinePath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to the divine tool executable (whenever you downloaded your exporttools (lslib) to. Inside that \\tools\\divine.exe)"
+                },
+                "bg3ModHelper.autoConvertLocalization": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically convert localization files when packing the mod."
+                },
+                "bg3ModHelper.modPackTime": {
+                    "type": "number",
+                    "default": 5,
+                    "description": "Time in seconds to pack the mod, if mod changes are not reflecting in game and you know your files are correct increase the time on this. Sometime seems to not wait and send files before pack is made, increasing this adds a delay so it will."
+                },
+                "bg3ModHelper.autoLaunchOnPack": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically launch the game after you pack your mod"
+                },
+                "bg3ModHelper.launchContinueGame": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically continue the most recent game on launch."
+                }
+            }
+        },
+        "keybindings": [
+            {
+                "command": "bg3-mod-helper.insertUUID",
+                "key": "ctrl+shift+u",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "bg3-mod-helper.insertHandle",
+                "key": "ctrl+shift+h",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "bg3-mod-helper.createFileFromTemplate",
+                "key": "ctrl+shift+q",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "bg3-mod-helper.createFileFromTemplate",
+                "key": "ctrl+1",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "bg3-mod-helper.insertAttribute",
+                "key": "ctrl+shift+a",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "bg3-mod-helper.insertClipboard",
+                "key": "ctrl+shift+2",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "bg3-mod-helper.packMod",
+                "title": "Pack Mod"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "resourceExtname == .dds || resourceExtname == .DDS",
+                    "command": "bg3-mod-helper.DDSToPNG",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceExtname == .png || resourceExtname == .PNG",
+                    "command": "bg3-mod-helper.PNGToDDS",
+                    "group": "navigation"
+                },
+                {
+                    "command": "bg3-mod-helper.createFileFromTemplate",
+                    "group": "navigation@10"
+                },
+                {
+                    "when": "resourceExtname == .png || resourceExtname == .PNG || resourceExtname == .dds || resourceExtname == .DDS",
+                    "submenu": "bg3ModHelper.imageResizeSubmenu",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceExtname == .png",
+                    "command": "extension.addIconBackground",
+                    "group": "9_modification"
+                }
+            ],
+            "editor/context": [
+                {
+                    "when": "editorTextFocus",
+                    "command": "bg3-mod-helper.goToHandleUUID",
+                    "group": "navigation@0"
+                },
+                {
+                    "when": "editorTextFocus",
+                    "command": "bg3-mod-helper.insertUUID",
+                    "group": "navigation@0"
+                },
+                {
+                    "when": "editorTextFocus",
+                    "command": "bg3-mod-helper.insertHandle",
+                    "group": "navigation@0"
+                },
+                {
+                    "when": "editorTextFocus",
+                    "submenu": "bg3ModHelper.exportToolsSubmenu",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "bg3-mod-helper.createFileFromTemplate",
+                    "group": "navigation@2"
+                }
+            ],
+            "bg3ModHelper.exportToolsSubmenu": [
+                {
+                    "command": "bg3-mod-helper.openStatsValidator"
+                },
+                {
+                    "command": "bg3-mod-helper.openLSXValidator"
+                },
+                {
+                    "command": "bg3-mod-helper.openBG3SearchEngine"
+                }
+            ],
+            "bg3ModHelper.imageResizeSubmenu": [
+                {
+                    "command": "bg3-mod-helper.resizeImageTooltip"
+                },
+                {
+                    "command": "bg3-mod-helper.resizeImageController"
+                },
+                {
+                    "command": "bg3-mod-helper.resizeImageHotbar"
+                },
+                {
+                    "command": "bg3-mod-helper.resizeImageCustom"
+                }
+            ]
+        },
+        "submenus": [
+            {
+                "id": "bg3ModHelper.exportToolsSubmenu",
+                "label": "Export Tools"
+            },
+            {
+                "id": "bg3ModHelper.createFileSubmenu",
+                "label": "Create BG3 File"
+            },
+            {
+                "id": "bg3ModHelper.imageResizeSubmenu",
+                "label": "Resize Image"
+            }
+        ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "bg3ModHelper",
+                    "title": "BG3 Mod Helper",
+                    "icon": "media/pack_icon.svg"
+                }
+            ]
+        },
+        "views": {
+            "bg3ModHelper": [
+                {
+                    "id": "bg3ModHelperView",
+                    "name": "Quick Actions"
+                }
+            ]
+        }
+    },
+    "icons": {
+        "light": "media/light/pack_icon.svg",
+        "dark": "media/dark/pack_icon.svg"
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "pretest": "npm run lint",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.6",
+        "@types/node": "18.x",
+        "@types/vscode": "^1.86.0",
+        "@vscode/test-cli": "^0.0.4",
+        "@vscode/test-electron": "^2.3.9",
+        "eslint": "^8.56.0",
+        "typescript": "^5.3.3"
+    },
+    "dependencies": {
+        "node-fetch": "^3.3.2",
+        "sharp": "^0.33.2",
+        "uuid": "^9.0.1",
+        "xmlbuilder": "^15.1.1"
+    },
+    "license": "MIT"
+}
