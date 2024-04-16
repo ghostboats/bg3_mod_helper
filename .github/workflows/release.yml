@@ -33,7 +33,7 @@ jobs:
 
       - name: Set VSIX filename
         id: set_vsix_name
-        run: echo "::set-output name=vsix_filename::bg3-mod-helper-${{ steps.get_version.outputs.version }}.vsix"
+        run: echo "::set-output name=vsix_filename::bg3_mod_helper-${{ steps.get_version.outputs.version }}.vsix"
         shell: bash
 
   release:
