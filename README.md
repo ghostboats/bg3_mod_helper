@@ -28,16 +28,30 @@ This Visual Studio Code extension aids in modding Baldur's Gate 3 by speeding up
 
 ## Installation & Download Options
 
+To install the BG3 Mod Helper, follow these instructions:
+
+1. **Open Visual Studio Code**:
+   - Launch the Visual Studio Code application on your computer.
+
+2. **Access Extensions**:
+   - Click on `View` in the top menu.
+   - Select `Extensions` from the dropdown menu.
+
+3. **Install from VSIX**:
+   - In the Extensions view, click on the `...` button at the top-right corner.
+   - Choose `Install from VSIX` from the dropdown menu.
+
+4. **Select the VSIX File**:
+   - Navigate to the folder where you downloaded the `.vsix` file.
+   - Select the file and click `Open`.
+
+### Additional Download Options:
 - [Nexus Mods](https://www.nexusmods.com/baldursgate3/mods/6574)
 - [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ghostboats.bg3-mod-helper)
 - Directly from inside VS Code (search in extensions 'bg3_mod_helper').
-- Github: Coming soon!
-- VSIX (less frequently updated): Install via VS Code.
-
-Dependencies include Python, PythonNet, Image Magick, lslib, divine.exe. The extension will guide you through the download and installation if these are not found.
 
 ## Contribution & Feedback
 
 If you have any feature requests or encounter bugs, please feel free to reach out. Contributions and suggestions are highly appreciated to enhance this tool.
 
-A special thanks to the BG3 community whose documentation provided significant assistance in the development of this extension.
+A special thanks to the BG3 community, whose documentation provided significant assistance in the development of this extension.

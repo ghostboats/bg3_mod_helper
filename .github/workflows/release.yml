@@ -1,0 +1,59 @@
+name: Release Workflow
+
+on:
+  push:
+    branches:
+      - prod  # Adjust this if your production branch has a different name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and package VS Code extension
+        run: vsce package
+
+      - name: Get version from package.json
+        id: get_version
+        run: echo "::set-output name=version::$(jq -r .version package.json)"
+        shell: bash
+
+      - name: Set VSIX filename
+        id: set_vsix_name
+        run: echo "::set-output name=vsix_filename::bg3-mod-helper-${{ steps.get_version.outputs.version }}.vsix"
+        shell: bash
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ needs.build.outputs.vsix_filename }}
+          asset_name: ${{ needs.build.outputs.vsix_filename }}
+          asset_content_type: application/octet-stream
