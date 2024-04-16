@@ -1,0 +1,8 @@
+.gitignore
+.yarnrc
+vsc-extension-quickstart.md
+**/jsconfig.json
+**/*.map
+**/.eslintrc.json
+**/update_notes.txt
+**/reference_files
