@@ -55,3 +55,5 @@ To install the BG3 Mod Helper, follow these instructions:
 If you have any feature requests or encounter bugs, please feel free to reach out. Contributions and suggestions are highly appreciated to enhance this tool.
 
 A special thanks to the BG3 community, whose documentation provided significant assistance in the development of this extension.
+
+DMing on discord is best way to directly contact me.
