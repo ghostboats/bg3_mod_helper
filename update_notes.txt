@@ -15,4 +15,4 @@
 --update all uuids/handles when replacing a highlighted uuid
 --clean up background adidtion stuff
 
---prepping attribute reading via github
+--prepping attribute reading via github.
