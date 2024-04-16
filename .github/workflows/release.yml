@@ -1,9 +1,9 @@
 name: Release Workflow
 
-on:
-  push:
-    branches:
-      - prod
+#on:
+#  push:
+#    branches:
+#      - prod
 
 jobs:
   build:
