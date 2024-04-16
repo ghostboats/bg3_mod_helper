@@ -3,7 +3,7 @@ name: Release Workflow
 on:
   push:
     branches:
-      - prod  # Adjust this if your production branch has a different name
+      - prod
 
 jobs:
   build:
@@ -16,36 +16,37 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-      
       - name: Install dependencies
         run: npm install
-
       - name: Install VSCE
         run: npm install -g vsce
-
       - name: Build and package VS Code extension
         run: vsce package
         id: package_extension
-
       - name: Get version from package.json
         id: get_version
         run: echo "::set-output name=version::$(jq -r .version package.json)"
         shell: bash
-
       - name: Set VSIX filename
         id: set_vsix_name
         run: echo "::set-output name=vsix_filename::bg3-mod-helper-${{ steps.get_version.outputs.version }}.vsix"
         shell: bash
-
-      - name: List files in the directory  # Verify the .vsix file exists
-        run: ls -lah
+      - name: Upload VSIX as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: vsix-file
+          path: ${{ steps.set_vsix_name.outputs.vsix_filename }}
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: vsix-file
+          path: ./
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -56,13 +57,12 @@ jobs:
           release_name: Release v${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
-
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ needs.build.outputs.vsix_filename }}
+          asset_path: ${{ needs.build.outputs.vsix_filename }}
           asset_name: ${{ needs.build.outputs.vsix_filename }}
           asset_content_type: application/octet-stream
