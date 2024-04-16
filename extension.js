@@ -28,6 +28,9 @@ const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImag
 const { getFullPath } = require('./support_files/helper_functions');
 
 
+// test comment for 
+
+
 /**
  * @param {vscode.ExtensionContext} context
  */
