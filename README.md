@@ -56,4 +56,4 @@ If you have any feature requests or encounter bugs, please feel free to reach ou
 
 A special thanks to the BG3 community, whose documentation provided significant assistance in the development of this extension.
 
-DMing on discord is best way to directly contact me.
+DMing on discord is best way to directly contact me
