@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+     outputs:
+      vsix_filename: ${{ steps.set_vsix_name.outputs.vsix_filename }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Node.js
