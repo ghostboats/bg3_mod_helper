@@ -324,6 +324,10 @@
         "light": "media/light/pack_icon.svg",
         "dark": "media/dark/pack_icon.svg"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ghostboats/bg3_mod_helper"
+    },
     "scripts": {
         "lint": "eslint .",
         "pretest": "npm run lint",
