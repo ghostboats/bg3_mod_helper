@@ -1,3 +1,10 @@
+name: Release Workflow
+
+on:
+  push:
+    branches:
+      - prod  # Adjust this if your production branch has a different name
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,9 +24,8 @@ jobs:
         run: npm install -g vsce
 
       - name: Build and package VS Code extension
-        run: |
-          vsce package
-          mv *.vsix $GITHUB_WORKSPACE/  # Move the VSIX file to a known location
+        run: vsce package
+        id: package_extension
 
       - name: Get version from package.json
         id: get_version
@@ -28,8 +34,11 @@ jobs:
 
       - name: Set VSIX filename
         id: set_vsix_name
-        run: echo "::set-output name=vsix_filename::$GITHUB_WORKSPACE/bg3-mod-helper-${{ steps.get_version.outputs.version }}.vsix"
+        run: echo "::set-output name=vsix_filename::bg3-mod-helper-${{ steps.get_version.outputs.version }}.vsix"
         shell: bash
+
+      - name: List files in the directory  # Verify the .vsix file exists
+        run: ls -lah
 
   release:
     needs: build
