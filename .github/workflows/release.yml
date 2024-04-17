@@ -33,6 +33,8 @@ jobs:
         id: set_vsix_name
         run: echo "::set-output name=vsix_filename::bg3-mod-helper-${{ steps.get_version.outputs.version }}.vsix"
         shell: bash
+      - name: Log file size
+        run: ls -lh "${{ steps.set_vsix_name.outputs.vsix_filename }}"
       - name: Upload VSIX as artifact
         uses: actions/upload-artifact@v2
         with:
