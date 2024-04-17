@@ -7,3 +7,6 @@ vsc-extension-quickstart.md
 **/.eslintrc.json
 **/update_notes.txt
 node_modules/@img/sharp-libvips-*/
+node_modules/@img/sharp-libvips-*/
+node_modules/@img/sharp-linux-x64/**
+node_modules/@img/sharp-linuxmusl-x64/**
