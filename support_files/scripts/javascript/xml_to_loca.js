@@ -1,1 +1,1 @@
-const sys = require('')
+const koffi = require('koffi')
