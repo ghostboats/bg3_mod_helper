@@ -38,6 +38,14 @@ jobs:
         with:
           name: vsix-file
           path: ${{ steps.set_vsix_name.outputs.vsix_filename }}
+      - name: Log VSCE version
+        run: vsce --version
+
+      - name: Log .vscodeignore contents
+        run: cat .vscodeignore
+
+      - name: Log npm dependencies
+        run: npm list
 
   release:
     needs: build
