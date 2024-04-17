@@ -346,7 +346,8 @@
         "node-fetch": "^3.3.2",
         "sharp": "^0.33.2",
         "uuid": "^9.0.1",
-        "xmlbuilder": "^15.1.1"
+        "xmlbuilder": "^15.1.1",
+        "koffi": "^2.8.6"
     },
     "license": "MIT"
 }
