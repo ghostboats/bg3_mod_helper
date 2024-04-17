@@ -1,9 +1,9 @@
 name: Release Workflow
 
-#on:
-#  push:
-#    branches:
-#      - prod
+on:
+  push:
+    branches:
+      - prod
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '20.11.1'
       - name: Install dependencies
         run: npm install
       - name: Install VSCE
@@ -23,6 +23,8 @@ jobs:
       - name: Build and package VS Code extension
         run: vsce package
         id: package_extension
+      - name: List contents of the VSIX package
+        run: vsce ls
       - name: Get version from package.json
         id: get_version
         run: echo "::set-output name=version::$(jq -r .version package.json)"
@@ -31,11 +33,21 @@ jobs:
         id: set_vsix_name
         run: echo "::set-output name=vsix_filename::bg3-mod-helper-${{ steps.get_version.outputs.version }}.vsix"
         shell: bash
+      - name: Log file size
+        run: ls -lh "${{ steps.set_vsix_name.outputs.vsix_filename }}"
       - name: Upload VSIX as artifact
         uses: actions/upload-artifact@v2
         with:
           name: vsix-file
           path: ${{ steps.set_vsix_name.outputs.vsix_filename }}
+      - name: Log VSCE version
+        run: vsce --version
+
+      - name: Log .vscodeignore contents
+        run: cat .vscodeignore
+
+      - name: Log npm dependencies
+        run: npm list
 
   release:
     needs: build
