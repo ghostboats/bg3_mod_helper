@@ -20,8 +20,6 @@ jobs:
         run: npm install
       - name: Install VSCE
         run: npm install -g vsce
-      - name: Remove unnecessary binaries
-        run: rm -rf node_modules/@img/sharp-*
       - name: Build and package VS Code extension
         run: vsce package
         id: package_extension
