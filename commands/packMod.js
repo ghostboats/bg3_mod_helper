@@ -12,7 +12,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     const isRunning = await isGameRunning();
 
     if (isRunning) {
-        vscode.window.showErrorMessage('Baldur\'s Gate 3 is currently running. Please close the game before packing the mod.');
+        vscode.window.showErrorMessage("Baldur's Gate 3 is currently running. Please close the game before packing the mod.");
         return; // Stop further execution
     }
 
@@ -93,7 +93,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     }
 
     // Function to recursively find all 'merged.lsx' and 'Icons_*.lsx' files
-    async function findTargetLsxFiles(dir) {
+    /*async function findTargetLsxFiles(dir) {
         let files = await fs.promises.readdir(dir, { withFileTypes: true });
         let targetLsxFiles = files
             .filter(file => !file.isDirectory() && file.name.endsWith('.lsx'))// || (file.name.startsWith('Icons_') && file.name.endsWith('.lsx'))))
@@ -102,16 +102,16 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             targetLsxFiles = targetLsxFiles.concat(await findTargetLsxFiles(path.join(dir, file.name)));
         }
         return targetLsxFiles;
-    }
+    }*/
 
     // convert all lsx files to lsf within the root mod folder
-    // const targetLsxFiles = await findTargetLsxFiles(rootModPath);
     const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'convert_lsf.py');
-    const convertCommand = `python "${scriptPath}" -d "${divinePath}" -b -f "${rootModPath}"`;// -o "${outputFile}"`;
+    const convertCommand = `python "${scriptPath}" -d "${divinePath}" --file "${rootModPath}"`;
+    //const checkDir = `ls "${divinePath}"`
 
     exec(convertCommand, (error, stdout, stderr) => {
         if (error) {
-            console.error('Error:', error);
+            console.error(error);
             vscode.window.showErrorMessage(`Error running conversion script: ${error.message}`);
             return;
         }
@@ -140,8 +140,9 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
 
     const pakPath = path.join(path.dirname(rootModPath), "temp", `${modName}.pak`);
     const modDir = path.join(path.dirname(rootModPath), modName);
+    const divExePath = path.join(divinePath, "Tools\\Divine.exe");
 
-    const command = `"${divinePath}" -g bg3 --action create-package --source "${modDir}" --destination "${pakPath}" -l all`;
+    const command = `"${divExePath}" -g bg3 --action create-package --source "${modDir}" --destination "${pakPath}" -l all`;
 
     // Path to .vscode directory and settings file
     const vscodeDirPath = path.join(rootModPath, '.vscode');

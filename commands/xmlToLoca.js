@@ -2,8 +2,8 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
 const util = require('util');
+const { exec } = require('child_process')
 const execAsync = util.promisify(require('child_process').exec);
-const { exec } = require('child_process');
 
 const { getConfig } = require('../support_files/config');
 
@@ -38,7 +38,7 @@ const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLo
 });
 
 async function processLocalizationFiles(rootModPath, divinePath, singleFileConversion) {
-    const localizationPath = path.join(rootModPath, 'Localization');
+    const localizationPath = path.join(rootModPath, "Localization");
     let xmlCount = 0, locaCount = 0;
     let xmlPaths = [], locaPaths = []; // Changed to arrays
     // Check if Localization folder exists
@@ -56,10 +56,10 @@ async function processLocalizationFiles(rootModPath, divinePath, singleFileConve
 
                 if (stat.isDirectory()) {
                     filesQueue.push(fullPath);
-                } else if (fullPath.endsWith('.xml')) {
+                } else if (fullPath.endsWith(".xml")) {
                     xmlCount++;
                     xmlPaths.push(fullPath); // Push to array
-                } else if (fullPath.endsWith('.loca')) {
+                } else if (fullPath.endsWith(".loca")) {
                     locaCount++;
                     locaPaths.push(fullPath); // Push to array
                 }
@@ -81,7 +81,7 @@ async function processLocalizationFiles(rootModPath, divinePath, singleFileConve
                 placeHolder: 'Select an XML file to convert',
             });
             if (pickedFile) {
-                let outputPath = pickedFile.replace('.xml', '.loca');
+                let outputPath = pickedFile.replace(".xml", ".loca");
                 console.log('Parameters used in python script:');
                 console.log('divinePath:',divinePath,'\noutputPath:',outputPath,'\nxmlPath:',pickedFile);
                 try {
@@ -94,12 +94,12 @@ async function processLocalizationFiles(rootModPath, divinePath, singleFileConve
         } else {
             console.log('Converting all xml files in Localization folder')
             for (const xmlPath of xmlPaths) {
-                let outputPath = xmlPath.replace('.xml', '.loca');
-                console.log('Parameters used in python script:');
-                console.log('divinePath:',divinePath,'\noutputPath:',outputPath,'\nxmlPath:',xmlPath);
+                let outputPath = xmlPath.replace(".xml", ".loca");
+                console.log("why are you like this");
+                console.log("divinePath:" + divinePath + "\noutputPath:" + outputPath + "\nxmlPath:" + xmlPath);
         
                 try {
-                    await executePythonScript(divinePath, outputPath, xmlPath);
+                    executePythonScript(divinePath, outputPath, xmlPath);
                     vscode.window.showInformationMessage('Loca file created using '+xmlPath);
                 } catch (error) {
                     vscode.window.showErrorMessage('Error processing file: ' + xmlPath + '; Error: ' + error.message);
@@ -111,15 +111,32 @@ async function processLocalizationFiles(rootModPath, divinePath, singleFileConve
     }
 };
 
-async function executePythonScript(divinePath, outputPath, filePath) {
+// made this function not async- not sure if it needed to be?
+function executePythonScript(divinePath, outputPath, filePath) 
+{
     const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'xml_to_loca.py');
-    try {
-        const { stdout, stderr } = await execAsync(`python "${scriptPath}" -d "${divinePath}" -o "${outputPath}" -f "${filePath}"`);
-        console.log(`stdout: ${stdout}`);
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
+    // const command = "python " + scriptPath + " -d " + divinePath + " -o " + outputPath + " -f " + filePath;
+    const locaCommand = `python "${scriptPath}" -d "${divinePath}" -o "${outputPath}" -f "${filePath}"`;
+    // const convertC = `python "${scriptPath}" -d "${divinePath}" -b -f "${rootModPath}"`; 
+    // truncated to check for missing characters. i have no idea why this one throws fits and the other one doesn't
+    
+    exec
+    (
+        locaCommand, (error, stdout, stderr) => 
+        {
+            console.log(`stdout: ${stdout}`);
+            
+            if (error) 
+            {
+                console.error(`Error: ${error.message}`);
+                return;
+            }
+
+            if (stderr) 
+            {
+                console.error(`Stderr: ${stderr}`);
+                return;
+            }
         }
-    } catch (error) {
-        console.error(`exec error: ${error}`);
-    }
+    );
 }

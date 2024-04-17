@@ -1,4 +1,3 @@
-//vsce package
 const vscode = require('vscode');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -26,9 +25,6 @@ const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector')
 const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
 
 const { getFullPath } = require('./support_files/helper_functions');
-
-
-// test comment for 
 
 
 /**
