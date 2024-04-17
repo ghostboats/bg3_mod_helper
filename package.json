@@ -334,8 +334,6 @@
         "test": "vscode-test"
     },
     "devDependencies": {
-        "eslint": "^8.56.0",
-        "typescript": "^5.3.3"
     },
     "dependencies": {
         "koffi": "^2.8.6",
