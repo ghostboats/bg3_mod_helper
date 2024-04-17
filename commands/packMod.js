@@ -19,7 +19,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     // Check if modDestPath is blank
     if (!modDestPath.includes("Larian Studios\\Baldur's Gate 3\\Mods")) {
         const useStandardPath = await vscode.window.showInformationMessage(
-            'The Mods destination path does not seem to be the standard Baldur\'s Gate 3 Mods folder. Do you want to change it?',
+        "The Mods destination path does not seem to be the standard Baldur's Gate 3 Mods folder. Do you want to change it?",
             'Change to Standard', 'Keep Current'
         );
         if (useStandardPath === 'Change to Standard') {
@@ -96,7 +96,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     async function findTargetLsxFiles(dir) {
         let files = await fs.promises.readdir(dir, { withFileTypes: true });
         let targetLsxFiles = files
-            .filter(file => !file.isDirectory() && file.name.startsWith('merged') && file.name.endsWith('.lsx'))// || (file.name.startsWith('Icons_') && file.name.endsWith('.lsx'))))
+            .filter(file => !file.isDirectory() && file.name.endsWith('.lsx'))// || (file.name.startsWith('Icons_') && file.name.endsWith('.lsx'))))
             .map(file => path.join(dir, file.name));
         for (let file of files.filter(file => file.isDirectory())) {
             targetLsxFiles = targetLsxFiles.concat(await findTargetLsxFiles(path.join(dir, file.name)));
@@ -104,32 +104,33 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         return targetLsxFiles;
     }
 
-    // Find all target .lsx files (merged and Icons_)
-    const targetLsxFiles = await findTargetLsxFiles(rootModPath);
+    // convert all lsx files to lsf within the root mod folder
+    // const targetLsxFiles = await findTargetLsxFiles(rootModPath);
+    const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'convert_lsf.py');
+    const convertCommand = `python "${scriptPath}" -d "${divinePath}" -b -f "${rootModPath}"`;// -o "${outputFile}"`;
+
+    exec(convertCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error('Error:', error);
+            vscode.window.showErrorMessage(`Error running conversion script: ${error.message}`);
+            return;
+        }
+        if (stdout) {
+            console.log('Python script stdout:', stdout);
+        }
+        if (stderr) {
+            console.error('Python script stderr:', stderr);
+        }
+    });
 
     // Run the Python script for each found file
-    for (let file of targetLsxFiles) {
-        const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'convert_lsf.py');
+    /*for (let file of targetLsxFiles) {
         //const outputFile = file.replace('.lsx', '.lsf');
         vscode.window.showInformationMessage('Converting the following file to .lsf: '+file);
-        const convertCommand = `python "${scriptPath}" -d "${divinePath}" -f "${file}"`;// -o "${outputFile}"`;
+        
 
         console.log('Executing command:', convertCommand);
-
-        exec(convertCommand, (error, stdout, stderr) => {
-            if (error) {
-                console.error('Error:', error);
-                vscode.window.showErrorMessage(`Error running conversion script for file ${file}: ${error.message}`);
-                return;
-            }
-            if (stdout) {
-                console.log('Python script stdout:', stdout);
-            }
-            if (stderr) {
-                console.error('Python script stderr:', stderr);
-            }
-        });
-    }
+    }*/
 
     // Add a delay before executing the packaging command
     const packDelay = modPackTime * 1000 || 7000; // Convert seconds to milliseconds, default to 5000ms (5 seconds)
