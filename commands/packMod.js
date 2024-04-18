@@ -1,9 +1,12 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
+
 const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
 const { v4: uuidv4 } = require('uuid');
+const { testing } = require('../support_files/scripts/javascript/xml_to_loca')
+
 
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
     const { rootModPath, modDestPath, divinePath, autoConvertLocalization, modPackTime, autoLaunchOnPack } = getConfig();
@@ -89,7 +92,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     // If autoConvertLocalization is enabled, run the xmlToLoca command first
     if (autoConvertLocalization) {
         vscode.window.showInformationMessage('Auto Convert Localization enabled in settings, will convert .xml -> .loca');
-        await vscode.commands.executeCommand('bg3-mod-helper.xmlToLoca');
+        testing();
     }
 
     // Function to recursively find all 'merged.lsx' and 'Icons_*.lsx' files
