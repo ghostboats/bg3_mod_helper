@@ -1,7 +1,11 @@
 const vscode = require('vscode')
-const koffi = require('koffi')
+
+const { LOAD_LSLIB } = require('./lslib_utils').LOAD_LSLIB
+const lslib = new LOAD_LSLIB;
+const LocaUtils = lslib.LS.LocaUtils;
+const LocaFormat = lslib.LS.LocaFormat;
+
 const path = require('path');
-const LSLIB = require('./lslib_utils')
 
 const { getConfig }  = require('../../config.js');
 const { divinePath } = getConfig();
@@ -12,7 +16,10 @@ function testing()
     console.log("help");
     console.log(divinePath);
 
-    console.log(LSLIB);
+    console.log(lslib);
+
+    console.log(lslib + "\n" + LocaUtils + "\n" + LocaFormat);
+
 }
 
 function convert(outputPath, file)

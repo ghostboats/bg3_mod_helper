@@ -1,4 +1,4 @@
-const koffi = require('koffi');
+const dotnet = require('node-api-dotnet');
 const fs = require('fs');
 const { getConfig }  = require('../../config.js');
 const { divinePath } = getConfig();
@@ -28,10 +28,9 @@ function LOAD_LSLIB()
 
     if (LSLIB_PATH)
     {
-        LSLIB = koffi.load(LSLIB_PATH);
+        LSLIB = dotnet.load(LSLIB_PATH);
     }
 
-    return LSLIB;
 }
 
 
