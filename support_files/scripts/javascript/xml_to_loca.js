@@ -1,24 +1,22 @@
-const vscode = require('vscode')
+const vscode = require('vscode');
+const fs = require('fs');
 
-const { LOAD_LSLIB } = require('./lslib_utils').LOAD_LSLIB
-const lslib = new LOAD_LSLIB;
-const LocaUtils = lslib.LS.LocaUtils;
-const LocaFormat = lslib.LS.LocaFormat;
+// const { LOAD_LSLIB } = require('./lslib_utils');
+// const { LSLIB } = LOAD_LSLIB();
+// const LocaUtils = lslib.LS.LocaUtils;
+// const LocaFormat = lslib.LS.LocaFormat;
 
-const path = require('path');
+// const path = require('path');
 
 const { getConfig }  = require('../../config.js');
 const { divinePath } = getConfig();
-//const LSLIB = require('./lslib_utils')
 
 function testing()
 {
-    console.log("help");
+    console.log("help i'm stuck in xml_to_loca.js");
     console.log(divinePath);
 
-    console.log(lslib);
-
-    console.log(lslib + "\n" + LocaUtils + "\n" + LocaFormat);
+    // console.log(lslib + "\n" + LocaUtils + "\n" + LocaFormat);
 
 }
 
@@ -31,5 +29,4 @@ module.exports =
 { 
     testing, convert
 };
-//const lslib = require(divinePath + '/LSLIB.dll')
 

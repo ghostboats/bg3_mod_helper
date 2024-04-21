@@ -7,9 +7,12 @@ const execAsync = util.promisify(require('child_process').exec);
 
 const { getConfig } = require('../support_files/config');
 
+const { LOAD_LSLIB } = require('../support_files/scripts/javascript/lslib_utils');
+const { LSLIB } = LOAD_LSLIB();
+
 
 const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLoca', async function () {
-    const checkPythonnetScriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'check_pythonnet.py');
+    /* const checkPythonnetScriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'check_pythonnet.py');
 
     try {
         // Check if Pythonnet is installed
@@ -35,6 +38,9 @@ const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLo
     } catch (error) {
         console.error('Error:', error);
     }
+    */
+    console.log("this is xmlToLoca.js");
+
 });
 
 async function processLocalizationFiles(rootModPath, divinePath, singleFileConversion) {
