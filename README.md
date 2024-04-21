@@ -2,6 +2,8 @@
 
 This Visual Studio Code extension aids in modding Baldur's Gate 3 by speeding up various tasks. It offers a wide range of functionalities aimed at improving mod development efficiency.
 
+## DEV BRANCH IS NOT FUNCTIONAL AND IS UNDER HEAVY DEVELOPMENT. PLEASE BUILD FROM THE PROD BRANCH.
+
 ## General Features
 
 - **Generate UUIDs/Handles** via right-click menu:
