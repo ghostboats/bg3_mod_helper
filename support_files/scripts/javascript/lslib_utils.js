@@ -18,6 +18,8 @@ var LSLIB;
 var LSLIB_PATH;
 var LocaUtils;
 var LocaFormat;
+var in_format;
+var out_format;
 
 
 function LOAD_LSLIB()
@@ -51,7 +53,12 @@ function LOAD_LSLIB()
         LocaFormat = dotnet.LSLib.LS.LocaFormat;
         LocaUtils = dotnet.LSLib.LS.LocaUtils;
 
-        console.log(typeof(LocaFormat) + "\n" + typeof(LocaFormat));
+        in_format = LocaFormat.Xml;
+        out_format = LocaFormat.Loca;
+
+        console.log(typeof(LocaFormat) + "\n" + typeof(LocaUtils));
+        console.log(typeof(in_format) + "\n" + typeof(out_format));
+
         console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
     }
     catch (Error) 
