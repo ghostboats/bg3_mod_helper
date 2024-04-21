@@ -22,35 +22,33 @@ var in_format;
 var out_format;
 
 
-function LOAD_LSLIB()
-{
+function LOAD_LSLIB() {
     /*if (fs.existsSync(path.join(divinePath + LSLIB_DLL)))
     {
         LSLIB_PATH = path.join(divinePath + LSLIB_DLL);
         console.log("LSLib.dll found at " + LSLIB_PATH + ".");
     } */
-    if (fs.existsSync(path.join(divinePath + TOOL_DIR)))
-    {
+    if (fs.existsSync(path.join(divinePath + TOOL_DIR))) {
         LSLIB_PATH = path.join(divinePath + TOOL_DIR);
         console.log("LSLib.dll found at " + LSLIB_PATH + ".");
-    }
-    else
-    {
+    } 
+    else {
         console.error("LSLib.dll not found at " + divinePath + ".");
         LSLIB_PATH = null;
         LSLIB = null;
         return;
     }
 
-    try 
-    {
+    try {
         console.log("trying to load lslib...");
         dotnet.load(LSLIB_PATH);
         console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
 
         // LSLIB = "beep";
         
+        // @ts-ignore
         LocaFormat = dotnet.LSLib.LS.LocaFormat;
+        // @ts-ignore
         LocaUtils = dotnet.LSLib.LS.LocaUtils;
 
         in_format = LocaFormat.Xml;
@@ -61,13 +59,14 @@ function LOAD_LSLIB()
 
         console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
     }
-    catch (Error) 
-    {
+    catch (Error) {
         console.error("Error!");
         console.error(Error);
     }
 
-    return { LSLIB, LSLIB_PATH }
+    return { 
+        LSLIB, LSLIB_PATH 
+    }
 
 }
 

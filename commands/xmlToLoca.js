@@ -35,7 +35,8 @@ const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLo
         // Pythonnet is installed, proceed with conversion
         const { rootModPath, divinePath, singleFileConversion } = getConfig();
         await processLocalizationFiles(rootModPath, divinePath, singleFileConversion);
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Error:', error);
     }
     */
@@ -62,10 +63,12 @@ async function processLocalizationFiles(rootModPath, divinePath, singleFileConve
 
                 if (stat.isDirectory()) {
                     filesQueue.push(fullPath);
-                } else if (fullPath.endsWith(".xml")) {
+                } 
+                else if (fullPath.endsWith(".xml")) {
                     xmlCount++;
                     xmlPaths.push(fullPath); // Push to array
-                } else if (fullPath.endsWith(".loca")) {
+                } 
+                else if (fullPath.endsWith(".loca")) {
                     locaCount++;
                     locaPaths.push(fullPath); // Push to array
                 }
@@ -93,7 +96,8 @@ async function processLocalizationFiles(rootModPath, divinePath, singleFileConve
                 try {
                     await executePythonScript(divinePath, outputPath, pickedFile);
                     vscode.window.showInformationMessage(pickedFile + ' used to create loca file');
-                } catch (error) {
+                } 
+                catch (error) {
                     vscode.window.showErrorMessage('Error processing file: ' + pickedFile + '; Error: ' + error.message);
                 }
             }
@@ -107,39 +111,36 @@ async function processLocalizationFiles(rootModPath, divinePath, singleFileConve
                 try {
                     executePythonScript(divinePath, outputPath, xmlPath);
                     vscode.window.showInformationMessage('Loca file created using '+xmlPath);
-                } catch (error) {
+                } 
+                catch (error) {
                     vscode.window.showErrorMessage('Error processing file: ' + xmlPath + '; Error: ' + error.message);
                 }
             }
         }
-    } else {
+    } 
+    else {
         vscode.window.showInformationMessage('Localization folder not found.');
     }
 };
 
 // made this function not async- not sure if it needed to be?
-function executePythonScript(divinePath, outputPath, filePath) 
-{
+function executePythonScript(divinePath, outputPath, filePath) {
     const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'xml_to_loca.py');
     // const command = "python " + scriptPath + " -d " + divinePath + " -o " + outputPath + " -f " + filePath;
     const locaCommand = `python "${scriptPath}" -d "${divinePath}" -o "${outputPath}" -f "${filePath}"`;
     // const convertC = `python "${scriptPath}" -d "${divinePath}" -b -f "${rootModPath}"`; 
     // truncated to check for missing characters. i have no idea why this one throws fits and the other one doesn't
     
-    exec
-    (
-        locaCommand, (error, stdout, stderr) => 
-        {
+    exec (
+        locaCommand, (error, stdout, stderr) => {
             console.log(`stdout: ${stdout}`);
             
-            if (error) 
-            {
+            if (error) {
                 console.error(`Error: ${error.message}`);
                 return;
             }
 
-            if (stderr) 
-            {
+            if (stderr) {
                 console.error(`Stderr: ${stderr}`);
                 return;
             }

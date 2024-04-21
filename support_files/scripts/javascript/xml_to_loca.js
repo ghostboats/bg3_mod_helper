@@ -11,8 +11,7 @@ const fs = require('fs');
 const { getConfig }  = require('../../config.js');
 const { divinePath } = getConfig();
 
-function testing()
-{
+function testing() {
     console.log("help i'm stuck in xml_to_loca.js");
     console.log(divinePath);
 
@@ -20,13 +19,11 @@ function testing()
 
 }
 
-function convert(outputPath, file)
-{
+function convert(outputPath, file) {
     
 }
 
-module.exports = 
-{ 
+module.exports = { 
     testing, convert
 };
 
