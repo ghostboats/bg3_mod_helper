@@ -23,12 +23,12 @@ var out_format;
 
 
 function LOAD_LSLIB() {
-    /*if (fs.existsSync(path.join(divinePath + LSLIB_DLL)))
+    if (fs.existsSync(path.join(divinePath + LSLIB_DLL)))
     {
         LSLIB_PATH = path.join(divinePath + LSLIB_DLL);
         console.log("LSLib.dll found at " + LSLIB_PATH + ".");
-    } */
-    if (fs.existsSync(path.join(divinePath + TOOL_DIR))) {
+    }
+    else if (fs.existsSync(path.join(divinePath + TOOL_DIR))) {
         LSLIB_PATH = path.join(divinePath + TOOL_DIR);
         console.log("LSLib.dll found at " + LSLIB_PATH + ".");
     } 
@@ -43,21 +43,24 @@ function LOAD_LSLIB() {
         console.log("trying to load lslib...");
         dotnet.load(LSLIB_PATH);
         console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
-
-        // LSLIB = "beep";
         
         // @ts-ignore
-        LocaFormat = dotnet.LSLib.LS.LocaFormat;
+        // have to ignore these because the ts-linter doesn't know 'LSLib' exists
+        LSLIB = dotnet.LSLib.LS;
+        
+        /*
         // @ts-ignore
-        LocaUtils = dotnet.LSLib.LS.LocaUtils;
+        LocaFormat = LSLIB.LocaFormat;
+        // @ts-ignore
+        LocaUtils = LSLIB.LocaUtils;
 
         in_format = LocaFormat.Xml;
         out_format = LocaFormat.Loca;
+        
 
         console.log(typeof(LocaFormat) + "\n" + typeof(LocaUtils));
         console.log(typeof(in_format) + "\n" + typeof(out_format));
-
-        console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
+        */
     }
     catch (Error) {
         console.error("Error!");
