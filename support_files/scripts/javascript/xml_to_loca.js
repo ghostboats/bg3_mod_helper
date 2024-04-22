@@ -3,12 +3,18 @@ const fs = require('fs');
 const path = require('path')
 
 const { LOAD_LSLIB } = require('./lslib_utils');
-const { LSLIB } = LOAD_LSLIB();
+const { LSLIB, sys } = LOAD_LSLIB();
 const LocaUtils = LSLIB.LocaUtils;
 const LocaFormat = LSLIB.LocaFormat;
+const LocaResource = LSLIB.LocaResource;
+const extension = LocaFormat.extension;
+
 
 const { getConfig }  = require('../../config.js');
 const { divinePath } = getConfig();
+
+var File;
+var FileMode;
 
 var in_format;
 var out_format;
@@ -17,13 +23,12 @@ var target_file;
 function testing() {
     console.log("Getting Localization file extension values...");
 
-    in_format = LocaFormat.Xml;
-    out_format = LocaFormat.Loca;
+    // i love javscript types!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    in_format = LocaFormat.Xml | 0;
+    out_format = LocaFormat.Loca | 0;
 
     console.log(in_format + "\n" + out_format);
     console.log(typeof(LocaUtils));
-
-    // console.log(lslib + "\n" + LocaUtils + "\n" + LocaFormat);
 
 }
 
@@ -41,36 +46,34 @@ async function aReadFile(path) {
 
 
 function read(filePath) {
-    const readableStream = fs.createReadStream(filePath);
+    const writeableStream = fs.createWriteStream(filePath);
 
-    readableStream.on('error', function (error) {
+    writeableStream.on('error', function (error) {
         console.log(`error: ${error.message}`);
     })
 
-    readableStream.on('data', (chunk) => {
+    writeableStream.on('data', (chunk) => {
         console.log(chunk);
     })
 
-    return readableStream;
+    return writeableStream;
 }
 
 
 function convert() {
     console.log("opening convert function....")
-    console.log(__dirname);
+    // console.log(__dirname);
     var xml_test = path.normalize(__dirname + "/text.xml");
     var loca_test = path.normalize(__dirname + "/text.loca");
 
-    console.log(xml_test + "\n" + loca_test)
-
-    target_file = read(xml_test);
-    console.log("Found XML file: " + target_file);
+    // console.log(xml_test + "\n" + loca_test)
+    console.log(typeof(LocaFormat.Xml) + "\n" + typeof(LocaFormat.Loca));
 
     try {
-        LocaUtils.Load(target_file, in_format);
-        console.log("Loaded XML file: " + target_file);
+        //console.log("Loaded XML file: " + loca_resource);
+        var temp_loca = LocaUtils.Load(loca_test);
 
-        LocaUtils.Save(loca_test, target_file, out_format);
+        LocaUtils.Save(temp_loca, xml_test);
         console.log("Exported loca file: " + loca_test);
     }
     catch (error) {

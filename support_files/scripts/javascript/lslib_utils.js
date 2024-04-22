@@ -14,6 +14,7 @@ const TOOL_DIR = path.join('\\Tools' + LSLIB_DLL);
 
 // require('../../../node_modules/node-api-dotnet/net8.0.js')
 
+var sys;
 var LSLIB;
 var LSLIB_PATH;
 var LocaUtils;
@@ -47,7 +48,9 @@ function LOAD_LSLIB() {
         // @ts-ignore
         // have to ignore these because the ts-linter doesn't know 'LSLib' exists
         LSLIB = dotnet.LSLib.LS;
-        
+        // @ts-ignore
+        sys = dotnet.System.IO;
+
         /*
         // @ts-ignore
         LocaFormat = LSLIB.LocaFormat;
@@ -68,7 +71,7 @@ function LOAD_LSLIB() {
     }
 
     return { 
-        LSLIB, LSLIB_PATH 
+        LSLIB, LSLIB_PATH, sys
     }
 
 }

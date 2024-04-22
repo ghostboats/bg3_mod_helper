@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<contentList>
+    <!--Subclass Descriptions-->
+    <content contentuid="KHB_hearteaterPathDisplayName" version="1">Path of the Hearteater</content>
+    <content contentuid="KHB_hearteaterPathDescription" version="1">Eat your heart out, Sceleritas Fel.</content>
+</contentList>
