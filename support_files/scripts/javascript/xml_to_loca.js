@@ -1,13 +1,8 @@
-const vscode = require('vscode');
-const fs = require('fs');
 const path = require('path')
 
 const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const { LSLIB } = LOAD_LSLIB();
 const LocaUtils = LSLIB.LocaUtils;
-const LocaFormat = LSLIB.LocaFormat;
-// const LocaResource = LSLIB.LocaResource;
-// const extension = LocaFormat.extension;
 
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
@@ -15,6 +10,8 @@ const locaSuffix = '\\Localization\\English\\';
 const locaPath = path.normalize(rootModPath + locaSuffix);
 
 const { xml, loca } = getFormats();
+
+var to_loca;
 
 
 function testing() {
@@ -27,69 +24,43 @@ function errorLog(error) {
 }
 
 
-async function aReadFile(path) {
-    var tempFile = await fs.readFile(path, (error) => {
-        errorLog(error);
-    });
-    return tempFile;
-}
+function getLocaOutputPath(filePath) {
+    var source_ext = path.extname(filePath);
 
-
-function read(filePath) {
-    const writeableStream = fs.createWriteStream(filePath);
-
-    writeableStream.on('error', function (error) {
-        console.log(`error: ${error.message}`);
-    })
-
-    writeableStream.on('data', (chunk) => {
-        console.log(chunk);
-    })
-
-    return writeableStream;
-}
-
-
-function getOutputPath(filePath, targetExt) {
-    var temp = filePath.substring(0, (filePath.length - targetExt.length))
+    var temp = filePath.substring(0, (filePath.length - source_ext.length));
     
-    if (targetExt == xml) {
-        temp = path.normalize(temp + loca);
+    if (source_ext == xml) {
+        to_loca = loca;
+        temp = path.normalize(temp + to_loca);
+        return temp;
     }
-    else {
-        temp = path.normalize(temp + xml);
-    }
+
+    to_loca = xml;
+    temp = path.normalize(temp + to_loca);
     return temp;
 }
 
 
 function convert(targetExt = xml) {
     console.log("Starting convert function....")
-    console.log(locaPath);
+
     var file_output;
     var temp_loca;
-
-    // console.log(xml_test + "\n" + loca_test)
-
     var filesToConvert = FIND_FILES(locaPath, targetExt);
-
-    console.log(filesToConvert);
-    console.log(targetExt);
 
     for (var i = 0; i < filesToConvert.length; i++) {
         try {
-            file_output = getOutputPath(filesToConvert[i], targetExt);
-            console.log("Converting file: " + filesToConvert[i]);
+            file_output = getLocaOutputPath(filesToConvert[i]);
+            console.log("Converting %s file %s to format %s", targetExt, filesToConvert[i], to_loca);
 
             temp_loca = LocaUtils.Load(filesToConvert[i]);
 
             LocaUtils.Save(temp_loca, file_output);
-            console.log("Exported loca file: " + file_output);
+            console.log("Exported %s file: %s", to_loca, file_output);
         }
         catch (error) {
             console.error(error);
         }
-
     }
 }
 

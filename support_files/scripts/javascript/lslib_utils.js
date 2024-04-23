@@ -53,7 +53,7 @@ function LOAD_LSLIB() {
         console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
         
         // @ts-ignore
-        // have to ignore these because the ts-linter doesn't know 'LSLib' exists
+        // have to ignore these because the ts-linter doesn't know 'LSLib' exists :| 
         LSLIB = dotnet.LSLib.LS;
     }
     catch (Error) {
@@ -64,31 +64,25 @@ function LOAD_LSLIB() {
     return { 
         LSLIB, LSLIB_PATH
     }
-
 }
 
 
 function FIND_FILES(filesPath, targetExt = xml_format) {
-    var file;
     var filesToConvert = [];
     var filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
         recursive: true,
     });
 
-    console.log(filesList);
-
     for (var i = 0; i < filesList.length; i++) {
         var temp = filesList[i].toString();
         if (path.extname(temp) == targetExt) {
-            console.log(temp);
             filesToConvert.push(filesPath + filesList[i]);
         }
     }
 
     return filesToConvert;
-
 }
 
 
-module.exports = { LOAD_LSLIB, FIND_FILES, getFormats }
+module.exports = { LOAD_LSLIB, FIND_FILES, getFormats };

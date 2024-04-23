@@ -44,7 +44,7 @@ const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLo
     }
     */
     console.log("this is xmlToLoca.js");
-    convert(loca);
+    convert();
 
 });
 
