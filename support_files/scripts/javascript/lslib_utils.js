@@ -1,10 +1,10 @@
 /*
 job of this file is to expose LSLib and provide commonly-used functions and vars in conversion
 */
-const dotnet = require('node-api-dotnet/net8.0');
-
 const fs = require('fs');
 const path = require('path');
+
+const dotnet = require('node-api-dotnet/net8.0');
 
 const { getConfig }  = require('../../config.js');
 const { divinePath } = getConfig();
@@ -12,20 +12,19 @@ const { divinePath } = getConfig();
 const LSLIB_DLL = '\\LSLib.dll';
 const TOOL_DIR = path.join('\\Tools' + LSLIB_DLL);
 
-var sys;
 var LSLIB;
 var LSLIB_PATH;
-var xml_format = ".xml";
-var loca_format = ".loca";
 
 
 function getFormats() {
     return {
         loca: ".loca",
         xml: ".xml",
-        lsf: "lsf",
-        lsx: "lsx",
-        lsfx: "lsfx"
+        lsf: ".lsf",
+        lsfx: ".lsfx",
+        lsbc: ".lsbc",
+        lsbs: ".lsbs",
+        lsx: ".lsx"
     }
 }
 
@@ -53,7 +52,7 @@ function LOAD_LSLIB() {
         console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
         
         // @ts-ignore
-        // have to ignore these because the ts-linter doesn't know 'LSLib' exists :| 
+        // have to ignore these because the ts-linter doesn't know 'LSLib' exists :starege: 
         LSLIB = dotnet.LSLib.LS;
     }
     catch (Error) {
@@ -67,7 +66,7 @@ function LOAD_LSLIB() {
 }
 
 
-function FIND_FILES(filesPath, targetExt = xml_format) {
+function FIND_FILES(filesPath, targetExt = getFormats().lsf) {
     var filesToConvert = [];
     var filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,

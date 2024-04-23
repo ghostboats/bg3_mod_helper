@@ -1,6 +1,6 @@
-const path = require('path')
 const fs = require('fs');
 const vscode = require('vscode');
+const path = require('path')
 
 const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const { LSLIB } = LOAD_LSLIB();
@@ -37,11 +37,11 @@ function getLocaOutputPath(filePath) {
     
     if (source_ext == xml) {
         to_loca = loca;
-        temp = path.normalize(temp + to_loca);
-        return temp;
+    }
+    else {
+        to_loca = xml;
     }
 
-    to_loca = xml;
     temp = path.normalize(temp + to_loca);
     return temp;
 }

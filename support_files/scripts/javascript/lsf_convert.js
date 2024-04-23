@@ -1,4 +1,5 @@
-const path = require('path')
+const fs = require('fs');
+const path = require('path');
 
 const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const { LSLIB } = LOAD_LSLIB();
@@ -7,19 +8,68 @@ const ResourceUtils = LSLIB.ResourceUtils;
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
 
-const { lsf, lsfx, lsx } = getFormats();
+const { lsf, lsfx, lsbc, lsbs, lsx } = getFormats();
+const lsfFormats = [lsf, lsfx, lsbc, lsbs, lsx]
+
+var to_lsf;
 
 
 function isLsf(ext) {
-    return (ext == lsf || ext == lsx);
+    return lsfFormats.includes(ext);
 }
 
 
-function isLsfx(ext) {
-    return (ext == lsfx);
+function checkForLsfx(tempPath) {
+    var lsfxDir = fs.existsSync(tempPath + lsfx);
+    return lsfxDir;
 }
 
 
+function checkForLsbc(tempPath) {
+    var lsbcDir = fs.existsSync(tempPath + lsbc);
+    return lsbcDir;
+}
 
 
-module.exports = { isLsf, isLsfx}
+function checkForLsbs(tempPath) {
+    var lsbsDir = fs.existsSync(tempPath + lsbs);
+    return lsbsDir;
+}
+
+
+function getLsfOutputPath(filePath) {
+    var source_ext = path.extname(filePath);
+    var temp = filePath.substring(0, (filePath.length - source_ext.length));
+    
+    if (source_ext == lsf) {
+        to_lsf = lsx;
+    }
+    else if (source_ext == lsx) {
+        if (checkForLsfx(temp)) {
+            to_lsf = lsfx;
+        }
+        else if (checkForLsbc(temp)) {
+            to_lsf = lsbc;
+        }
+        else if (checkForLsbs(temp)) {
+            to_lsf = lsbs;
+        }
+        else {
+            to_lsf = lsf;
+        }
+    }
+    else if (source_ext == lsfx || source_ext == lsbc || source_ext == lsbs) {
+        to_lsf = lsx;
+    }
+
+    temp = path.normalize(temp + to_lsf);
+    return temp;
+}
+
+
+function processLsf(file, targetExt) {
+
+}
+ 
+
+module.exports = { isLsf }

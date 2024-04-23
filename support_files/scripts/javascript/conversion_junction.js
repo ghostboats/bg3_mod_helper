@@ -4,14 +4,14 @@ const fs = require('fs');
 const vscode = require('vscode');
 
 const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
-const { LSLIB } = LOAD_LSLIB();
+// const { LSLIB } = LOAD_LSLIB();
 const { lsx, lsf, lsfx, xml, loca } = getFormats();
 
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
-const { isLsf, isLsfx } = require('./lsf_convert')
+const { isLsf } = require('./lsf_convert')
 // const locaSuffix = '\\Localization\\English\\';
 
 
@@ -21,9 +21,9 @@ function getActiveTabPath() {
 
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
-    console.log("Starting convert function...");
+    console.log("Starting converter function...");
 
-    if (Object.hasOwn(getFormats(), targetExt)) {
+    if (isLoca(targetExt)) {
         if (fs.lstatSync(convertPath).isDirectory()) {
             var filesToConvert = FIND_FILES(convertPath, targetExt);
 
@@ -33,13 +33,16 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
         }
         else if (fs.lstatSync(convertPath).isFile()) {
             processLoca(convertPath, targetExt);
-
         }
         else {
             console.error("%s is not a recognized directory or loca file.", convertPath);
             return;
         }
     }
+    else if (isLsf(targetExt)) {
+        console.log("hi from the lsf processor");
+    }
+
 }
 
 
