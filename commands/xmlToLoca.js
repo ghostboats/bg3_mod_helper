@@ -7,7 +7,9 @@ const execAsync = util.promisify(require('child_process').exec);
 
 const { getConfig } = require('../support_files/config');
 
-const { convert } = require('../support_files/scripts/javascript/xml_to_loca.js');
+const { testing } = require('../support_files/scripts/javascript/loca_convert.js');
+
+const { convert} = require('../support_files/scripts/javascript/conversion_junction.js');
 
 const { getFormats } = require('../support_files/scripts/javascript/lslib_utils.js');
 const { loca, xml } = getFormats();

@@ -5,7 +5,7 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
 const { v4: uuidv4 } = require('uuid');
-const { testing } = require('../support_files/scripts/javascript/xml_to_loca');
+const { testing } = require('../support_files/scripts/javascript/loca_convert');
 
 
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {

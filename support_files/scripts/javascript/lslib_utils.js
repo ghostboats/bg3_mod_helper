@@ -1,5 +1,5 @@
 /*
-job of this file is to expose LSLib and provide commonly-used functions in conversion
+job of this file is to expose LSLib and provide commonly-used functions and vars in conversion
 */
 const dotnet = require('node-api-dotnet/net8.0');
 

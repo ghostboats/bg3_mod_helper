@@ -1,4 +1,6 @@
 const path = require('path')
+const fs = require('fs');
+const vscode = require('vscode');
 
 const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const { LSLIB } = LOAD_LSLIB();
@@ -7,7 +9,6 @@ const LocaUtils = LSLIB.LocaUtils;
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
 const locaSuffix = '\\Localization\\English\\';
-const locaPath = path.normalize(rootModPath + locaSuffix);
 
 const { xml, loca } = getFormats();
 
@@ -15,7 +16,12 @@ var to_loca;
 
 
 function testing() {
-    console.log("Getting Localization file extension values...");
+    console.log(vscode.window.activeTextEditor.document.fileName);
+}
+
+
+function isLoca(ext) {
+    return ext == xml || ext == loca;
 }
 
 
@@ -41,31 +47,25 @@ function getLocaOutputPath(filePath) {
 }
 
 
-function convert(targetExt = xml) {
-    console.log("Starting convert function....")
-
+function processLoca(file, targetExt) {
     var file_output;
     var temp_loca;
-    var filesToConvert = FIND_FILES(locaPath, targetExt);
+    try {
+        file_output = getLocaOutputPath(file);
+        console.log("Converting %s file %s to format %s", targetExt, file, to_loca);
 
-    for (var i = 0; i < filesToConvert.length; i++) {
-        try {
-            file_output = getLocaOutputPath(filesToConvert[i]);
-            console.log("Converting %s file %s to format %s", targetExt, filesToConvert[i], to_loca);
+        temp_loca = LocaUtils.Load(file);
 
-            temp_loca = LocaUtils.Load(filesToConvert[i]);
-
-            LocaUtils.Save(temp_loca, file_output);
-            console.log("Exported %s file: %s", to_loca, file_output);
-        }
-        catch (error) {
-            console.error(error);
-        }
+        LocaUtils.Save(temp_loca, file_output);
+        console.log("Exported %s file: %s", to_loca, file_output);
+    }
+    catch (error) {
+        console.error(error);
     }
 }
 
 
 module.exports = { 
-    testing, convert
+    isLoca, testing, processLoca, getLocaOutputPath, locaSuffix,
 };
 
