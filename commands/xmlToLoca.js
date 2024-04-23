@@ -8,6 +8,9 @@ const execAsync = util.promisify(require('child_process').exec);
 const { getConfig } = require('../support_files/config');
 
 const { convert } = require('../support_files/scripts/javascript/xml_to_loca.js');
+
+const { getFormats } = require('../support_files/scripts/javascript/lslib_utils.js');
+const { loca, xml } = getFormats();
 // const { LSLIB } = LOAD_LSLIB();
 
 
@@ -41,7 +44,7 @@ const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLo
     }
     */
     console.log("this is xmlToLoca.js");
-    convert();
+    convert(loca);
 
 });
 

@@ -1,10 +1,10 @@
+/*
+job of this file is to expose LSLib and provide commonly-used functions in conversion
+*/
 const dotnet = require('node-api-dotnet/net8.0');
 
 const fs = require('fs');
 const path = require('path');
-const koffi = require('koffi');
-// const Runtime = require('System.Runtime')
-// const Runtime = require('node-api-dotnet/net8.0').System.Runtime
 
 const { getConfig }  = require('../../config.js');
 const { divinePath } = getConfig();
@@ -12,15 +12,22 @@ const { divinePath } = getConfig();
 const LSLIB_DLL = '\\LSLib.dll';
 const TOOL_DIR = path.join('\\Tools' + LSLIB_DLL);
 
-// require('../../../node_modules/node-api-dotnet/net8.0.js')
-
 var sys;
 var LSLIB;
 var LSLIB_PATH;
-var LocaUtils;
-var LocaFormat;
-var in_format;
-var out_format;
+var xml_format = ".xml";
+var loca_format = ".loca";
+
+
+function getFormats() {
+    return {
+        loca: ".loca",
+        xml: ".xml",
+        lsf: "lsf",
+        lsx: "lsx",
+        lsfx: "lsfx"
+    }
+}
 
 
 function LOAD_LSLIB() {
@@ -48,22 +55,6 @@ function LOAD_LSLIB() {
         // @ts-ignore
         // have to ignore these because the ts-linter doesn't know 'LSLib' exists
         LSLIB = dotnet.LSLib.LS;
-        // @ts-ignore
-        sys = dotnet.System.IO;
-
-        /*
-        // @ts-ignore
-        LocaFormat = LSLIB.LocaFormat;
-        // @ts-ignore
-        LocaUtils = LSLIB.LocaUtils;
-
-        in_format = LocaFormat.Xml;
-        out_format = LocaFormat.Loca;
-        
-
-        console.log(typeof(LocaFormat) + "\n" + typeof(LocaUtils));
-        console.log(typeof(in_format) + "\n" + typeof(out_format));
-        */
     }
     catch (Error) {
         console.error("Error!");
@@ -71,10 +62,33 @@ function LOAD_LSLIB() {
     }
 
     return { 
-        LSLIB, LSLIB_PATH, sys
+        LSLIB, LSLIB_PATH
     }
 
 }
 
 
-module.exports = { LOAD_LSLIB }
+function FIND_FILES(filesPath, targetExt = xml_format) {
+    var file;
+    var filesToConvert = [];
+    var filesList = fs.readdirSync(filesPath, {
+        withFileTypes: false,
+        recursive: true,
+    });
+
+    console.log(filesList);
+
+    for (var i = 0; i < filesList.length; i++) {
+        var temp = filesList[i].toString();
+        if (path.extname(temp) == targetExt) {
+            console.log(temp);
+            filesToConvert.push(filesPath + filesList[i]);
+        }
+    }
+
+    return filesToConvert;
+
+}
+
+
+module.exports = { LOAD_LSLIB, FIND_FILES, getFormats }
