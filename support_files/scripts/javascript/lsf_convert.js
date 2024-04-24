@@ -1,26 +1,38 @@
 const fs = require('fs');
 const path = require('path');
 
-const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
-const { LSLIB } = LOAD_LSLIB();
+const { LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const ResourceUtils = LSLIB.ResourceUtils;
 const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
 const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
 const Game = LSLIB.Enums.Game;
-const ResourceFormat = LSLIB.Enums.ResourceFormat;
-
+// const ResourceFormat = LSLIB.Enums.ResourceFormat;
 
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
 
-const { lsf, lsfx, lsbc, lsbs, lsx } = getFormats();
-const lsfFormats = [lsf, lsfx, lsbc, lsbs, lsx]
+const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
+const lsfFormats = [lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx]
 
 var to_lsf;
+var load_params = ResourceLoadParameters.FromGameVersion(Game.BaldursGate3);
+var conversion_params = ResourceConversionParameters.FromGameVersion(Game.BaldursGate3);
 
 
 function isLsf(ext) {
     return lsfFormats.includes(ext);
+}
+
+
+function checkForLsb(tempPath) {
+    var lsbDir = fs.existsSync(tempPath + lsb);
+    return lsbDir;
+}
+
+
+function checkForLsj(tempPath) {
+    var lsjDir = fs.existsSync(tempPath + lsj);
+    return lsjDir;
 }
 
 
@@ -45,12 +57,19 @@ function checkForLsbs(tempPath) {
 function getLsfOutputPath(filePath) {
     var source_ext = path.extname(filePath);
     var temp = filePath.substring(0, (filePath.length - source_ext.length));
-    
-    if (source_ext == lsf) {
+
+    if (lsfFormats.includes(source_ext) && source_ext != lsx) {
         to_lsf = lsx;
     }
+
     else if (source_ext == lsx) {
-        if (checkForLsfx(temp)) {
+        if (checkForLsb(temp)) {
+            to_lsf = lsb;
+        }
+        else if (checkForLsj(temp)) {
+            to_lsf = lsj;
+        }
+        else if (checkForLsfx(temp)) {
             to_lsf = lsfx;
         }
         else if (checkForLsbc(temp)) {
@@ -63,9 +82,6 @@ function getLsfOutputPath(filePath) {
             to_lsf = lsf;
         }
     }
-    else if (source_ext == lsfx || source_ext == lsbc || source_ext == lsbs) {
-        to_lsf = lsx;
-    }
 
     temp = path.normalize(temp + to_lsf);
     return temp;
@@ -73,8 +89,22 @@ function getLsfOutputPath(filePath) {
 
 
 function processLsf(file, targetExt) {
+    var file_output;
+    var temp_lsf;
 
+    try {
+        file_output = getLsfOutputPath(file);
+        console.log("Converting %s file %s to format %s", targetExt, file, to_lsf);
+
+        temp_lsf = ResourceUtils.LoadResource(file, load_params);
+
+        ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
+        console.log("Exported %s file: %s", to_lsf, file_output);
+    }
+    catch (error) {
+        console.error(error);
+    }
 }
  
 
-module.exports = { isLsf, getLsfOutputPath }
+module.exports = { isLsf, processLsf, getLsfOutputPath, to_lsf };

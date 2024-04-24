@@ -6,21 +6,31 @@ const path = require('path');
 
 const dotnet = require('node-api-dotnet/net8.0');
 
+const LSLIB_DLL = 'LSLib.dll';
+const LSLIBNATIVE_DLL = 'LSLibNative.dll';
+const ZSTDSHARP_DLL = 'ZstdSharp.dll';
+const LZ4_DLL = 'LZ4.dll'
+const TOOL_SUBDIR = 'Tools\\';
+
 const { getConfig }  = require('../../config.js');
-const { divinePath } = getConfig();
+const divinePath = path.normalize(getConfig().divinePath + "\\");
+const divineToolsPath = path.normalize(getConfig().divinePath + "\\" + TOOL_SUBDIR);
 
-const LSLIB_DLL = '\\LSLib.dll';
-const TOOL_DIR = path.join('\\Tools' + LSLIB_DLL);
-
-var LSLIB;
 var LSLIB_PATH;
+
+const DLLS = [LSLIB_DLL, LSLIBNATIVE_DLL, ZSTDSHARP_DLL, LZ4_DLL];
+
+var DLL_PATHS = [];
 
 
 function getFormats() {
     return {
+        dll: ".dll", // for the future? maybe?
         loca: ".loca",
         xml: ".xml",
+        lsb: ".lsb",
         lsf: ".lsf",
+        lsj: ".lsj",
         lsfx: ".lsfx",
         lsbc: ".lsbc",
         lsbs: ".lsbs",
@@ -29,40 +39,61 @@ function getFormats() {
 }
 
 
-function LOAD_LSLIB() {
-    if (fs.existsSync(path.join(divinePath + LSLIB_DLL)))
-    {
-        LSLIB_PATH = path.join(divinePath + LSLIB_DLL);
-        console.log("LSLib.dll found at " + LSLIB_PATH + ".");
+function getDllPaths(dllDirPath) {
+    for (let i = 0; i < DLLS.length; i++) {
+        var temp_path = path.join(dllDirPath + DLLS[i]);
+
+        try {
+            if (fs.existsSync(temp_path)) {
+                DLL_PATHS.push(temp_path);
+                console.log("%s found at %s", DLLS[i], DLL_PATHS[i]);
+            }
+        }
+        catch {
+            console.error("Error!");
+            console.error(Error);
+        }
     }
-    else if (fs.existsSync(path.join(divinePath + TOOL_DIR))) {
-        LSLIB_PATH = path.join(divinePath + TOOL_DIR);
-        console.log("LSLib.dll found at " + LSLIB_PATH + ".");
+}
+
+
+function loadDlls() {
+    for (let i = 0; i < DLL_PATHS.length; i++) {
+        try {
+            dotnet.load(DLL_PATHS[i]);
+            console.log("%s loaded.", DLLS[i]);
+        }
+        catch {
+            console.error("Error!");
+            console.error(Error);
+        }
+    }
+}
+
+
+function LOAD_LSLIB() {
+    var tempLSLIB;
+
+    if (fs.existsSync(path.join(divinePath + LSLIB_DLL))) {
+        getDllPaths(divinePath);
+    }
+    else if (fs.existsSync(path.join(divineToolsPath + LSLIB_DLL))) {
+        getDllPaths(divineToolsPath);
     } 
     else {
         console.error("LSLib.dll not found at " + divinePath + ".");
         LSLIB_PATH = null;
-        LSLIB = null;
+        tempLSLIB = null;
         return;
-    }
-
-    try {
-        console.log("trying to load lslib...");
-        dotnet.load(LSLIB_PATH);
-        console.log ("LSLib.dll loaded from " + LSLIB_PATH + ".");
-        
+    }        
+        loadDlls();
         // @ts-ignore
         // have to ignore these because the ts-linter doesn't know 'LSLib' exists :starege: 
-        LSLIB = dotnet.LSLib.LS;
-    }
-    catch (Error) {
-        console.error("Error!");
-        console.error(Error);
-    }
+        tempLSLIB = dotnet.LSLib.LS;
+        // LSLib should always be at [0] because of its position in DLLS[].
+        LSLIB_PATH = DLL_PATHS[0];
 
-    return { 
-        LSLIB, LSLIB_PATH
-    }
+    return tempLSLIB;
 }
 
 
@@ -84,4 +115,7 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf) {
 }
 
 
-module.exports = { LOAD_LSLIB, FIND_FILES, getFormats };
+const LSLIB = LOAD_LSLIB();
+
+
+module.exports = { LSLIB, FIND_FILES, getFormats };

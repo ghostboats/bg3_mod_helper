@@ -2,8 +2,7 @@ const fs = require('fs');
 const vscode = require('vscode');
 const path = require('path')
 
-const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
-const { LSLIB } = LOAD_LSLIB();
+const { LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const LocaUtils = LSLIB.LocaUtils;
 
 const { getConfig } = require('../../config.js');
@@ -50,6 +49,7 @@ function getLocaOutputPath(filePath) {
 function processLoca(file, targetExt) {
     var file_output;
     var temp_loca;
+
     try {
         file_output = getLocaOutputPath(file);
         console.log("Converting %s file %s to format %s", targetExt, file, to_loca);
@@ -65,7 +65,5 @@ function processLoca(file, targetExt) {
 }
 
 
-module.exports = { 
-    isLoca, testing, processLoca, getLocaOutputPath, locaSuffix,
-};
+module.exports = { isLoca, testing, processLoca, getLocaOutputPath, to_loca };
 

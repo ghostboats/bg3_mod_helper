@@ -3,16 +3,14 @@ const path = require('path')
 const fs = require('fs');
 const vscode = require('vscode');
 
-const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
-// const { LSLIB } = LOAD_LSLIB();
+const { FIND_FILES, getFormats } = require('./lslib_utils');
 const { lsx, lsf, lsfx, xml, loca } = getFormats();
 
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
-const { isLsf, getLsfOutputPath } = require('./lsf_convert')
-// const locaSuffix = '\\Localization\\English\\';
+const { isLsf, processLsf, getLsfOutputPath, to_lsf } = require('./lsf_convert');
 
 
 function getActiveTabPath() {
@@ -40,38 +38,25 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
         }
     }
     else if (isLsf(targetExt)) {
-        var compressionType;
+        console.log("hi from the lsf processor");
+        // console.log("compression type set to: %s for file:\n%s", to_lsf, convertPath);
+        console.log("end result will be:\n%s", getLsfOutputPath(convertPath));
 
-        if (targetExt != lsx) {
-            compressionType = lsx;
+        if (fs.lstatSync(convertPath).isDirectory()) {
+            var filesToConvert = FIND_FILES(convertPath, targetExt);
+
+            for (var i = 0; i < filesToConvert.length; i++) {
+                processLsf(filesToConvert[i], targetExt);
+            }
+        }
+        else if (fs.lstatSync(convertPath).isFile()) {
+            processLsf(convertPath, targetExt);
         }
         else {
-            compressionType = lsf;
+            console.error("%s is not a recognized directory or lsf file.", convertPath);
+            return;
         }
-
-        console.log("hi from the lsf processor");
-        console.log("compression type set to: %s for file:\n%s", compressionType, convertPath);
-        console.log("end result will be:\n%s", getLsfOutputPath(convertPath))
     }
-
-}
-
-
-function convertActiveWindow() {
-    console.log(vscode.window.activeTextEditor.document.fileName);
-    
-    var activeFile = vscode.window.activeTextEditor.document.fileName;
-    var activeFileExt = path.extname(activeFile);
-
-    console.log("%s\n%s", activeFile, activeFileExt);
-
-    if (activeFileExt == xml || activeFileExt == loca) {
-        var activeFileOutput = getLocaOutputPath(activeFile);
-        var activeFileOutputExt = path.extname(activeFileOutput);
-
-        processLoca(activeFile, activeFileOutputExt);
-    }
-
 }
 
 
