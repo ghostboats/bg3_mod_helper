@@ -11,7 +11,7 @@ const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
-const { isLsf } = require('./lsf_convert')
+const { isLsf, getLsfOutputPath } = require('./lsf_convert')
 // const locaSuffix = '\\Localization\\English\\';
 
 
@@ -40,7 +40,18 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
         }
     }
     else if (isLsf(targetExt)) {
+        var compressionType;
+
+        if (targetExt != lsx) {
+            compressionType = lsx;
+        }
+        else {
+            compressionType = lsf;
+        }
+
         console.log("hi from the lsf processor");
+        console.log("compression type set to: %s for file:\n%s", compressionType, convertPath);
+        console.log("end result will be:\n%s", getLsfOutputPath(convertPath))
     }
 
 }

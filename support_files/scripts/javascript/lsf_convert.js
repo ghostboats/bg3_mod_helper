@@ -4,6 +4,11 @@ const path = require('path');
 const { LOAD_LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const { LSLIB } = LOAD_LSLIB();
 const ResourceUtils = LSLIB.ResourceUtils;
+const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
+const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
+const Game = LSLIB.Enums.Game;
+const ResourceFormat = LSLIB.Enums.ResourceFormat;
+
 
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
@@ -72,4 +77,4 @@ function processLsf(file, targetExt) {
 }
  
 
-module.exports = { isLsf }
+module.exports = { isLsf, getLsfOutputPath }
