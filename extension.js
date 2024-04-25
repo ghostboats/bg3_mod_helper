@@ -16,6 +16,7 @@ const PNGToDDSCommand = require('./commands/PNGToDDS');
 const addIconBackground  = require('./commands/addIconBackground');
 const createModTemplateImport = require('./commands/createModTemplate/createModTemplate');
 const getAttributesCommand = require('./commands/getAttributes');
+const smartConvertCommand = require('./commands/smartConvert')
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
