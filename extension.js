@@ -16,10 +16,12 @@ const addIconBackground  = require('./commands/addIconBackground');
 const createModTemplateImport = require('./commands/createModTemplate/createModTemplate');
 const getAttributesCommand = require('./commands/getAttributes');
 const smartConvertCommand = require('./commands/smartConvert');
-const lsxToLsfCommand = require('./commands/lsxToLsf');
-const lsfToLsxCommand = require('./commands/lsfToLsx');
-const xmlToLocaImport = require('./commands/xmlToLoca');
-const locaToXmlImport = require('./commands/locaToXml');
+// const lsxToLsfCommand = require('./commands/lsxToLsf');
+// const lsfToLsxCommand = require('./commands/lsfToLsx');
+// const xmlToLocaImport = require('./commands/xmlToLoca');
+// const locaToXmlImport = require('./commands/locaToXml');
+
+const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } = require('./commands/commands')
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
@@ -146,7 +148,7 @@ function aSimpleDataProvider() {
                 { label: 'Pack Mod (Ensure LSLib.dll is unblocked in its properties)', command: 'bg3-mod-helper.packMod' },
                 { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                 { label: 'Convert all XML files to LOCA', command: 'bg3-mod-helper.xmlToLoca' },
-                { label: 'Convert all LOCA files to XML', command: 'bg3-mod-helper.locaToXml' },
+                { label: 'Convert all LOCA files to XML', command: 'bg3-mod-helper.locaToXml// ' },
                 { label: 'Convert all LSX files to LSF', command: 'bg3-mod-helper.lsxToLsf' },
                 { label: 'Convert all LSF files to LSX', command: 'bg3-mod-helper.lsfToLsx' },
                 { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
