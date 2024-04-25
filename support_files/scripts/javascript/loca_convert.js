@@ -3,7 +3,6 @@ const vscode = require('vscode');
 const path = require('path')
 
 const { LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
-const LocaUtils = LSLIB.LocaUtils;
 
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
@@ -47,6 +46,7 @@ function getLocaOutputPath(filePath) {
 
 
 function processLoca(file, targetExt) {
+    var LocaUtils = LSLIB.LocaUtils;
     var file_output;
     var temp_loca;
 

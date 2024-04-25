@@ -19,8 +19,6 @@ function getActiveTabPath() {
 
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
-    console.log("Starting converter function...");
-
     if (isLoca(targetExt)) {
         if (fs.lstatSync(convertPath).isDirectory()) {
             var filesToConvert = FIND_FILES(convertPath, targetExt);
@@ -38,10 +36,6 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
         }
     }
     else if (isLsf(targetExt)) {
-        console.log("hi from the lsf processor");
-        // console.log("compression type set to: %s for file:\n%s", to_lsf, convertPath);
-        console.log("end result will be:\n%s", getLsfOutputPath(convertPath));
-
         if (fs.lstatSync(convertPath).isDirectory()) {
             var filesToConvert = FIND_FILES(convertPath, targetExt);
 

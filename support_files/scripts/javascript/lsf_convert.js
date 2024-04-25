@@ -15,8 +15,6 @@ const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
 const lsfFormats = [lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx]
 
 var to_lsf;
-var load_params = ResourceLoadParameters.FromGameVersion(Game.BaldursGate3);
-var conversion_params = ResourceConversionParameters.FromGameVersion(Game.BaldursGate3);
 
 
 function isLsf(ext) {
@@ -55,14 +53,11 @@ function checkForLsbs(tempPath) {
 
 
 function getLsfOutputPath(filePath) {
+    to_lsf = "";
     var source_ext = path.extname(filePath);
     var temp = filePath.substring(0, (filePath.length - source_ext.length));
 
-    if (lsfFormats.includes(source_ext) && source_ext != lsx) {
-        to_lsf = lsx;
-    }
-
-    else if (source_ext == lsx) {
+    if (source_ext == lsx) {
         if (checkForLsb(temp)) {
             to_lsf = lsb;
         }
@@ -82,6 +77,9 @@ function getLsfOutputPath(filePath) {
             to_lsf = lsf;
         }
     }
+    else if (lsfFormats.includes(source_ext) && source_ext != lsx) {
+        to_lsf = lsx;
+    }
 
     temp = path.normalize(temp + to_lsf);
     return temp;
@@ -89,21 +87,24 @@ function getLsfOutputPath(filePath) {
 
 
 function processLsf(file, targetExt) {
-    var file_output;
-    var temp_lsf;
+    var load_params = ResourceLoadParameters.FromGameVersion(Game.BaldursGate3);
+    var conversion_params = ResourceConversionParameters.FromGameVersion(Game.BaldursGate3);
+    var ResourceUtils = LSLIB.ResourceUtils;
 
-    try {
+    var file_output = "";
+    var temp_lsf = "";
         file_output = getLsfOutputPath(file);
         console.log("Converting %s file %s to format %s", targetExt, file, to_lsf);
 
+    try {
         temp_lsf = ResourceUtils.LoadResource(file, load_params);
-
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
-        console.log("Exported %s file: %s", to_lsf, file_output);
     }
-    catch (error) {
-        console.error(error);
+    catch (Error) {
+        console.log(Error);
     }
+    
+    console.log("Exported %s file: %s", to_lsf, file_output);
 }
  
 
