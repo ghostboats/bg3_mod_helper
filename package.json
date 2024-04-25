@@ -334,7 +334,6 @@
         "test": "vscode-test"
     },
     "dependencies": {
-        "koffi": "^2.8.6",
         "node-api-dotnet": "^0.7.7",
         "node-fetch": "^3.3.2",
         "sharp": "^0.33.3",
