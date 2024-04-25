@@ -334,6 +334,7 @@
         "test": "vscode-test"
     },
     "dependencies": {
+        "magickwand.js": "^1.1.0",
         "node-api-dotnet": "^0.7.7",
         "node-fetch": "^3.3.2",
         "sharp": "^0.33.3",

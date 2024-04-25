@@ -1,0 +1,12 @@
+{
+  "name": "node-esm",
+  "version": "1.0.0",
+  "description": "node-esm integration test",
+  "type": "module",
+  "scripts": {
+    "test": "npx mocha index.mjs"
+  },
+  "dependencies": {
+    "chai": "^4.3.10"
+  }
+}

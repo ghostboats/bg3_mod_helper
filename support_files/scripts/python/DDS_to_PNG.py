@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import NoneType
 from typing import List
 import argparse
 import wand.image
