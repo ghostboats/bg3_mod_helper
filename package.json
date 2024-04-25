@@ -19,6 +19,10 @@
     "contributes": {
         "commands": [
             {
+                "command": "bg3-mod-helper.smartConvert",
+                "title": "Convert the currently active tab"
+            },
+            {
                 "command": "bg3-mod-helper.goToHandleUUID",
                 "title": "Go to UUID/Handle"
             },

@@ -139,6 +139,7 @@ function aSimpleDataProvider() {
         },
         getChildren: (element) => {
             return Promise.resolve([
+                { label: 'Convert the currently active tab', command: 'bg3-mod-helper.smartConvert' },
                 { label: 'Pack Mod (Ensure LSLib.dll is unblocked in its properties)', command: 'bg3-mod-helper.packMod' },
                 { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                 { label: 'Xml To Loca (Ensure LSLib.dll is unblocked in its properties)', command: 'bg3-mod-helper.xmlToLoca' },
