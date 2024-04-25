@@ -11,10 +11,9 @@ const { convert, compatRootModPath} = require('../support_files/scripts/javascri
 const { getFormats } = require('../support_files/scripts/javascript/lslib_utils.js');
 const { loca, xml } = getFormats();
 
+const locaToXmlCommand = vscode.commands.registerCommand('bg3-mod-helper.locaToXml', async function () {
 
-const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLoca', async function () {
-
-    convert(compatRootModPath, xml);
+    convert(compatRootModPath, loca);
 
 });
 

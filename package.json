@@ -64,7 +64,22 @@
             },
             {
                 "command": "bg3-mod-helper.xmlToLoca",
-                "title": "Convert xml file to loca file (or vice versa)",
+                "title": "Convert all xml files to loca files",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.locaToXml",
+                "title": "Convert all loca files to xml files",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.lsxToLsf",
+                "title": "Convert all lsx files to lsf files",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.lsfToLsx",
+                "title": "Convert all lsf files to lsx files",
                 "category": "BG3 Mod Helper"
             },
             {

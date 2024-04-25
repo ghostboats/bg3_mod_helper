@@ -8,6 +8,7 @@ const { lsx, lsf, lsfx, xml, loca } = getFormats();
 
 const { getConfig } = require('../../config.js');
 const { rootModPath } = getConfig();
+const compatRootModPath = path.normalize(rootModPath + "\\");
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath, to_lsf } = require('./lsf_convert');
@@ -54,4 +55,4 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
 }
 
 
-module.exports = { convert }
+module.exports = { convert, compatRootModPath }

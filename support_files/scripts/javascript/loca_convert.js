@@ -44,11 +44,17 @@ function getLocaOutputPath(filePath) {
     return temp;
 }
 
+// shrimple
 
+// dotnet.load(shrimple)
+
+// SMOGE
 function processLoca(file, targetExt) {
     var LocaUtils = LSLIB.LocaUtils;
     var file_output;
     var temp_loca;
+
+    console.log(file);
 
     try {
         file_output = getLocaOutputPath(file);
