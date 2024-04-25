@@ -11,16 +11,12 @@ const { loca, xml, lsf, lsx } = getFormats();
 
 
 const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLoca', async function () {
-
     convert(compatRootModPath, xml);
-
 });
 
 
 const locaToXmlCommand = vscode.commands.registerCommand('bg3-mod-helper.locaToXml', async function () {
-
     convert(compatRootModPath, loca);
-
 });
 
 
