@@ -54,8 +54,6 @@ function processLoca(file, targetExt) {
     var file_output;
     var temp_loca;
 
-    console.log(file);
-
     try {
         file_output = getLocaOutputPath(file);
         console.log("Converting %s file %s to format %s", targetExt, file, to_loca);

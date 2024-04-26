@@ -35,7 +35,8 @@ function getFormats() {
         lsfx: ".lsfx",
         lsbc: ".lsbc",
         lsbs: ".lsbs",
-        lsx: ".lsx"
+        lsx: ".lsx",
+        pak: ".pak"
     }
 }
 

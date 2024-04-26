@@ -5,10 +5,15 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
 const { v4: uuidv4 } = require('uuid');
-const { testing } = require('../support_files/scripts/javascript/loca_convert');
 
+const { convert, compatRootModPath } = require('../support_files/scripts/javascript/conversion_junction.js');
+const { getFormats } = require('../support_files/scripts/javascript/lslib_utils.js');
+const { pak } = getFormats();
 
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
+    convert(compatRootModPath, pak)
+});
+    /*
     const { rootModPath, modDestPath, divinePath, autoConvertLocalization, modPackTime, autoLaunchOnPack } = getConfig();
 
     // Check if BG3 is running
@@ -105,7 +110,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             targetLsxFiles = targetLsxFiles.concat(await findTargetLsxFiles(path.join(dir, file.name)));
         }
         return targetLsxFiles;
-    }*/
+    }
 
     // convert all lsx files to lsf within the root mod folder
     const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'convert_lsf.py');
@@ -133,7 +138,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         
 
         console.log('Executing command:', convertCommand);
-    }*/
+    }
 
     // Add a delay before executing the packaging command
     const packDelay = modPackTime * 1000 || 7000; // Convert seconds to milliseconds, default to 5000ms (5 seconds)
@@ -203,6 +208,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     });
 });
 
+
 function moveFileAcrossDevices(sourcePath, destPath, callback) {
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
@@ -249,7 +255,9 @@ function createVersion64(major, minor, build, revision) {
 
     // Return the version as a string
     return version64;
+    
 }
+
 
 function isGameRunning() {
     return new Promise((resolve, reject) => {
@@ -264,4 +272,4 @@ function isGameRunning() {
             resolve(isRunning);
         });
     });
-}
+*/
