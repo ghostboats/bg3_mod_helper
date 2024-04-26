@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const path = require('path');
 
 let config = {};
 function setConfig(newConfig) {
@@ -13,6 +14,7 @@ function getConfig() {
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: config.get('rootModPath'),
+        modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
         divinePath: config.get('divinePath'),
         modPackTime: config.get('modPackTime'),
