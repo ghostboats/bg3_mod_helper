@@ -8,15 +8,16 @@ const { pak } = getFormats();
 
 const { getConfig } = require('../../config.js');
 const { rootModPath, modName } = getConfig();
+const rootParentPath = path.dirname(rootModPath);
 
-const test_folder = "\\test_folder";
-const test_path = path.normalize(rootModPath + test_folder);
-const modDestPath = path.normalize(test_path + "\\" + modName + pak);
+const temp_folder = "\\temp_folder";
+const temp_path = path.normalize(rootParentPath + temp_folder);
+const modDestPath = path.normalize(temp_path + "\\" + modName + pak);
 
 
-function prepareTestDir() {
-    if (!fs.existsSync(test_path)) {
-        fs.mkdirSync(test_path);
+function prepareTempDir() {
+    if (!fs.existsSync(temp_path)) {
+        fs.mkdirSync(temp_path);
     }
     else {
         if (fs.existsSync(modDestPath)) {
@@ -44,4 +45,4 @@ async function processPak(modPath) {
     // console.log("%s\n%s", typeof(Packager), );
 }
 
-module.exports = { processPak, prepareTestDir }
+module.exports = { processPak, prepareTempDir }

@@ -12,7 +12,7 @@ const compatRootModPath = path.normalize(rootModPath + "\\");
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath, to_lsf } = require('./lsf_convert');
-const { processPak, prepareTestDir } = require('./pack_mod');
+const { processPak, prepareTempDir } = require('./pack_mod');
 
 
 function getActiveTabPath() {
@@ -22,7 +22,7 @@ function getActiveTabPath() {
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
     if (targetExt == pak) {
-        prepareTestDir();
+        prepareTempDir();
         convert(compatRootModPath, xml);
         convert(compatRootModPath, lsx);
         processPak(compatRootModPath);
