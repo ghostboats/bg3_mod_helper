@@ -1,10 +1,9 @@
-const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const util = require('util');
 
 const { LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
 const { pak } = getFormats();
+const { logPath } = require('./log_utils');
 
 const { getConfig } = require('../../config.js');
 const { rootModPath, modName } = getConfig();
@@ -13,6 +12,13 @@ const rootParentPath = path.dirname(rootModPath);
 const temp_folder = "\\temp_folder";
 const temp_path = path.normalize(rootParentPath + temp_folder);
 const modDestPath = path.normalize(temp_path + "\\" + modName + pak);
+
+const log4js = require('log4js');
+log4js.configure({
+    appenders: { pakLogger: { type: "file", filename: logPath } },
+    categories: { default: { appenders: ["pakLogger"], level: "debug" } },
+  });
+var pakLogger = log4js.getLogger("pakLogger");
 
 
 function prepareTempDir() {
@@ -41,8 +47,7 @@ async function processPak(modPath) {
         console.error(error);
     }
 
-    console.log("testing from the mod packing file catyes");
-    // console.log("%s\n%s", typeof(Packager), );
+    pakLogger.debug("%s%s exported to %s", modName, pak, modDestPath);
 }
 
 module.exports = { processPak, prepareTempDir }

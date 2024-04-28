@@ -3,19 +3,18 @@ const vscode = require('vscode');
 const path = require('path')
 
 const { LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
-
-const { getConfig } = require('../../config.js');
-const { rootModPath } = getConfig();
-const locaSuffix = '\\Localization\\English\\';
+const { logPath } = require('./log_utils'); 
 
 const { xml, loca } = getFormats();
 
+const log4js = require('log4js');
+log4js.configure({
+    appenders: { locaLogger: { type: "file", filename: logPath } },
+    categories: { default: { appenders: ["locaLogger"], level: "debug" } },
+  });
+
 var to_loca;
-
-
-function testing() {
-    console.log(vscode.window.activeTextEditor.document.fileName);
-}
+var locaLogger = log4js.getLogger("locaLogger");
 
 
 function isLoca(ext) {
@@ -56,12 +55,12 @@ function processLoca(file, targetExt) {
 
     try {
         file_output = getLocaOutputPath(file);
-        console.log("Converting %s file %s to format %s", targetExt, file, to_loca);
+        locaLogger.debug("Converting %s file %s to format %s", targetExt, file, to_loca);
 
         temp_loca = LocaUtils.Load(file);
 
         LocaUtils.Save(temp_loca, file_output);
-        console.log("Exported %s file: %s", to_loca, file_output);
+        locaLogger.debug("Exported %s file: %s", to_loca, file_output);
     }
     catch (error) {
         console.error(error);
@@ -69,5 +68,5 @@ function processLoca(file, targetExt) {
 }
 
 
-module.exports = { isLoca, testing, processLoca, getLocaOutputPath, to_loca };
+module.exports = { isLoca, processLoca, getLocaOutputPath, to_loca };
 

@@ -1,15 +1,15 @@
 /*
 job of this file is to expose LSLib and provide commonly-used functions and vars in conversion
 */
+
+//TODO: auto-update LSLib from github 
+
 const fs = require('fs');
 const path = require('path');
 
 const dotnet = require('node-api-dotnet/net8.0');
 
 const LSLIB_DLL = 'LSLib.dll';
-const LSLIBNATIVE_DLL = 'LSLibNative.dll';
-const ZSTDSHARP_DLL = 'ZstdSharp.dll';
-const LZ4_DLL = 'LZ4.dll'
 const TOOL_SUBDIR = 'Tools\\';
 
 const { getConfig }  = require('../../config.js');
@@ -77,10 +77,10 @@ function loadDlls() {
 function LOAD_LSLIB() {
     var tempLSLIB;
 
-    if (fs.existsSync(path.join(divinePath + LSLIB_DLL))) {
+    if (fs.existsSync(path.normalize(divinePath + LSLIB_DLL))) {
         DLL_PATHS = FIND_FILES(divinePath, getFormats().dll, false);
     }
-    else if (fs.existsSync(path.join(divineToolsPath + LSLIB_DLL))) {
+    else if (fs.existsSync(path.normalize(divineToolsPath + LSLIB_DLL))) {
         DLL_PATHS = FIND_FILES(divineToolsPath, getFormats().dll, false);
     } 
     else {
