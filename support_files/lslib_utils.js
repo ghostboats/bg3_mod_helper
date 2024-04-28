@@ -1,8 +1,8 @@
 /*
-job of this file is to expose LSLib and provide commonly-used functions and vars in conversion
+    job of this file is to expose LSLib and provide commonly-used functions and vars in conversion
+    
+    TODO: auto-update LSLib from github 
 */
-
-//TODO: auto-update LSLib from github 
 
 const fs = require('fs');
 const path = require('path');
@@ -11,13 +11,14 @@ const dotnet = require('node-api-dotnet/net8.0');
 
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
+const { CREATE_LOGGER } = require('./log_utils.js')
+const bg3mh_logger = CREATE_LOGGER();
 
-const { getConfig }  = require('../../config.js');
+const { getConfig }  = require('./config.js');
 const divinePath = path.normalize(getConfig().divinePath + "\\");
 const divineToolsPath = path.normalize(getConfig().divinePath + "\\" + TOOL_SUBDIR);
-
-var LSLIB_PATH;
 const BANNED_DLLS = ['ConverterApp.dll'];
+
 
 // const DLLS = [LSLIB_DLL, LSLIBNATIVE_DLL, ZSTDSHARP_DLL, LZ4_DLL];
 var DLLS = [];
@@ -49,7 +50,7 @@ function processDllPaths() {
         try {
             if (fs.existsSync(temp_path) && (!BANNED_DLLS.includes(temp_name))) {
                 DLLS.push(temp_path);
-                console.log("%s found at %s", temp_name, temp_path);
+                bg3mh_logger.debug("%s found at %s", temp_name, temp_path);
             }
         }
         catch {
@@ -64,7 +65,7 @@ function loadDlls() {
     for (let i = 0; i < DLLS.length; i++) {
         try {
             dotnet.load(DLLS[i]);
-            console.log("%s loaded.", DLLS[i]);
+            bg3mh_logger.debug("%s loaded.", DLLS[i]);
         }
         catch {
             console.error("Error!");
@@ -85,7 +86,6 @@ function LOAD_LSLIB() {
     } 
     else {
         console.error("LSLib.dll not found at " + divinePath + ".");
-        LSLIB_PATH = null;
         tempLSLIB = null;
         return;
     }

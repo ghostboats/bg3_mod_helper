@@ -4,11 +4,14 @@ const fs = require('fs');
 const vscode = require('vscode');
 
 const { FIND_FILES, getFormats } = require('./lslib_utils');
-const { lsx, lsf, lsfx, xml, loca, pak } = getFormats();
+const { lsx, xml, pak } = getFormats();
 
-const { getConfig } = require('../../config.js');
+const { getConfig } = require('./config.js');
 const { rootModPath } = getConfig();
 const compatRootModPath = path.normalize(rootModPath + "\\");
+
+const { CREATE_LOGGER } = require('./log_utils');
+var bg3mh_logger = CREATE_LOGGER();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath, to_lsf } = require('./lsf_convert');
@@ -39,7 +42,7 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
             processLoca(convertPath, targetExt);
         }
         else {
-            console.error("%s is not a recognized directory or loca file.", convertPath);
+            bg3mh_logger.error("%s is not a recognized directory or loca file.", convertPath);
             return;
         }
     }
@@ -55,7 +58,7 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
             processLsf(convertPath, targetExt);
         }
         else {
-            console.error("%s is not a recognized directory or lsf file.", convertPath);
+            bg3mh_logger.error("%s is not a recognized directory or lsf file.", convertPath);
             return;
         }
     }

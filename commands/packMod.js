@@ -6,8 +6,8 @@ const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
 const { v4: uuidv4 } = require('uuid');
 
-const { convert, compatRootModPath } = require('../support_files/scripts/javascript/conversion_junction.js');
-const { getFormats } = require('../support_files/scripts/javascript/lslib_utils.js');
+const { convert, compatRootModPath } = require('../support_files/conversion_junction.js');
+const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {

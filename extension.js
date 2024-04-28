@@ -16,14 +16,12 @@ const addIconBackground  = require('./commands/addIconBackground');
 const createModTemplateImport = require('./commands/createModTemplate/createModTemplate');
 const getAttributesCommand = require('./commands/getAttributes');
 const smartConvertCommand = require('./commands/smartConvert');
-// const lsxToLsfCommand = require('./commands/lsxToLsf');
-// const lsfToLsxCommand = require('./commands/lsfToLsx');
-// const xmlToLocaImport = require('./commands/xmlToLoca');
-// const locaToXmlImport = require('./commands/locaToXml');
-
 const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } = require('./commands/commands')
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
+
+const { CREATE_LOGGER } = require('./support_files/log_utils');
+var bg3mh_logger = CREATE_LOGGER();
 
 const debugCommand = require('./commands/debug');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
@@ -37,15 +35,7 @@ const { getFullPath } = require('./support_files/helper_functions');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    console.log('Displaying extension activation message')
-    vscode.window.showInformationMessage(
-        'bg3-mod-helper extension is now active! Click here to change settings for this extension.',
-        'Open Settings'
-    ).then(selection => {
-        if (selection === 'Open Settings') {
-            vscode.commands.executeCommand('workbench.action.openSettings', 'bg3ModHelper');
-        }
-    });
+    bg3mh_logger.debug('Displaying extension activation message');
 
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders && workspaceFolders.length > 0) {
@@ -53,9 +43,16 @@ function activate(context) {
 
         // Update the extension configuration
         const config = vscode.workspace.getConfiguration('bg3ModHelper');
-        config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace)
-            .then(() => {
-                vscode.window.showInformationMessage(`Workspace set to ${mainFolderPath}. When packing your mod and converting xml->loca, it will use this folder.`);
+        config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace
+            ).then(() => {
+                vscode.window.showInformationMessage(`Workspace set to: 
+                ${mainFolderPath}.`,
+                'Open Settings'
+            ).then(selection => {
+                if (selection === 'Open Settings') {
+                vscode.commands.executeCommand('workbench.action.openSettings', 'bg3ModHelper');
+                }
+            });
             }, (error) => {
                 vscode.window.showErrorMessage(`Error setting workspace: ${error}`);
             });
@@ -77,7 +74,7 @@ function activate(context) {
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame')
     });
-    console.log('Initial configs set:' + JSON.stringify(config, null, 2))
+    bg3mh_logger.debug('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
             'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'

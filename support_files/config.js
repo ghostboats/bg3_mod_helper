@@ -2,9 +2,12 @@ const vscode = require('vscode');
 const path = require('path');
 
 let config = {};
+
 function setConfig(newConfig) {
     config = newConfig;
 }
+
+
 function getConfig() {
     const config = vscode.workspace.getConfiguration('bg3ModHelper');
     return {

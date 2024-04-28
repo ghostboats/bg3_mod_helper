@@ -1,29 +1,16 @@
-const fs = require('fs');
-const vscode = require('vscode');
 const path = require('path')
 
-const { LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
-const { logPath } = require('./log_utils'); 
+const { LSLIB, getFormats } = require('./lslib_utils');
+const { CREATE_LOGGER } = require('./log_utils');
+const bg3mh_logger = CREATE_LOGGER(); 
 
 const { xml, loca } = getFormats();
 
-const log4js = require('log4js');
-log4js.configure({
-    appenders: { locaLogger: { type: "file", filename: logPath } },
-    categories: { default: { appenders: ["locaLogger"], level: "debug" } },
-  });
-
 var to_loca;
-var locaLogger = log4js.getLogger("locaLogger");
 
 
 function isLoca(ext) {
     return ext == xml || ext == loca;
-}
-
-
-function errorLog(error) {
-    console.error(error);
 }
 
 
@@ -43,11 +30,7 @@ function getLocaOutputPath(filePath) {
     return temp;
 }
 
-// shrimple
 
-// dotnet.load(shrimple)
-
-// SMOGE
 function processLoca(file, targetExt) {
     var LocaUtils = LSLIB.LocaUtils;
     var file_output;
@@ -55,15 +38,15 @@ function processLoca(file, targetExt) {
 
     try {
         file_output = getLocaOutputPath(file);
-        locaLogger.debug("Converting %s file %s to format %s", targetExt, file, to_loca);
+        bg3mh_logger.debug("Converting %s file %s to format %s", targetExt, file, to_loca);
 
         temp_loca = LocaUtils.Load(file);
 
         LocaUtils.Save(temp_loca, file_output);
-        locaLogger.debug("Exported %s file: %s", to_loca, file_output);
+        bg3mh_logger.debug("Exported %s file: %s", to_loca, file_output);
     }
     catch (error) {
-        console.error(error);
+        bg3mh_logger.error(error);
     }
 }
 

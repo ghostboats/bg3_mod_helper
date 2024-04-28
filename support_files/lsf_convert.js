@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { LSLIB, FIND_FILES, getFormats } = require('./lslib_utils');
+const { LSLIB, getFormats } = require('./lslib_utils');
 const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
 const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
 const Game = LSLIB.Enums.Game;
@@ -9,14 +9,8 @@ const Game = LSLIB.Enums.Game;
 const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
 const lsfFormats = [lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx];
 
-const { logPath } = require('./log_utils');
-
-const log4js = require('log4js');
-log4js.configure({
-    appenders: { lsfLogger: { type: "file", filename: logPath } },
-    categories: { default: { appenders: ["lsfLogger"], level: "debug" } },
-  });
-var lsfLogger = log4js.getLogger("lsfLogger");
+const { CREATE_LOGGER } = require('./log_utils');
+var bg3mh_logger = CREATE_LOGGER();
 
 var to_lsf;
 
@@ -98,17 +92,17 @@ function processLsf(file, targetExt) {
     var file_output = "";
     var temp_lsf = "";
         file_output = getLsfOutputPath(file);
-        lsfLogger.debug("Converting %s file %s to format %s", targetExt, file, to_lsf);
+        bg3mh_logger.debug("Converting %s file %s to format %s", targetExt, file, to_lsf);
 
     try {
         temp_lsf = ResourceUtils.LoadResource(file, load_params);
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
     }
     catch (Error) {
-        lsfLogger.debug(Error);
+        bg3mh_logger.error(Error);
     }
     
-    lsfLogger.debug("Exported %s file: %s", to_lsf, file_output);
+    bg3mh_logger.debug("Exported %s file: %s", to_lsf, file_output);
 }
  
 

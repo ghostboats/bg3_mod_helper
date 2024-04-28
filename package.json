@@ -165,17 +165,17 @@
                 "bg3ModHelper.modDestPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Mod destination folder path (Where your games mods are held)"
+                    "description": "Path where your mod should end up, ie [C:/Users/<username>/AppData/Local/Larian Studios/Baldur's Gate 3/Mods]"
                 },
                 "bg3ModHelper.divinePath": {
                     "type": "string",
                     "default": "",
-                    "description": "Path to the divine tool executable (whenever you downloaded your exporttools (lslib) to. Inside that \\tools\\divine.exe)"
+                    "description": "Path where your LSLib.dll file lives, ie [C:/Documents/ExportTool-v1.19.5/]:"
                 },
                 "bg3ModHelper.autoConvertLocalization": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Automatically convert localization files when packing the mod."
+                    "description": "Automatically convert localization files when packing the mod. //MAYBE NOT FUNCTIONAL/NEEDED AT CURRENT"
                 },
                 "bg3ModHelper.modPackTime": {
                     "type": "number",
