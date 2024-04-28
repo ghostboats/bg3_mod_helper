@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.88.0"
@@ -18,6 +18,11 @@
     "main": "./extension.js",
     "contributes": {
         "commands": [
+            {
+                "command": "bg3-mod-helper.packMod",
+                "title": "Pack Mod",
+                "category": "BG3 Mod Helper"
+            },
             {
                 "command": "bg3-mod-helper.smartConvert",
                 "title": "Convert the currently active tab",
@@ -224,13 +229,16 @@
                 "command": "bg3-mod-helper.insertClipboard",
                 "key": "ctrl+shift+2",
                 "when": "editorTextFocus"
-            },
-            {
-                "command": "bg3-mod-helper.packMod",
-                "title": "Pack Mod"
             }
         ],
         "menus": {
+            "view/title" : [
+                {
+                    "when": "view == bg3ModHelperView",
+                    "command": "bg3-mod-helper.packMod",
+                    "group": "navigation"
+                }
+            ],
             "explorer/context": [
                 {
                     "when": "resourceExtname == .dds || resourceExtname == .DDS",

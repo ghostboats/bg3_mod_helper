@@ -152,7 +152,7 @@ function aSimpleDataProvider() {
                 { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
                 { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                 { label: 'Get attributes and an example value for the currently opened file', command: 'bg3-mod-helper.getAttributes' },
-                { label: 'Debug Command, dont press unless you are me :)', command: 'bg3-mod-helper.debugCommand' }
+                { label: "Debug Command, don't press unless you are me :)", command: 'bg3-mod-helper.debugCommand' }
             ]);
         }
     };
