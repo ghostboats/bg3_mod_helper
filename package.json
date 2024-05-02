@@ -130,6 +130,10 @@
                 "title": "View attributes and an example value for the currently opened file"
             },
             {
+                "command": "bg3-mod-helper.openConverter",
+                "title": "Open Converter"
+            }, 
+            {
                 "command": "bg3-mod-helper.debugCommand",
                 "title": "For dev use, dont press the button"
             }
