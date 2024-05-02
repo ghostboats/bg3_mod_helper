@@ -16,7 +16,6 @@ const temp_path = path.normalize(rootParentPath + temp_folder);
 const modDestPath = path.normalize(temp_path + "\\" + modName + pak);
 
 
-
 function prepareTempDir() {
     if (!fs.existsSync(temp_path)) {
         fs.mkdirSync(temp_path);
@@ -44,4 +43,5 @@ async function processPak(modPath) {
     bg3mh_logger.debug("%s%s exported to %s", modName, pak, modDestPath);
 }
 
-module.exports = { processPak, prepareTempDir }
+
+module.exports = { processPak, prepareTempDir, modDestPath }

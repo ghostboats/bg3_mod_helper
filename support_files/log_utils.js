@@ -6,7 +6,6 @@ const logPath = path.normalize(divinePath + "\\logs\\bg3mh_log_" + LOGDATE() + "
 // TODO: clear logs function
 
 
-
 function LOGDATE() {
     var date = new Date();
     var year = date.getFullYear();

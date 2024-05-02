@@ -4,14 +4,53 @@ const fs = require('fs');
 
 const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
+const { modName, rootModPath,  } = getConfig();
+const modsDirPath = path.join(rootModPath, 'Mods');
+
 const { v4: uuidv4 } = require('uuid');
+
+const { modDestPath } = require('../support_files/pack_mod')
 
 const { convert, compatRootModPath } = require('../support_files/conversion_junction.js');
 const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
+
+
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
-    convert(compatRootModPath, pak)
+    convert(compatRootModPath, pak);
+
+    /*
+    if (modDestPath) {
+        const destPakPath = path.join(modDestPath, `${modName}.pak`);
+        moveFileAcrossDevices(pakPath, destPakPath, (err) => {
+            if (err) {
+                vscode.window.showErrorMessage(`Error moving file: ${err}`);
+                vscode.window.showErrorMessage("Workplace settings reset, this is a known bug you will need to reset them. Close and reopen bg3 to get some autoset and reset whatever else you need. Sorry, looking into this. Try to ensure settings are correct to avoid this");
+                return;
+            }
+            vscode.window.showInformationMessage(`Mod files moved to ${modDestPath}`);
+
+            const tempFolder = path.join(path.dirname(rootModPath), "temp");
+            if (fs.existsSync(tempFolder)) {
+                fs.rmdirSync(tempFolder, { recursive: true });
+            }
+            // Recreate .vscode and restore settings.json after packing
+            if (settingsContent) {
+                if (!fs.existsSync(vscodeDirPath)) {
+                    fs.mkdirSync(vscodeDirPath, { recursive: true });
+                }
+                fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
+            }
+            if (autoLaunchOnPack) {
+                vscode.commands.executeCommand('bg3-mod-helper.launchGame');
+            }
+        });
+    } else {
+        vscode.window.showErrorMessage("Mod Destination Folder not provided. Workplace settings reset, this is a known bug you will need to reset them. Close and reopen bg3 to get some autoset and reset whatever else you need. Sorry, looking into this.");
+    }
+    */
+
 });
     /*
     const { rootModPath, modDestPath, divinePath, autoConvertLocalization, modPackTime, autoLaunchOnPack } = getConfig();
@@ -37,7 +76,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
 
-    const modsDirPath = path.join(rootModPath, 'Mods');
     let modName = '';
 
     // Check if Mods directory exists and get the first subfolder name
@@ -58,40 +96,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     } else {
         vscode.window.showErrorMessage('Mods directory not found.');
         return;
-    }
-
-    const metaPath = path.join(modsDirPath, modName, 'meta.lsx');
-
-    if (!fs.existsSync(metaPath)) {
-        const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in '+modName+'. Do you want to create one?', 'Create Meta', 'Close');
-        if (shouldCreateMeta === 'Create Meta') {
-            // Check if the directory exists, if not, create it
-            const directoryPath = path.join(rootModPath, 'Mods', modName);
-            if (!fs.existsSync(directoryPath)) {
-                fs.mkdirSync(directoryPath, { recursive: true });
-            }
-
-            const author = await vscode.window.showInputBox({ prompt: 'Enter the Author Name' });
-            const description = await vscode.window.showInputBox({ prompt: 'Enter a Description for your Mod' });
-            const folder = modName;
-            const major = await vscode.window.showInputBox({ prompt: 'Enter the Major version number' });
-            const minor = await vscode.window.showInputBox({ prompt: 'Enter the Minor version number' });
-            const revision = await vscode.window.showInputBox({ prompt: 'Enter the Revision number' });
-            const build = await vscode.window.showInputBox({ prompt: 'Enter the Build number' });
-            const uuid = uuidv4();
-            const version64 = createVersion64(major,minor,revision,build)
-
-            const skeletonMetaPath = path.join(__dirname, '../support_files/templates/long_skeleton_files/meta.lsx');
-            let fileContent = fs.readFileSync(skeletonMetaPath, 'utf8');
-            let newMetaContent = createMetaContent(fileContent, author, description, folder, major, minor, revision, build, uuid, version64);
-
-            // Write the new meta.lsx file with UTF-8 BOM
-            const BOM = '\uFEFF';
-            fs.writeFileSync(metaPath, BOM + newMetaContent, 'utf8');
-            vscode.window.showInformationMessage('meta.lsx created successfully.');
-        } else {
-            return;
-        }
     }
 
     // If autoConvertLocalization is enabled, run the xmlToLoca command first
@@ -177,36 +181,10 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         console.log(`stdout: ${stdout}`);
         vscode.window.showInformationMessage('Mod packed.');
 
-        if (modDestPath) {
-            const destPakPath = path.join(modDestPath, `${modName}.pak`);
-            moveFileAcrossDevices(pakPath, destPakPath, (err) => {
-                if (err) {
-                    vscode.window.showErrorMessage(`Error moving file: ${err}`);
-                    vscode.window.showErrorMessage("Workplace settings reset, this is a known bug you will need to reset them. Close and reopen bg3 to get some autoset and reset whatever else you need. Sorry, looking into this. Try to ensure settings are correct to avoid this");
-                    return;
-                }
-                vscode.window.showInformationMessage(`Mod files moved to ${modDestPath}`);
-
-                const tempFolder = path.join(path.dirname(rootModPath), "temp");
-                if (fs.existsSync(tempFolder)) {
-                    fs.rmdirSync(tempFolder, { recursive: true });
-                }
-                // Recreate .vscode and restore settings.json after packing
-                if (settingsContent) {
-                    if (!fs.existsSync(vscodeDirPath)) {
-                        fs.mkdirSync(vscodeDirPath, { recursive: true });
-                    }
-                    fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
-                }
-                if (autoLaunchOnPack) {
-                    vscode.commands.executeCommand('bg3-mod-helper.launchGame');
-                }
-            });
-        } else {
-            vscode.window.showErrorMessage("Mod Destination Folder not provided. Workplace settings reset, this is a known bug you will need to reset them. Close and reopen bg3 to get some autoset and reset whatever else you need. Sorry, looking into this.");
-        }
+        
     });
 });
+*/
 
 
 function moveFileAcrossDevices(sourcePath, destPath, callback) {
@@ -227,9 +205,43 @@ function moveFileAcrossDevices(sourcePath, destPath, callback) {
     });
 }
 
-function createMetaContent(templateContent, author, description, folder, major, minor, revision, build, uuid, version64) {
+
+async function createMetaContent(templateContent, author, description, folder, major, minor, revision, build, uuid, version64) {
     // Replace placeholders in templateContent with actual values
-    return templateContent
+    const metaPath = path.join(modsDirPath, modName, 'meta.lsx');
+
+    if (!fs.existsSync(metaPath)) {
+        const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in '+modName+'. Do you want to create one?', 'Create Meta', 'Close');
+        if (shouldCreateMeta === 'Create Meta') {
+            // Check if the directory exists, if not, create it
+            const directoryPath = path.join(rootModPath, 'Mods', modName);
+            if (!fs.existsSync(directoryPath)) {
+                fs.mkdirSync(directoryPath, { recursive: true });
+            }
+
+            const author = await vscode.window.showInputBox({ prompt: 'Enter the Author Name' });
+            const description = await vscode.window.showInputBox({ prompt: 'Enter a Description for your Mod' });
+            const folder = modName;
+            const major = await vscode.window.showInputBox({ prompt: 'Enter the Major version number' });
+            const minor = await vscode.window.showInputBox({ prompt: 'Enter the Minor version number' });
+            const revision = await vscode.window.showInputBox({ prompt: 'Enter the Revision number' });
+            const build = await vscode.window.showInputBox({ prompt: 'Enter the Build number' });
+            const uuid = uuidv4();
+            const version64 = createVersion64(major,minor,revision,build)
+
+            const skeletonMetaPath = path.join(__dirname, '../support_files/templates/long_skeleton_files/meta.lsx');
+            let fileContent = fs.readFileSync(skeletonMetaPath, 'utf8');
+            let newMetaContent = createMetaContent(fileContent, author, description, folder, major, minor, revision, build, uuid, version64);
+
+            // Write the new meta.lsx file with UTF-8 BOM
+            const BOM = '\uFEFF';
+            fs.writeFileSync(metaPath, BOM + newMetaContent, 'utf8');
+            vscode.window.showInformationMessage('meta.lsx created successfully.');
+        } else {
+            return;
+        }
+    }
+    templateContent
         .replace('{AUTHOR}', author)
         .replace('{DESCRIPTION}', description)
         .replace('{FOLDER}', folder)
@@ -242,6 +254,7 @@ function createMetaContent(templateContent, author, description, folder, major, 
         .replace('{VERSION64_1}', version64)
         .replace('{VERSION64_2}', version64);
 }
+
 
 function createVersion64(major, minor, build, revision) {
     // Convert input numbers to BigInt
@@ -258,7 +271,7 @@ function createVersion64(major, minor, build, revision) {
     
 }
 
-
+/*
 function isGameRunning() {
     return new Promise((resolve, reject) => {
         exec('tasklist', (error, stdout, stderr) => {
