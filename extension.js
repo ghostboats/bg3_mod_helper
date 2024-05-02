@@ -18,6 +18,8 @@ const getAttributesCommand = require('./commands/getAttributes');
 const smartConvertCommand = require('./commands/smartConvert');
 const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } = require('./commands/commands')
 
+const openConverterCommand = require('./commands/openConverter');
+
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
 const { CREATE_LOGGER } = require('./support_files/log_utils');
@@ -124,6 +126,7 @@ function activate(context) {
 
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
 
+
     context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand);
 }
 
@@ -152,6 +155,7 @@ function aSimpleDataProvider() {
                 { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
                 { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                 { label: 'Get attributes and an example value for the currently opened file', command: 'bg3-mod-helper.getAttributes' },
+                { label: 'Open the converter tab', command: 'bg3-mod-helper.openConverter' },
                 { label: "Debug Command, don't press unless you are me :)", command: 'bg3-mod-helper.debugCommand' }
             ]);
         }
