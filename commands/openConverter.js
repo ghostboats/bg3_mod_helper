@@ -1,6 +1,5 @@
-const vscode = require('vscode');
-
 const { convert } = require('../support_files/conversion_junction.js');
+const vscode = require('vscode');
 
 let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openConverter', async function () {
     console.log('‾‾openConverterCommand‾‾');
@@ -11,26 +10,23 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
         { enableScripts: true }
     );
 
-    const lsxFiles = await vscode.workspace.findFiles("**/*.lsx");
-    const lsfFiles = await vscode.workspace.findFiles("**/*.{lsf,lsfx,lsj,lsb,lsbs,lsbc}");
-    const xmlFiles = await vscode.workspace.findFiles("**/*.xml");
-    const locaFiles = await vscode.workspace.findFiles("**/*.loca");
+    const lsxFiles = await vscode.workspace.findFiles('**/*.lsx');
+    const lsfFiles = await vscode.workspace.findFiles('**/*.lsf');
+    const xmlFiles = await vscode.workspace.findFiles('**/*.xml');
+    const locaFiles = await vscode.workspace.findFiles('**/*.loca');
 
     panel.webview.html = getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles);
     panel.webview.onDidReceiveMessage(
-        message => {
-            console.log('Received message:', message);  // you can see that even on first button click the selected files are shown but nothing is converted until second click? if you alter the selected items its like resting it , you will need to double click again?
-            // async is weird :catyes: who knows
+        async message => {
+            console.log('Received message:', message);
             try {
                 switch (message.command) {
                     case 'convertSelected':
                     case 'convertAll':
                         const pathsString = message.paths.join(", ");
-                        vscode.window.showInformationMessage(`Converting files: ${pathsString}`);
-                        console.log(message.paths);
-    
                         const result = convert(message.paths, "arr");
                         panel.webview.postMessage({ command: 'alert', text: 'Conversion successful!' });
+                        await refreshFileList(panel);
                         break;
                 }
             } catch (err) {
@@ -39,7 +35,6 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
             }
         }
     );
-    
     console.log('__openConverterCommand__');
 });
 
@@ -50,10 +45,25 @@ function normalizePath(path) {
     return path;
 }
 
+async function refreshFileList(panel) {
+    const lsxFiles = await vscode.workspace.findFiles('**/*.lsx');
+    const lsfFiles = await vscode.workspace.findFiles('**/*.lsf');
+    const xmlFiles = await vscode.workspace.findFiles('**/*.xml');
+    const locaFiles = await vscode.workspace.findFiles('**/*.loca');
+
+    panel.webview.postMessage({
+        command: 'updateFiles',
+        lsxFiles: lsxFiles.map(file => file.path),
+        lsfFiles: lsfFiles.map(file => file.path),
+        xmlFiles: xmlFiles.map(file => file.path),
+        locaFiles: locaFiles.map(file => file.path)
+    });
+}
+
+
 function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
-    vscode.window.showInformationMessage(`nice`)
     const makeListItems = files => files.map(file => 
-        `<div class='file-item' data-path="${normalizePath(file.path)}" onclick='selectFile(this)'>${file.path.split('/').pop()}</div>`
+        `<div class='file-item' data-path='${normalizePath(file.path)}' onclick='selectFile(this)'>${file.path.split('/').pop()}</div>`
     ).join('');
 
     return `
@@ -166,6 +176,26 @@ function convertAll() {
         paths: filePaths
     });
 }
+
+window.addEventListener('message', event => {
+    const message = event.data;
+    switch (message.command) {
+        case 'updateFiles':
+            updateFileList('lsxFilesList', message.lsxFiles);
+            updateFileList('lsfFilesList', message.lsfFiles);
+            updateFileList('xmlFilesList', message.xmlFiles);
+            updateFileList('locaFilesList', message.locaFiles);
+            break;
+    }
+});
+
+function updateFileList(elementId, files) {
+    const fileList = document.getElementById(elementId);
+    fileList.innerHTML = files.map(file => 
+        <div class='file-item' data-path='${file}' onclick='selectFile(this)'>${file.split('/').pop()}</div>
+    ).join('');
+}
+
 </script>
 </body>
 </html>
