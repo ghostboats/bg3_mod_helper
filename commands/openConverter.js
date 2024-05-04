@@ -34,11 +34,12 @@ function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
 <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #121212; color: #ccc; }
     .file-container { display: flex; flex-wrap: wrap; justify-content: space-around; }
-    .file-box { flex: 1 1 200px; /* Sets a minimum width of 200px and allows boxes to grow */ border: 1px solid #333; padding: 20px; margin-bottom: 20px; background: #1e1e1e; box-shadow: 0 2px 5px rgba(0,0,0,0.3); margin: 5px; }
+    .file-box { flex: 1 1 200px; border: 1px solid #333; padding: 20px; margin-bottom: 20px; background: #1e1e1e; box-shadow: 0 2px 5px rgba(0,0,0,0.3); margin: 5px; }
     .file-item { padding: 10px; margin: 8px 0; border: 1px solid #555; cursor: pointer; transition: all 0.3s ease; color: #ccc; }
     .file-item:hover, .file-item.selected { background-color: #333; border-color: #76baff; color: #fff; }
-    .header { display: flex; align-items: baseline; }
-    h3 { color: #ddd; margin-right: 10px; flex-grow: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header { display: flex; align-items: baseline; justify-content: space-between; }
+    .title { color: #bbb; cursor: pointer; }
+    .title.active { color: #fff; }
     button { padding: 10px 20px; background-color: #333; border: none; color: #bbb; cursor: pointer; border-radius: 5px; transition: background 0.3s; }
     button:hover { background-color: #555; }
 </style>
@@ -46,36 +47,32 @@ function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
 <body>
 
 <div class="file-container">
-    <div class="file-box" id="lsxFiles">
+    <div class="file-box" id="lsxLsfFiles">
         <div class="header">
-            <h3>Lsx Files</h3>
-            <button onclick="toggleSelectAll('lsxFiles')">Toggle Select All</button>
+            <span class="title active" onclick="toggleFiles('lsx', 'lsf')">Lsx Files</span> / 
+            <span class="title" onclick="toggleFiles('lsf', 'lsx')">Lsf Files</span>
+            <button onclick="toggleSelectAll('lsxLsfFiles')">Toggle Select All</button>
         </div>
-        <div id="lsxFilesList">${makeListItems(lsxFiles)}</div>
+        <div id="lsxFilesList" class="file-list">
+            ${makeListItems(lsxFiles)}
+        </div>
+        <div id="lsfFilesList" class="file-list" style="display: none;">
+            ${makeListItems(lsfFiles)}
+        </div>
     </div>
 
-    <div class="file-box" id="lsfFiles">
+    <div class="file-box" id="xmlLocaFiles">
         <div class="header">
-            <h3>Lsf Files</h3>
-            <button onclick="toggleSelectAll('lsfFiles')">Toggle Select All</button>
+            <span class="title active" onclick="toggleFiles('xml', 'loca')">Xml Files</span> / 
+            <span class="title" onclick="toggleFiles('loca', 'xml')">Loca Files</span>
+            <button onclick="toggleSelectAll('xmlLocaFiles')">Toggle Select All</button>
         </div>
-        <div id="lsfFilesList">${makeListItems(lsfFiles)}</div>
-    </div>
-
-    <div class="file-box" id="xmlFiles">
-        <div class="header">
-            <h3>Xml Files</h3>
-            <button onclick="toggleSelectAll('xmlFiles')">Toggle Select All</button>
+        <div id="xmlFilesList" class="file-list">
+            ${makeListItems(xmlFiles)}
         </div>
-        <div id="xmlFilesList">${makeListItems(xmlFiles)}</div>
-    </div>
-
-    <div class="file-box" id="locaFiles">
-        <div class="header">
-            <h3>Loca Files</h3>
-            <button onclick="toggleSelectAll('locaFiles')">Toggle Select All</button>
+        <div id="locaFilesList" class="file-list" style="display: none;">
+            ${makeListItems(locaFiles)}
         </div>
-        <div id="locaFilesList">${makeListItems(locaFiles)}</div>
     </div>
 </div>
 
@@ -95,6 +92,26 @@ function toggleSelectAll(boxId) {
         if (allSelected) file.classList.remove('selected');
         else file.classList.add('selected');
     }
+}
+
+function toggleFiles(activeType, inactiveType) {
+    let activeFilesList = document.getElementById(activeType + 'FilesList');
+    let inactiveFilesList = document.getElementById(inactiveType + 'FilesList');
+    let activeTitle = document.querySelector('.title[onclick*="' + activeType + '"]');
+    let inactiveTitle = document.querySelector('.title[onclick*="' + inactiveType + '"]');
+
+    clearSelections(activeFilesList);
+    clearSelections(inactiveFilesList);
+
+    activeFilesList.style.display = '';
+    inactiveFilesList.style.display = 'none';
+    activeTitle.classList.add('active');
+    inactiveTitle.classList.remove('active');
+}
+
+function clearSelections(filesList) {
+    let selectedItems = filesList.getElementsByClassName('selected');
+    Array.from(selectedItems).forEach(item => item.classList.remove('selected'));
 }
 
 function convertSelected() {
