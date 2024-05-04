@@ -16,12 +16,41 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
     const locaFiles = await vscode.workspace.findFiles('**/*.loca');
 
     panel.webview.html = getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles);
+    panel.webview.onDidReceiveMessage(
+        async message => {
+            console.log('Received message:', message);  // you can see that even on first button click the selected files are shown but nothing is converted until second click? if you alter the selected items its like resting it , you will need to double click again?
+            try {
+                switch (message.command) {
+                    case 'convertSelected':
+                    case 'convertAll':
+                        const pathsString = message.paths.join(", ");
+                        await vscode.window.showInformationMessage(`Converting files: ${pathsString}`);
+    
+                        const result = await convert(message.paths, "arr");
+                        panel.webview.postMessage({ command: 'alert', text: 'Conversion successful!' });
+                        break;
+                }
+            } catch (err) {
+                panel.webview.postMessage({ command: 'alert', text: 'Error during conversion: ' + err.message });
+                console.error('Error during message processing:', err);
+            }
+        }
+    );
+    
     console.log('__openConverterCommand__');
 });
 
+function normalizePath(path) {
+    if (path.startsWith('/')) {
+        return path.slice(1);
+    }
+    return path;
+}
+
 function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
+    vscode.window.showInformationMessage(`nice`)
     const makeListItems = files => files.map(file => 
-        `<div class='file-item' data-path='${file.path}' onclick='selectFile(this)'>${file.path.split('/').pop()}</div>`
+        `<div class='file-item' data-path='${normalizePath(file.path)}' onclick='selectFile(this)'>${file.path.split('/').pop()}</div>`
     ).join('');
 
     return `
@@ -80,6 +109,7 @@ function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
 <button onclick="convertAll()">Convert All</button>
 
 <script>
+const vscode = acquireVsCodeApi();
 function selectFile(element) {
     element.classList.toggle('selected');
 }
@@ -117,20 +147,20 @@ function clearSelections(filesList) {
 function convertSelected() {
     let selectedFiles = Array.from(document.querySelectorAll('.file-item.selected'));
     let filePaths = selectedFiles.map(file => file.getAttribute('data-path'));
-    convert(filePaths).then(result => {
-        alert('Conversion successful!');
-    }).catch(err => {
-        alert('Error during conversion: ' + err.message);
+    console.log('Attempting to convert selected files with paths:', filePaths);
+    vscode.postMessage({
+        command: 'convertSelected',
+        paths: filePaths
     });
 }
 
 function convertAll() {
     let allFiles = Array.from(document.querySelectorAll('.file-item'));
     let filePaths = allFiles.map(file => file.getAttribute('data-path'));
-    convert(filePaths).then(result => {
-        alert('Conversion successful!');
-    }).catch(err => {
-        alert('Error during conversion: ' + err.message);
+    console.log('Attempting to convert all files with paths:', filePaths);
+    vscode.postMessage({
+        command: 'convertAll',
+        paths: filePaths
     });
 }
 </script>

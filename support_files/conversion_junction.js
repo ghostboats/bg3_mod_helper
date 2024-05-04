@@ -24,7 +24,13 @@ function getActiveTabPath() {
 
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
-    if (targetExt == pak) {
+    if (Array.isArray(convertPath) && targetExt == "arr") {
+        for (var i = 0; i < convertPath.length; i++) {
+            console.log(convertPath[i])
+            convert(convertPath[i], path.extname(convertPath[i]));
+        }
+    }
+    else if (targetExt == pak) {
         prepareTempDir();
         convert(compatRootModPath, xml);
         convert(compatRootModPath, lsx);
