@@ -63,7 +63,7 @@ async function refreshFileList(panel) {
 
 function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
     const makeListItems = files => files.map(file => 
-        `<div class='file-item' data-path='${normalizePath(file.path)}' onclick='selectFile(this)'>${file.path.split('/').pop()}</div>`
+        `<div class='file-item' data-path="${normalizePath(file.path)}" onclick='selectFile(this)'>${file.path.split('/').pop()}</div>`
     ).join('');
 
     return `
