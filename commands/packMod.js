@@ -69,9 +69,10 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     }
     */
     console.log("2 " + metaPath);
+    console.log(fs.lstatSync(metaPath).isFile())
 
     if (!fs.lstatSync(metaPath).isFile()) {
-        const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + path.dirname(modsDirPath) + '. Do you want to create one?', 'Create Meta', 'Close');
+        const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + metaPath + '. Do you want to create one?', 'Create Meta', 'Close');
         if (shouldCreateMeta === 'Create Meta') {
             // Check if the directory exists, if not, create it
             const directoryPath = path.join(rootModPath, 'Mods', modName);
@@ -97,7 +98,10 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             const BOM = '\uFEFF';
             fs.writeFileSync(metaPath, BOM + newMetaContent, 'utf8');
             vscode.window.showInformationMessage('meta.lsx created successfully.');
-        } else {
+        } 
+        else {
+            console.log(metaPath);
+            
             return;
         }
     }

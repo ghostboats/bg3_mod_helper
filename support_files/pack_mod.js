@@ -20,15 +20,15 @@ function prepareTempDir(modMoved = false) {
     //console.log("%s in pack_mod.js", rootModPath); 
     try {
         if (modMoved) {
-            fs.unlinkSync(modTempDestPath);
+            fs.rmSync(temp_path, { recursive:true, force: true });
             return;
         }
         else if (!fs.existsSync(temp_path)) {
             fs.mkdirSync(temp_path, { recursive: true});
         }
         else {
-            if (fs.existsSync(modTempDestPath)) {
-                fs.unlinkSync(modTempDestPath);
+            if (fs.lstatSync(modTempDestPath).isFile()) {
+                fs.rmSync(temp_path, { recursive:true, force: true });
             }
         }
     }
