@@ -117,46 +117,13 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         // eslint threw a fit so i changed this, seems to be basically the same :catyes:
         fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
-    convert(compatRootModPath, pak);
+    convert(rootModPath, pak);
 });
 
 
-async function createMetaContent(templateContent, author, description, folder, major, minor, revision, build, uuid, version64) {
+function createMetaContent(templateContent, author, description, folder, major, minor, revision, build, uuid, version64) {
     // Replace placeholders in templateContent with actual values
-    const metaPath = path.join(modsDirPath, modName, 'meta.lsx');
-
-    if (!fs.existsSync(metaPath)) {
-        const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in '+modName+'. Do you want to create one?', 'Create Meta', 'Close');
-        if (shouldCreateMeta === 'Create Meta') {
-            // Check if the directory exists, if not, create it
-            const directoryPath = path.join(rootModPath, 'Mods', modName);
-            if (!fs.existsSync(directoryPath)) {
-                fs.mkdirSync(directoryPath, { recursive: true });
-            }
-
-            const author = await vscode.window.showInputBox({ prompt: 'Enter the Author Name' });
-            const description = await vscode.window.showInputBox({ prompt: 'Enter a Description for your Mod' });
-            const folder = modName;
-            const major = await vscode.window.showInputBox({ prompt: 'Enter the Major version number' });
-            const minor = await vscode.window.showInputBox({ prompt: 'Enter the Minor version number' });
-            const revision = await vscode.window.showInputBox({ prompt: 'Enter the Revision number' });
-            const build = await vscode.window.showInputBox({ prompt: 'Enter the Build number' });
-            const uuid = uuidv4();
-            const version64 = createVersion64(major,minor,revision,build)
-
-            const skeletonMetaPath = path.join(__dirname, '../support_files/templates/long_skeleton_files/meta.lsx');
-            let fileContent = fs.readFileSync(skeletonMetaPath, 'utf8');
-            let newMetaContent = createMetaContent(fileContent, author, description, folder, major, minor, revision, build, uuid, version64);
-
-            // Write the new meta.lsx file with UTF-8 BOM
-            const BOM = '\uFEFF';
-            fs.writeFileSync(metaPath, BOM + newMetaContent, 'utf8');
-            vscode.window.showInformationMessage('meta.lsx created successfully.');
-        } else {
-            return;
-        }
-    }
-    templateContent
+    return templateContent
         .replace('{AUTHOR}', author)
         .replace('{DESCRIPTION}', description)
         .replace('{FOLDER}', folder)
