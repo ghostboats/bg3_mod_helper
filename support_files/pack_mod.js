@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const { LSLIB, getFormats, moveFileAcrossDevices } = require('./lslib_utils');
+const { LSLIB, getFormats, moveFileAcrossDevices, compatRootModPath } = require('./lslib_utils');
 const { pak } = getFormats();
 
 const { CREATE_LOGGER } = require('./log_utils');
@@ -16,10 +16,14 @@ const temp_path = path.normalize(rootParentPath + temp_folder);
 const modTempDestPath = path.normalize(temp_path + "\\" + modName + pak);
 
 
-function prepareTempDir() {
-    console.log("%s in pack_mod.js", rootModPath); 
+function prepareTempDir(modMoved = false) {
+    //console.log("%s in pack_mod.js", rootModPath); 
     try {
-        if (!fs.existsSync(temp_path)) {
+        if (modMoved) {
+            fs.unlinkSync(modTempDestPath);
+            return;
+        }
+        else if (!fs.existsSync(temp_path)) {
             fs.mkdirSync(temp_path, { recursive: true});
         }
         else {
@@ -35,21 +39,23 @@ function prepareTempDir() {
 
 
 async function processPak(modPath) {
+    console.log("8 %s from processPak()", modPath);
+
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 
     try {
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
-        moveFileAcrossDevices(modTempDestPath, modDestPath);
-        prepareTempDir();
+        moveFileAcrossDevices(modTempDestPath, modDestPath + "\\" + modName + pak);
+        prepareTempDir(true);
         
     }
     catch (error) {
         console.error(error);
     }
 
-    bg3mh_logger.debug("%s%s exported to %s", modName, pak, modDestPath);
+    // bg3mh_logger.debug("%s%s exported to %s", modName, pak, modDestPath);
 }
 
 

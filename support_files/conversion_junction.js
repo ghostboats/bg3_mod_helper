@@ -3,12 +3,11 @@ const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
 
-const { FIND_FILES, getFormats } = require('./lslib_utils');
+const { FIND_FILES, getFormats, compatRootModPath } = require('./lslib_utils');
 const { lsx, xml, pak } = getFormats();
 
 const { getConfig } = require('./config.js');
 const { rootModPath } = getConfig();
-// const compatRootModPath = path.normalize(rootModPath + "\\");
 
 const { CREATE_LOGGER } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
@@ -24,7 +23,7 @@ function getActiveTabPath() {
 
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
-    console.log("%s in convert() in conversion_junction.js", rootModPath);
+    console.log("4 %s in convert() in conversion_junction.js", rootModPath);
     try {
         if (Array.isArray(convertPath) && targetExt == "arr") {
             for (var i = 0; i < convertPath.length; i++) {
@@ -33,14 +32,15 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
             }
         }
         else if (targetExt == pak) {
-            console.log("%s in pak check in conversion_junction.js", rootModPath); 
+            console.log("5 %s in pak check in conversion_junction.js", rootModPath); 
 
             prepareTempDir();
-            convert(rootModPath, xml);
-            convert(rootModPath, lsx);
-            processPak(rootModPath);
+            convert(compatRootModPath, xml);
+            convert(compatRootModPath, lsx);
+            processPak(compatRootModPath);
         }
         else if (isLoca(targetExt)) {
+            console.log("6 %s converting loca");
             console.log(convertPath);
             if (fs.lstatSync(convertPath).isDirectory()) {
                 var filesToConvert = FIND_FILES(convertPath, targetExt);
@@ -58,6 +58,7 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
             }
         }
         else if (isLsf(targetExt)) {
+            console.log("7 %s converting lsf")
             if (fs.lstatSync(convertPath).isDirectory()) {
                 var filesToConvert = FIND_FILES(convertPath, targetExt);
 

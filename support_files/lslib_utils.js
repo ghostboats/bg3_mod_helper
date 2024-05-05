@@ -21,6 +21,7 @@ const { CREATE_LOGGER } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
+const compatRootModPath = path.normalize(getConfig().rootModPath + "\\");
 const divinePath = path.normalize(getConfig().divinePath + "\\");
 const divineToolsPath = path.normalize(getConfig().divinePath + "\\" + TOOL_SUBDIR);
 const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
@@ -158,4 +159,4 @@ function moveFileAcrossDevices(sourcePath, destPath, callback = error => console
 
 const LSLIB = LOAD_LSLIB();
 
-module.exports = { LSLIB, FIND_FILES, getFormats, moveFileAcrossDevices };
+module.exports = { LSLIB, FIND_FILES, getFormats, moveFileAcrossDevices, compatRootModPath };
