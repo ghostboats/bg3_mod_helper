@@ -16,24 +16,15 @@ const temp_path = path.normalize(rootParentPath + temp_folder);
 const modTempDestPath = path.normalize(temp_path + "\\" + modName + pak);
 
 
-function prepareTempDir(modMoved = false) {
+function prepareTempDir() {
     //console.log("%s in pack_mod.js", rootModPath); 
-    try {
-        if (modMoved) {
-            fs.rmSync(temp_path, { recursive:true, force: true });
-            return;
-        }
-        else if (!fs.existsSync(temp_path)) {
-            fs.mkdirSync(temp_path, { recursive: true});
-        }
-        else {
-            if (fs.lstatSync(modTempDestPath).isFile()) {
-                fs.rmSync(temp_path, { recursive:true, force: true });
-            }
-        }
+    if (!fs.existsSync(temp_path)) {
+        fs.mkdirSync(temp_path, { recursive: true});
+        return;
     }
-    catch (error) {
-        console.error(error);
+    else {
+        fs.rmSync(temp_path, { recursive:true, force: true });
+        return;
     }
 }
 
@@ -48,7 +39,7 @@ async function processPak(modPath) {
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
         moveFileAcrossDevices(modTempDestPath, modDestPath + "\\" + modName + pak);
-        prepareTempDir(true);
+        prepareTempDir();
         
     }
     catch (error) {
