@@ -8,6 +8,12 @@ const fs = require('fs');
 const path = require('path');
 
 const dotnet = require('node-api-dotnet/net8.0');
+/*
+    const dotnet_elastic = require('node-api-dotnet/net8.0');
+    const story_compiler = require('node-api-dotnet/net8.0');
+    const converter_app = require('node-api-dotnet/net8.0');
+*/
+
 
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
@@ -17,10 +23,10 @@ const bg3mh_logger = CREATE_LOGGER();
 const { getConfig }  = require('./config.js');
 const divinePath = path.normalize(getConfig().divinePath + "\\");
 const divineToolsPath = path.normalize(getConfig().divinePath + "\\" + TOOL_SUBDIR);
-const BANNED_DLLS = ['ConverterApp.dll'];
+const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
+const storyCompilerDll = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
+const converterAppDll = ['ConverterApp.dll'];
 
-
-// const DLLS = [LSLIB_DLL, LSLIBNATIVE_DLL, ZSTDSHARP_DLL, LZ4_DLL];
 var DLLS = [];
 var DLL_PATHS = [];
 
@@ -48,13 +54,10 @@ function processDllPaths() {
         var temp_name = path.basename(temp_path);
 
         try {
-            if (fs.existsSync(temp_path) && (!BANNED_DLLS.includes(temp_name))) {
-                DLLS.push(temp_path);
-                bg3mh_logger.debug("%s found at %s", temp_name, temp_path);
-            }
+            DLLS.push(temp_path);
+            bg3mh_logger.debug("%s found at %s", temp_name, temp_path);
         }
-        catch {
-            console.error("Error!");
+        catch (Error) {
             console.error(Error);
         }
     }
@@ -64,11 +67,29 @@ function processDllPaths() {
 function loadDlls() {
     for (let i = 0; i < DLLS.length; i++) {
         try {
-            dotnet.load(DLLS[i]);
-            bg3mh_logger.debug("%s loaded.", DLLS[i]);
+            let temp_name = path.basename(DLLS[i]);
+
+            /* leaving this here for now, in case i find a quick solution
+                if (elasticDlls.includes(temp_name)) {
+                    console.log("%s going into dotnet_elastic", temp_name);
+                    // dotnet_elastic.load(DLLS[i]);
+                }
+                else if (storyCompilerDll.includes(temp_name)) {
+                    console.log("%s going into story_compiler", temp_name);
+                    // story_compiler.load(DLLS[i]);
+                }
+                else if (converterAppDll.includes(temp_name)) {
+                    console.log("%s going into converter_app", temp_name);
+                    // converter_app.load(DLLS[i]);
+                } 
+            */
+
+            if (!converterAppDll.includes(temp_name) && !storyCompilerDll.includes(temp_name) && !elasticDlls.includes(temp_name)) {
+                dotnet.load(DLLS[i]);
+                bg3mh_logger.debug("%s loaded.", DLLS[i]);
+            }
         }
-        catch {
-            console.error("Error!");
+        catch (Error) {
             console.error(Error);
         }
     }
@@ -91,12 +112,10 @@ function LOAD_LSLIB() {
     }
         processDllPaths();    
         loadDlls();
-        
-        // @ts-ignore
-        // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege: 
-        tempLSLIB = dotnet.LSLib.LS;
 
-    return tempLSLIB;
+    // @ts-ignore
+    // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege: 
+    return dotnet.LSLib.LS;
 }
 
 
@@ -118,7 +137,25 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
 }
 
 
+function moveFileAcrossDevices(sourcePath, destPath, callback) {
+    fs.readFile(sourcePath, (readErr, data) => {
+        if (readErr) {
+            callback(readErr);
+            return;
+        }
+        fs.writeFile(destPath, data, (writeErr) => {
+            if (writeErr) {
+                callback(writeErr);
+                return;
+            }
+            fs.unlink(sourcePath, unlinkErr => {
+                callback(unlinkErr);
+            });
+        });
+    });
+}
+
+
 const LSLIB = LOAD_LSLIB();
 
-
-module.exports = { LSLIB, FIND_FILES, getFormats };
+module.exports = { LSLIB, FIND_FILES, getFormats, moveFileAcrossDevices };

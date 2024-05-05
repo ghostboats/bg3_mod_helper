@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const { LSLIB, getFormats } = require('./lslib_utils');
+const { LSLIB, getFormats, moveFileAcrossDevices } = require('./lslib_utils');
 const { pak } = getFormats();
 
 const { CREATE_LOGGER } = require('./log_utils');

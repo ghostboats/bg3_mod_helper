@@ -114,29 +114,11 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         if (fs.existsSync(settingsFilePath)) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
-        fs.rmdirSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
+        // eslint threw a fit so i changed this, seems to be basically the same :catyes:
+        fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
     convert(compatRootModPath, pak);
 });
-
-
-function moveFileAcrossDevices(sourcePath, destPath, callback) {
-    fs.readFile(sourcePath, (readErr, data) => {
-        if (readErr) {
-            callback(readErr);
-            return;
-        }
-        fs.writeFile(destPath, data, (writeErr) => {
-            if (writeErr) {
-                callback(writeErr);
-                return;
-            }
-            fs.unlink(sourcePath, unlinkErr => {
-                callback(unlinkErr);
-            });
-        });
-    });
-}
 
 
 async function createMetaContent(templateContent, author, description, folder, major, minor, revision, build, uuid, version64) {
