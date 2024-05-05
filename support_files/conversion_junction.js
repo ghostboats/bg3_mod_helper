@@ -8,7 +8,7 @@ const { lsx, xml, pak } = getFormats();
 
 const { getConfig } = require('./config.js');
 const { rootModPath } = getConfig();
-const compatRootModPath = path.normalize(rootModPath + "\\");
+// const compatRootModPath = path.normalize(rootModPath + "\\");
 
 const { CREATE_LOGGER } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
@@ -32,9 +32,9 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
     }
     else if (targetExt == pak) {
         prepareTempDir();
-        convert(compatRootModPath, xml);
-        convert(compatRootModPath, lsx);
-        processPak(compatRootModPath);
+        convert(rootModPath, xml);
+        convert(rootModPath, lsx);
+        processPak(rootModPath);
     }
     else if (isLoca(targetExt)) {
         if (fs.lstatSync(convertPath).isDirectory()) {
@@ -71,4 +71,4 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
 }
 
 
-module.exports = { convert, compatRootModPath }
+module.exports = { convert, rootModPath }
