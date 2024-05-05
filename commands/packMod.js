@@ -7,6 +7,10 @@ const { getConfig } = require('../support_files/config');
 const { modName, rootModPath,  } = getConfig();
 const modsDirPath = path.join(rootModPath, 'Mods');
 
+const vscodeDirPath = path.join(rootModPath, '.vscode');
+const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
+const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
+
 const { v4: uuidv4 } = require('uuid');
 
 const { convert } = require('../support_files/conversion_junction.js');
@@ -64,8 +68,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         return;
     }
     */
-
-    const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
     console.log("2 " + metaPath);
 
     if (!fs.lstatSync(metaPath).isFile()) {
@@ -107,8 +109,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     //await new Promise(resolve => setTimeout(resolve, packDelay));
 
     // Path to .vscode directory and settings file
-    const vscodeDirPath = path.join(rootModPath, '.vscode');
-    const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
     let settingsContent = '';
 
     // Check and save settings.json if .vscode exists
