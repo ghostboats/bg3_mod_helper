@@ -18,55 +18,20 @@ const { pak } = getFormats();
 
 
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
-    convert(compatRootModPath, pak);
-
-    /*
-    if (modDestPath) {
-        const destPakPath = path.join(modDestPath, `${modName}.pak`);
-        moveFileAcrossDevices(pakPath, destPakPath, (err) => {
-            if (err) {
-                vscode.window.showErrorMessage(`Error moving file: ${err}`);
-                vscode.window.showErrorMessage("Workplace settings reset, this is a known bug you will need to reset them. Close and reopen bg3 to get some autoset and reset whatever else you need. Sorry, looking into this. Try to ensure settings are correct to avoid this");
-                return;
-            }
-            vscode.window.showInformationMessage(`Mod files moved to ${modDestPath}`);
-
-            const tempFolder = path.join(path.dirname(rootModPath), "temp");
-            if (fs.existsSync(tempFolder)) {
-                fs.rmdirSync(tempFolder, { recursive: true });
-            }
-            // Recreate .vscode and restore settings.json after packing
-            if (settingsContent) {
-                if (!fs.existsSync(vscodeDirPath)) {
-                    fs.mkdirSync(vscodeDirPath, { recursive: true });
-                }
-                fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
-            }
-            if (autoLaunchOnPack) {
-                vscode.commands.executeCommand('bg3-mod-helper.launchGame');
-            }
-        });
-    } else {
-        vscode.window.showErrorMessage("Mod Destination Folder not provided. Workplace settings reset, this is a known bug you will need to reset them. Close and reopen bg3 to get some autoset and reset whatever else you need. Sorry, looking into this.");
-    }
-    */
-
-});
-    /*
     const { rootModPath, modDestPath, divinePath, autoConvertLocalization, modPackTime, autoLaunchOnPack } = getConfig();
 
     // Check if BG3 is running
     const isRunning = await isGameRunning();
 
     if (isRunning) {
-        vscode.window.showErrorMessage("Baldur's Gate 3 is currently running. Please close the game before packing the mod.");
+        vscode.window.showErrorMessage('Baldur\'s Gate 3 is currently running. Please close the game before packing the mod.');
         return; // Stop further execution
     }
 
     // Check if modDestPath is blank
     if (!modDestPath.includes("Larian Studios\\Baldur's Gate 3\\Mods")) {
         const useStandardPath = await vscode.window.showInformationMessage(
-        "The Mods destination path does not seem to be the standard Baldur's Gate 3 Mods folder. Do you want to change it?",
+            'The Mods destination path does not seem to be the standard Baldur\'s Gate 3 Mods folder. Do you want to change it?',
             'Change to Standard', 'Keep Current'
         );
         if (useStandardPath === 'Change to Standard') {
@@ -76,6 +41,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
 
+    const modsDirPath = path.join(rootModPath, 'Mods');
     let modName = '';
 
     // Check if Mods directory exists and get the first subfolder name
@@ -98,63 +64,45 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         return;
     }
 
-    // If autoConvertLocalization is enabled, run the xmlToLoca command first
-    if (autoConvertLocalization) {
-        vscode.window.showInformationMessage('Auto Convert Localization enabled in settings, will convert .xml -> .loca');
-        testing();
-    }
+    const metaPath = path.join(modsDirPath, modName, 'meta.lsx');
 
-    // Function to recursively find all 'merged.lsx' and 'Icons_*.lsx' files
-    /*async function findTargetLsxFiles(dir) {
-        let files = await fs.promises.readdir(dir, { withFileTypes: true });
-        let targetLsxFiles = files
-            .filter(file => !file.isDirectory() && file.name.endsWith('.lsx'))// || (file.name.startsWith('Icons_') && file.name.endsWith('.lsx'))))
-            .map(file => path.join(dir, file.name));
-        for (let file of files.filter(file => file.isDirectory())) {
-            targetLsxFiles = targetLsxFiles.concat(await findTargetLsxFiles(path.join(dir, file.name)));
-        }
-        return targetLsxFiles;
-    }
+    if (!fs.existsSync(metaPath)) {
+        const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in '+modName+'. Do you want to create one?', 'Create Meta', 'Close');
+        if (shouldCreateMeta === 'Create Meta') {
+            // Check if the directory exists, if not, create it
+            const directoryPath = path.join(rootModPath, 'Mods', modName);
+            if (!fs.existsSync(directoryPath)) {
+                fs.mkdirSync(directoryPath, { recursive: true });
+            }
 
-    // convert all lsx files to lsf within the root mod folder
-    const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'convert_lsf.py');
-    const convertCommand = `python "${scriptPath}" -d "${divinePath}" --file "${rootModPath}"`;
-    //const checkDir = `ls "${divinePath}"`
+            const author = await vscode.window.showInputBox({ prompt: 'Enter the Author Name' });
+            const description = await vscode.window.showInputBox({ prompt: 'Enter a Description for your Mod' });
+            const folder = modName;
+            const major = await vscode.window.showInputBox({ prompt: 'Enter the Major version number' });
+            const minor = await vscode.window.showInputBox({ prompt: 'Enter the Minor version number' });
+            const revision = await vscode.window.showInputBox({ prompt: 'Enter the Revision number' });
+            const build = await vscode.window.showInputBox({ prompt: 'Enter the Build number' });
+            const uuid = uuidv4();
+            const version64 = createVersion64(major,minor,revision,build)
 
-    exec(convertCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(error);
-            vscode.window.showErrorMessage(`Error running conversion script: ${error.message}`);
+            const skeletonMetaPath = path.join(__dirname, '../support_files/templates/long_skeleton_files/meta.lsx');
+            let fileContent = fs.readFileSync(skeletonMetaPath, 'utf8');
+            let newMetaContent = createMetaContent(fileContent, author, description, folder, major, minor, revision, build, uuid, version64);
+
+            // Write the new meta.lsx file with UTF-8 BOM
+            const BOM = '\uFEFF';
+            fs.writeFileSync(metaPath, BOM + newMetaContent, 'utf8');
+            vscode.window.showInformationMessage('meta.lsx created successfully.');
+        } else {
             return;
         }
-        if (stdout) {
-            console.log('Python script stdout:', stdout);
-        }
-        if (stderr) {
-            console.error('Python script stderr:', stderr);
-        }
-    });
-
-    // Run the Python script for each found file
-    /*for (let file of targetLsxFiles) {
-        //const outputFile = file.replace('.lsx', '.lsf');
-        vscode.window.showInformationMessage('Converting the following file to .lsf: '+file);
-        
-
-        console.log('Executing command:', convertCommand);
     }
 
     // Add a delay before executing the packaging command
-    const packDelay = modPackTime * 1000 || 7000; // Convert seconds to milliseconds, default to 5000ms (5 seconds)
-    const delaySeconds = packDelay / 1000; // Convert milliseconds back to seconds for display
-    vscode.window.showInformationMessage(`A short ${delaySeconds} second(s) delay to allow conversion (if your merged files don't reflect in-game, try packing two times in a row and let me know).`);
-    await new Promise(resolve => setTimeout(resolve, packDelay));
-
-    const pakPath = path.join(path.dirname(rootModPath), "temp", `${modName}.pak`);
-    const modDir = path.join(path.dirname(rootModPath), modName);
-    const divExePath = path.join(divinePath, "Tools\\Divine.exe");
-
-    const command = `"${divExePath}" -g bg3 --action create-package --source "${modDir}" --destination "${pakPath}" -l all`;
+    //const packDelay = modPackTime * 1000 || 7000; // Convert seconds to milliseconds, default to 5000ms (5 seconds)
+    //const delaySeconds = packDelay / 1000; // Convert milliseconds back to seconds for display
+    //vscode.window.showInformationMessage(`A short ${delaySeconds} second(s) delay to allow conversion (if your merged files don't reflect in-game, try packing two times in a row and let me know).`);
+    //await new Promise(resolve => setTimeout(resolve, packDelay));
 
     // Path to .vscode directory and settings file
     const vscodeDirPath = path.join(rootModPath, '.vscode');
@@ -168,23 +116,8 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
         fs.rmdirSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
-
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`Stderr: ${stderr}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-        vscode.window.showInformationMessage('Mod packed.');
-
-        
-    });
+    convert(compatRootModPath, pak);
 });
-*/
 
 
 function moveFileAcrossDevices(sourcePath, destPath, callback) {
@@ -271,7 +204,6 @@ function createVersion64(major, minor, build, revision) {
     
 }
 
-/*
 function isGameRunning() {
     return new Promise((resolve, reject) => {
         exec('tasklist', (error, stdout, stderr) => {
@@ -285,4 +217,4 @@ function isGameRunning() {
             resolve(isRunning);
         });
     });
-*/
+}
