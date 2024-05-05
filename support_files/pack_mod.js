@@ -17,6 +17,7 @@ const modTempDestPath = path.normalize(temp_path + "\\" + modName + pak);
 
 
 function prepareTempDir() {
+    console.log("%s in pack_mod.js", rootModPath); 
     try {
         if (!fs.existsSync(temp_path)) {
             fs.mkdirSync(temp_path, { recursive: true});

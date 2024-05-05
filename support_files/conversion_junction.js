@@ -1,5 +1,5 @@
 // what's your function
-const path = require('path')
+const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
 
@@ -8,7 +8,7 @@ const { lsx, xml, pak } = getFormats();
 
 const { getConfig } = require('./config.js');
 const { rootModPath } = getConfig();
-const compatRootModPath = path.normalize(rootModPath + "\\");
+// const compatRootModPath = path.normalize(rootModPath + "\\");
 
 const { CREATE_LOGGER } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
@@ -24,6 +24,7 @@ function getActiveTabPath() {
 
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
+    console.log("%s in convert() in conversion_junction.js", rootModPath);
     try {
         if (Array.isArray(convertPath) && targetExt == "arr") {
             for (var i = 0; i < convertPath.length; i++) {
@@ -32,6 +33,8 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
             }
         }
         else if (targetExt == pak) {
+            console.log("%s in pak check in conversion_junction.js", rootModPath); 
+
             prepareTempDir();
             convert(rootModPath, xml);
             convert(rootModPath, lsx);
@@ -77,4 +80,4 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
 }
 
 
-module.exports = { convert, rootModPath }
+module.exports = { convert }

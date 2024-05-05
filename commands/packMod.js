@@ -39,7 +39,9 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
 
-    const modsDirPath = path.join(rootModPath, 'Mods');
+    const modsDirPath = path.normalize(rootModPath + "\\Mods");
+    console.log(modsDirPath);
+    /*
     let modName = '';
 
     // Check if Mods directory exists and get the first subfolder name
@@ -61,8 +63,10 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         vscode.window.showErrorMessage('Mods directory not found.');
         return;
     }
+    */
 
-    const metaPath = path.join(modsDirPath, modName, 'meta.lsx');
+    const metaPath = path.normalize(modsDirPath + modName + "\\meta.lsx");
+    console.log(metaPath);
 
     if (!fs.existsSync(metaPath)) {
         const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in '+modName+'. Do you want to create one?', 'Create Meta', 'Close');
@@ -115,7 +119,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         // eslint threw a fit so i changed this, seems to be basically the same :catyes:
         fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
-    console.log(rootModPath)
+    console.log("%s before the convert(rootModPath, pak) in packMod.js", rootModPath)
     convert(rootModPath, pak);
 });
 
