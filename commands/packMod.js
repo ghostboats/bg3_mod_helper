@@ -5,10 +5,10 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
 const { modName, rootModPath,  } = getConfig();
-const modsDirPath = path.join(rootModPath, 'Mods');
 
 const vscodeDirPath = path.join(rootModPath, '.vscode');
 const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
+const modsDirPath = path.normalize(rootModPath + "\\Mods");
 const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
 
 const { v4: uuidv4 } = require('uuid');
@@ -42,8 +42,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             await vscode.workspace.getConfiguration('bg3ModHelper').update('modDestPath', standardPath, vscode.ConfigurationTarget.Global);
         }
     }
-
-    const modsDirPath = path.normalize(rootModPath + "\\Mods");
     console.log("1 " + modsDirPath);
     /*
     let modName = '';
@@ -121,7 +119,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
         // eslint threw a fit so i changed this, seems to be basically the same :catyes:
-        fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
+        fs.rmdirSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
     console.log("3 %s before the convert(rootModPath, pak) in packMod.js", rootModPath)
     convert(rootModPath, pak);
