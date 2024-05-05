@@ -28,7 +28,7 @@ function prepareTempDir() {
         }
     }
     catch (error) {
-        bg3mh_logger.error(error);
+        console.error(error);
     }
 }
 
@@ -45,7 +45,7 @@ async function processPak(modPath) {
         
     }
     catch (error) {
-        bg3mh_logger.error(error);
+        console.error(error);
     }
 
     bg3mh_logger.debug("%s%s exported to %s", modName, pak, modDestPath);

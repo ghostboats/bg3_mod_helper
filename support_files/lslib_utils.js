@@ -90,7 +90,7 @@ function loadDlls() {
             }
         }
         catch (Error) {
-            bg3mh_logger.error(Error);
+            console.error(Error);
         }
     }
 }
@@ -137,7 +137,7 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
 }
 
 
-function moveFileAcrossDevices(sourcePath, destPath, callback = error => bg3mh_logger.error(error)) {
+function moveFileAcrossDevices(sourcePath, destPath, callback = error => console.error(error)) {
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
             callback(readErr);

@@ -8,7 +8,7 @@ const { lsx, xml, pak } = getFormats();
 
 const { getConfig } = require('./config.js');
 const { rootModPath } = getConfig();
-// const compatRootModPath = path.normalize(rootModPath + "\\");
+const compatRootModPath = path.normalize(rootModPath + "\\");
 
 const { CREATE_LOGGER } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
@@ -24,49 +24,55 @@ function getActiveTabPath() {
 
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
-    if (Array.isArray(convertPath) && targetExt == "arr") {
-        for (var i = 0; i < convertPath.length; i++) {
-            console.log(convertPath[i])
-            convert(convertPath[i], path.extname(convertPath[i]));
-        }
-    }
-    else if (targetExt == pak) {
-        prepareTempDir();
-        convert(rootModPath, xml);
-        convert(rootModPath, lsx);
-        processPak(rootModPath);
-    }
-    else if (isLoca(targetExt)) {
-        if (fs.lstatSync(convertPath).isDirectory()) {
-            var filesToConvert = FIND_FILES(convertPath, targetExt);
-
-            for (var i = 0; i < filesToConvert.length; i++) {
-                processLoca(filesToConvert[i], targetExt);
+    try {
+        if (Array.isArray(convertPath) && targetExt == "arr") {
+            for (var i = 0; i < convertPath.length; i++) {
+                console.log(convertPath[i]);
+                convert(convertPath[i], path.extname(convertPath[i]));
             }
         }
-        else if (fs.lstatSync(convertPath).isFile()) {
-            processLoca(convertPath, targetExt);
+        else if (targetExt == pak) {
+            prepareTempDir();
+            convert(rootModPath, xml);
+            convert(rootModPath, lsx);
+            processPak(rootModPath);
         }
-        else {
-            bg3mh_logger.error("%s is not a recognized directory or loca file.", convertPath);
-            return;
-        }
-    }
-    else if (isLsf(targetExt)) {
-        if (fs.lstatSync(convertPath).isDirectory()) {
-            var filesToConvert = FIND_FILES(convertPath, targetExt);
+        else if (isLoca(targetExt)) {
+            console.log(convertPath);
+            if (fs.lstatSync(convertPath).isDirectory()) {
+                var filesToConvert = FIND_FILES(convertPath, targetExt);
 
-            for (var i = 0; i < filesToConvert.length; i++) {
-                processLsf(filesToConvert[i], targetExt);
+                for (var i = 0; i < filesToConvert.length; i++) {
+                    processLoca(filesToConvert[i], targetExt);
+                }
+            }
+            else if (fs.lstatSync(convertPath).isFile()) {
+                processLoca(convertPath, targetExt);
+            }
+            else {
+                console.error("%s is not a recognized directory or loca file.", convertPath);
+                return;
             }
         }
-        else if (fs.lstatSync(convertPath).isFile()) {
-            processLsf(convertPath, targetExt);
+        else if (isLsf(targetExt)) {
+            if (fs.lstatSync(convertPath).isDirectory()) {
+                var filesToConvert = FIND_FILES(convertPath, targetExt);
+
+                for (var i = 0; i < filesToConvert.length; i++) {
+                    processLsf(filesToConvert[i], targetExt);
+                }
+            }
+            else if (fs.lstatSync(convertPath).isFile()) {
+                processLsf(convertPath, targetExt);
+            }
+            else {
+                console.error("%s is not a recognized directory or lsf file.", convertPath);
+                return;
+            }
         }
-        else {
-            bg3mh_logger.error("%s is not a recognized directory or lsf file.", convertPath);
-            return;
-        }
+    }
+    catch (error) {
+        console.error(error);
     }
 }
 

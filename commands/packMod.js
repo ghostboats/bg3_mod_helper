@@ -9,9 +9,7 @@ const modsDirPath = path.join(rootModPath, 'Mods');
 
 const { v4: uuidv4 } = require('uuid');
 
-const { modDestPath } = require('../support_files/pack_mod')
-
-const { convert, compatRootModPath } = require('../support_files/conversion_junction.js');
+const { convert } = require('../support_files/conversion_junction.js');
 const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
@@ -117,6 +115,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         // eslint threw a fit so i changed this, seems to be basically the same :catyes:
         fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
+    console.log(rootModPath)
     convert(rootModPath, pak);
 });
 

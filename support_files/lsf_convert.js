@@ -99,7 +99,7 @@ function processLsf(file, targetExt) {
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
     }
     catch (Error) {
-        bg3mh_logger.error(Error);
+        console.error(Error);
     }
     
     bg3mh_logger.debug("Exported %s file: %s", to_lsf, file_output);
