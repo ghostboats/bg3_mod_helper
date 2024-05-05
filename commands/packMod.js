@@ -218,3 +218,5 @@ function isGameRunning() {
         });
     });
 }
+
+module.exports = packModCommand;
