@@ -177,6 +177,19 @@ function convertAll() {
     });
 }
 
+
+
+</script>
+</body>
+</html>
+`;
+}
+
+module.exports = openConverterCommand;
+
+
+//add this in html once we figure out the syntax stuff, hopoefully it helps update the window upon conversion. Its to add listener to update webview for new files
+/*
 window.addEventListener('message', event => {
     const message = event.data;
     switch (message.command) {
@@ -195,11 +208,4 @@ function updateFileList(elementId, files) {
         <div class='file-item' data-path='${file}' onclick='selectFile(this)'>${file.split('/').pop()}</div>
     ).join('');
 }
-
-</script>
-</body>
-</html>
-`;
-}
-
-module.exports = openConverterCommand;
+*/

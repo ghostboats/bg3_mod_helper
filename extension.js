@@ -134,30 +134,39 @@ function activate(context) {
 function aSimpleDataProvider() {
     return {
         getTreeItem: (element) => {
-            return {
-                label: element.label,
-                command: {
-                    command: element.command,
-                    title: '',
-                    arguments: [element.label]
-                }
-            };
+            const treeItem = new vscode.TreeItem(element.label);
+            if (element.id === 'conversion') {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+            } else if (element.children) {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+            } else {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            }
+            treeItem.command = element.command ? { command: element.command, title: "", arguments: [element.label] } : undefined;
+            return treeItem;
         },
         getChildren: (element) => {
-            return Promise.resolve([
-                { label: 'Convert the currently active tab', command: 'bg3-mod-helper.smartConvert' },
-                { label: 'Pack Mod (Ensure LSLib.dll is unblocked in its properties)', command: 'bg3-mod-helper.packMod' },
-                { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
-                { label: 'Convert all XML files to LOCA', command: 'bg3-mod-helper.xmlToLoca' },
-                { label: 'Convert all LOCA files to XML', command: 'bg3-mod-helper.locaToXml' },
-                { label: 'Convert all LSX files to LSF', command: 'bg3-mod-helper.lsxToLsf' },
-                { label: 'Convert all LSF files to LSX', command: 'bg3-mod-helper.lsfToLsx' },
-                { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
-                { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
-                { label: 'Get attributes and an example value for the currently opened file', command: 'bg3-mod-helper.getAttributes' },
-                { label: 'Open the converter tab', command: 'bg3-mod-helper.openConverter' },
-                { label: "Debug Command, don't press unless you are me :)", command: 'bg3-mod-helper.debugCommand' }
-            ]);
+            if (!element) {
+                // Root level
+                return Promise.resolve([
+                    { label: 'Conversion Tool (Click arrow for quick actions, text to open the tool', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
+                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
+                    { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
+                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
+                ]);
+            } else if (element.id === 'conversion') {
+                // Conversion submenu
+                return Promise.resolve([
+                    { label: 'Convert all XML to LOCA', command: 'bg3-mod-helper.xmlToLoca' },
+                    { label: 'Convert all LOCA to XML', command: 'bg3-mod-helper.locaToXml' },
+                    { label: 'Convert all LSX to LSF', command: 'bg3-mod-helper.lsxToLsf' },
+                    { label: 'Convert all LSF to LSX', command: 'bg3-mod-helper.lsfToLsx' }
+                ]);
+            } else {
+                // No further nesting
+                return Promise.resolve([]);
+            }
         }
     };
 }
