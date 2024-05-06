@@ -98,13 +98,14 @@ function processLsf(file, targetExt) {
     try {
         temp_lsf = ResourceUtils.LoadResource(file, load_params);
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
+
+        bg3mh_logger.debug("Exported %s file: %s", to_lsf, file_output);
     }
     catch (Error) {
         vscode.window.showErrorMessage(`${Error}`);
         console.error(Error);
+        bg3mh_logger.debug(Error);
     }
-    
-    bg3mh_logger.debug("Exported %s file: %s", to_lsf, file_output);
 }
  
 

@@ -53,6 +53,7 @@ async function processPak(modPath) {
     catch (Error) {
         vscode.window.showErrorMessage(`${Error}`);
         console.error(Error);
+        bg3mh_logger.debug(Error);
     }
 
     // bg3mh_logger.debug("%s%s exported to %s", modName, pak, modDestPath);

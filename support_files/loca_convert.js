@@ -47,8 +47,10 @@ function processLoca(file, targetExt) {
         bg3mh_logger.debug("Exported %s file: %s", to_loca, file_output);
     }
     catch (Error) {
+
         vscode.window.showErrorMessage(`${Error}`);
         console.error(Error);
+        bg3mh_logger.debug(Error);
     }
 }
 
