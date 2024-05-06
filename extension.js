@@ -149,7 +149,7 @@ function aSimpleDataProvider() {
             if (!element) {
                 // Root level
                 return Promise.resolve([
-                    { label: 'Conversion Tool (Click arrow for quick actions, text to open the tool', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
+                    { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
