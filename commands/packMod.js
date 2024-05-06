@@ -7,7 +7,6 @@ const { getConfig } = require('../support_files/config');
 const { modName, rootModPath,  } = getConfig();
 
 const vscodeDirPath = path.join(rootModPath, '.vscode');
-const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
 const modsDirPath = path.normalize(rootModPath + "\\Mods");
 const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
 
@@ -43,7 +42,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
     console.log("1 " + modsDirPath);
-    /*
+
     let modName = '';
 
     // Check if Mods directory exists and get the first subfolder name
@@ -65,11 +64,11 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         vscode.window.showErrorMessage('Mods directory not found.');
         return;
     }
-    */
-    console.log("2 " + metaPath);
-    console.log(fs.lstatSync(metaPath).isFile())
 
-    if (!fs.lstatSync(metaPath).isFile()) {
+    console.log("2 " + metaPath);
+    //console.log(fs.lstatSync(metaPath).isFile())
+
+    if (!fs.existsSync(metaPath)) {
         const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + metaPath + '. Do you want to create one?', 'Create Meta', 'Close');
         if (shouldCreateMeta === 'Create Meta') {
             // Check if the directory exists, if not, create it
@@ -111,6 +110,8 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     //await new Promise(resolve => setTimeout(resolve, packDelay));
 
     // Path to .vscode directory and settings file
+    const vscodeDirPath = path.join(rootModPath, '.vscode');
+    const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
     let settingsContent = '';
 
     // Check and save settings.json if .vscode exists
@@ -118,11 +119,16 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         if (fs.existsSync(settingsFilePath)) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
-        // eslint threw a fit so i changed this, seems to be basically the same :catyes:
         fs.rmdirSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
     console.log("3 %s before the convert(rootModPath, pak) in packMod.js", rootModPath)
     convert(rootModPath, pak);
+    if (settingsContent) {
+        if (!fs.existsSync(vscodeDirPath)) {
+            fs.mkdirSync(vscodeDirPath, { recursive: true });
+        }
+        fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
+    }
 });
 
 

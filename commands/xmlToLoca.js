@@ -6,15 +6,17 @@ const util = require('util');
 const { exec } = require('child_process')
 const execAsync = util.promisify(require('child_process').exec);
 
-const { convert, compatRootModPath} = require('../support_files/conversion_junction.js');
+const { convert } = require('../support_files/conversion_junction.js');
 
 const { getFormats } = require('../support_files/lslib_utils.js');
 const { loca, xml } = getFormats();
+const { getConfig } = require('../support_files/config');
+const { modName, rootModPath,  } = getConfig();
 
 
 const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLoca', async function () {
 
-    convert(compatRootModPath, xml);
+    convert(rootModPath, xml);
 
 });
 
