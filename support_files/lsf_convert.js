@@ -1,5 +1,6 @@
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
+const vscode = require('vscode');
 
 const { LSLIB, getFormats } = require('./lslib_utils');
 const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
@@ -99,6 +100,7 @@ function processLsf(file, targetExt) {
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
     }
     catch (Error) {
+        vscode.window.showErrorMessage(`${Error}`);
         console.error(Error);
     }
     

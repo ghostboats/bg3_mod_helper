@@ -1,4 +1,5 @@
-const path = require('path')
+const path = require('path');
+const vscode = require('vscode');
 
 const { LSLIB, getFormats } = require('./lslib_utils');
 const { CREATE_LOGGER } = require('./log_utils');
@@ -45,8 +46,9 @@ function processLoca(file, targetExt) {
         LocaUtils.Save(temp_loca, file_output);
         bg3mh_logger.debug("Exported %s file: %s", to_loca, file_output);
     }
-    catch (error) {
-        bg3mh_logger.error(error);
+    catch (Error) {
+        vscode.window.showErrorMessage(`${Error}`);
+        console.error(Error);
     }
 }
 

@@ -1,6 +1,21 @@
 const { convert } = require('../support_files/conversion_junction.js');
 const vscode = require('vscode');
 
+var lsxFiles;
+var lsfFiles;
+var xmlFiles;
+var locaFiles;
+
+
+async function refreshFiles() {
+    lsxFiles = await vscode.workspace.findFiles('**/*.lsx');
+    // added extra files that should be shown in the lsf panel of the webview
+    lsfFiles = await vscode.workspace.findFiles('**/*.{lsf,lsfx,lsc,lsj,lsbc,lsbs}');
+    xmlFiles = await vscode.workspace.findFiles('**/*.xml');
+    locaFiles = await vscode.workspace.findFiles('**/*.loca');
+}
+
+
 let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openConverter', async function () {
     console.log('‾‾openConverterCommand‾‾');
     const panel = vscode.window.createWebviewPanel(
@@ -10,10 +25,7 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
         { enableScripts: true }
     );
 
-    const lsxFiles = await vscode.workspace.findFiles('**/*.lsx');
-    const lsfFiles = await vscode.workspace.findFiles('**/*.lsf');
-    const xmlFiles = await vscode.workspace.findFiles('**/*.xml');
-    const locaFiles = await vscode.workspace.findFiles('**/*.loca');
+    await refreshFiles();
 
     panel.webview.html = getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles);
     panel.webview.onDidReceiveMessage(
@@ -46,10 +58,8 @@ function normalizePath(path) {
 }
 
 async function refreshFileList(panel) {
-    const lsxFiles = await vscode.workspace.findFiles('**/*.lsx');
-    const lsfFiles = await vscode.workspace.findFiles('**/*.lsf');
-    const xmlFiles = await vscode.workspace.findFiles('**/*.xml');
-    const locaFiles = await vscode.workspace.findFiles('**/*.loca');
+
+    await refreshFiles();
 
     panel.webview.postMessage({
         command: 'updateFiles',

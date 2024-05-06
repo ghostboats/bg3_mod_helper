@@ -29,5 +29,5 @@ const lsfToLsxCommand = vscode.commands.registerCommand('bg3-mod-helper.lsfToLsx
     convert(compatRootModPath, lsf);
 });
 
-
+// we should look into having a single file that exposes most commands :catyes:
 module.exports = { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand };

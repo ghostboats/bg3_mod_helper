@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 
+// loads the api
 const dotnet = require('node-api-dotnet/net8.0');
 /*
     const dotnet_elastic = require('node-api-dotnet/net8.0');
@@ -14,16 +15,15 @@ const dotnet = require('node-api-dotnet/net8.0');
     const converter_app = require('node-api-dotnet/net8.0');
 */
 
-
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
 const { CREATE_LOGGER } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
-const compatRootModPath = path.normalize(getConfig().rootModPath + "\\");
-const divinePath = path.normalize(getConfig().divinePath + "\\");
-const divineToolsPath = path.normalize(getConfig().divinePath + "\\" + TOOL_SUBDIR);
+const compatRootModPath = path.join(getConfig().rootModPath + "\\");
+const divinePath = path.join(getConfig().divinePath);
+const divineToolsPath = path.join(getConfig().divinePath, TOOL_SUBDIR);
 const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
 const storyCompilerDll = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
 const converterAppDll = ['ConverterApp.dll'];
@@ -49,6 +49,7 @@ function getFormats() {
 }
 
 
+// makes sure the path is normalized to the user's system, and then pushes that on to DLLS
 function processDllPaths() {
     for (let i = 0; i < DLL_PATHS.length; i++) {
         var temp_path = path.normalize(DLL_PATHS[i]);
@@ -65,6 +66,7 @@ function processDllPaths() {
 }
 
 
+// run through the created DLLS array and load each one
 function loadDlls() {
     for (let i = 0; i < DLLS.length; i++) {
         try {
@@ -97,29 +99,29 @@ function loadDlls() {
 }
 
 
+// handles the finding of LSLib. logs will be created wherever this laods from.
 function LOAD_LSLIB() {
-    var tempLSLIB;
-
-    if (fs.existsSync(path.normalize(divinePath + LSLIB_DLL))) {
+    if (fs.existsSync(path.join(divinePath, LSLIB_DLL))) {
         DLL_PATHS = FIND_FILES(divinePath, getFormats().dll, false);
     }
-    else if (fs.existsSync(path.normalize(divineToolsPath + LSLIB_DLL))) {
+    else if (fs.existsSync(path.join(divineToolsPath, LSLIB_DLL))) {
         DLL_PATHS = FIND_FILES(divineToolsPath, getFormats().dll, false);
     } 
     else {
         console.error("LSLib.dll not found at " + divinePath + ".");
-        tempLSLIB = null;
-        return;
+        return null;
     }
         processDllPaths();    
         loadDlls();
 
-    // @ts-ignore
-    // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege: 
+    // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
+    // @ts-ignore 
     return dotnet.LSLib.LS;
 }
 
 
+// returns an array with the absolute paths to every file found with the target file extension.
+// maybe replace with findFiles()? 
 function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     var filesToConvert = [];
     var filesList = fs.readdirSync(filesPath, {
@@ -130,14 +132,15 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
     for (var i = 0; i < filesList.length; i++) {
         var temp = filesList[i].toString();
         if (path.extname(temp) == targetExt) {
-            filesToConvert.push(filesPath + filesList[i]);
+            // toString() is needed here to conver the string[] | Buffer[] from readdirSync
+            filesToConvert.push(path.join(filesPath, filesList[i].toString()));
         }
     }
 
     return filesToConvert;
 }
 
-
+// here in case people (i'm people) have their working directory and their AppData on different hard drives.
 function moveFileAcrossDevices(sourcePath, destPath, callback = error => console.error(error)) {
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {

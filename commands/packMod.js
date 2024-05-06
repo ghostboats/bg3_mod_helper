@@ -4,7 +4,10 @@ const fs = require('fs');
 
 const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
-const { modName, rootModPath,  } = getConfig();
+const { modName, rootModPath } = getConfig();
+
+const { CREATE_LOGGER } = require('../support_files/log_utils');
+const bg3mh_logger = CREATE_LOGGER();
 
 const vscodeDirPath = path.join(rootModPath, '.vscode');
 const modsDirPath = path.normalize(rootModPath + "\\Mods");
@@ -17,7 +20,7 @@ const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
 
-
+// i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
     const { rootModPath, modDestPath, divinePath, autoConvertLocalization, modPackTime, autoLaunchOnPack } = getConfig();
 
@@ -41,8 +44,10 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             await vscode.workspace.getConfiguration('bg3ModHelper').update('modDestPath', standardPath, vscode.ConfigurationTarget.Global);
         }
     }
-    console.log("1 " + modsDirPath);
 
+    bg3mh_logger.debug("Grabbed mod name %s from %s.", modName, rootModPath);
+
+/*
     let modName = '';
 
     // Check if Mods directory exists and get the first subfolder name
@@ -64,9 +69,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         vscode.window.showErrorMessage('Mods directory not found.');
         return;
     }
-
-    console.log("2 " + metaPath);
-    //console.log(fs.lstatSync(metaPath).isFile())
+*/
 
     if (!fs.existsSync(metaPath)) {
         const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + metaPath + '. Do you want to create one?', 'Create Meta', 'Close');
@@ -97,7 +100,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             vscode.window.showInformationMessage('meta.lsx created successfully.');
         } 
         else {
-            console.log(metaPath);
+            bg3mh_logger.debug(metaPath);
             
             return;
         }
@@ -119,10 +122,11 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         if (fs.existsSync(settingsFilePath)) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
-        fs.rmdirSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
+        fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
     }
-    console.log("3 %s before the convert(rootModPath, pak) in packMod.js", rootModPath)
+    // send the directory to the convert() function, and let it know it's a pak
     convert(rootModPath, pak);
+
     if (settingsContent) {
         if (!fs.existsSync(vscodeDirPath)) {
             fs.mkdirSync(vscodeDirPath, { recursive: true });
