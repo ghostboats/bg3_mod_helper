@@ -42,7 +42,7 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
     console.log('‾‾createAtlasCommand‾‾');
     const { rootModPath, lslibPath } = getConfig();
 
-    const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'add_icons_to_atlas.py');
+    const scriptPath = path.join(__dirname, '..', 'support_files', 'scripts', 'python', 'add_icons_to_atlas.py');
     const modsDirPath = path.join(rootModPath, 'Mods');
     let modName = '';
     let import_test = false
