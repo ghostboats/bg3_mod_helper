@@ -18,7 +18,7 @@ const dotnet = require('node-api-dotnet/net8.0');
 
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
-const { CREATE_LOGGER, raiseError } = require('./log_utils.js')
+const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
@@ -144,22 +144,29 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
 }
 
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
-function moveFileAcrossDevices(sourcePath, destPath, callback = error => raiseError(error)) {
+function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
-            callback(readErr);
+            raiseError(readErr);
             return;
         }
         fs.writeFile(destPath, data, (writeErr) => {
             if (writeErr) {
-                callback(writeErr);
+                raiseError(writeErr);
                 return;
             }
             fs.unlink(sourcePath, unlinkErr => {
-                callback(unlinkErr);
+                // added the check because it was raising an error every time the func was called
+                if (unlinkErr) {
+                    raiseError(unlinkErr);
+                    return;
+                }
             });
         });
     });
+
+    raiseInfo(path.basename(sourcePath) + " moved to " + destPath, false);
+    vscode.window.showInformationMessage(`${path.basename(sourcePath)} moved to ${destPath}.`);
 }
 
 

@@ -38,6 +38,7 @@ function prepareTempDir(movedPak = false) {
 }
 
 
+// btw, sometimes this will log things before others because it's async.
 async function processPak(modPath) {
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
@@ -45,12 +46,12 @@ async function processPak(modPath) {
     try {
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
+        raiseInfo(modName + pak + " packed", false);
+        vscode.window.showInformationMessage(`${modName + pak} packed.`);
+
         // move files to chosen path and [in progress] clean up the empty directory
         moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
         prepareTempDir(true);
-        
-        raiseInfo(modName + pak + " exported to " + modDestPath + ".", false);
-        vscode.window.showInformationMessage(`${modName + pak} packed correctly and moved to ${modDestPath}.`);
     }
     catch (Error) {
         raiseError(Error);
