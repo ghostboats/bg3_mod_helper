@@ -47,7 +47,7 @@ async function processPak(modPath) {
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
         raiseInfo(modName + pak + " packed", false);
-        vscode.window.showInformationMessage(`${modName + pak} packed.`);
+        vscode.window.showInformationMessage(`${modName + pak} packed`);
 
         // move files to chosen path and [in progress] clean up the empty directory
         moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
