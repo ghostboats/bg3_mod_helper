@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const DDSToPNGCommand = vscode.commands.registerCommand('bg3-mod-helper.DDSToPNG', async (uri) => {
     console.log('‾‾DDSToPNGCommand‾‾');
     const checkWandScriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'check_wand.py');
-    const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'DDS_to_PNG.py');
+    const scriptPath = path.join(__dirname, '..', 'support_files', 'scripts', 'python', 'DDS_to_PNG.py');
     const filePath = uri.fsPath;
 
     // Check if Wand is installed
