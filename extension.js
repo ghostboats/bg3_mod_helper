@@ -63,14 +63,13 @@ function activate(context) {
 
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
     setConfig({
-        autoConvertLocalization: config.get('autoConvertLocalization'),
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: config.get('rootModPath'),
         modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
-        divinePath: config.get('divinePath'),
+        lslibPath: config.get('lslibPath'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         excludedFiles: config.get('excludedFiles') || []

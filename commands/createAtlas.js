@@ -40,7 +40,7 @@ function findDivineExe(lslibPath) {
 
 let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createAtlas', async function () { // Made the function async
     console.log('‾‾createAtlasCommand‾‾');
-    const { rootModPath, divinePath } = getConfig();
+    const { rootModPath, lslibPath } = getConfig();
 
     const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'add_icons_to_atlas.py');
     const modsDirPath = path.join(rootModPath, 'Mods');
@@ -49,7 +49,7 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
 
     let divinePath_;
     try {
-        divinePath_ = findDivineExe(divinePath);
+        divinePath_ = findDivineExe(lslibPath);
     } catch (error) {
         console.log(error)
         return;
@@ -126,7 +126,7 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
             '-a', `"${atlasPath}"`,
             '-t', `"${texturesPath}"`,
             '-u', `"${newUuid}"`,
-            '--divine', `"${divinePath}"`
+            '--divine', `"${divinePath_}"`
         ].join(' ');
 
         // Before writing the modified content to the new merged.lsx file

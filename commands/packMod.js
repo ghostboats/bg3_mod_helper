@@ -22,7 +22,7 @@ const { pak } = getFormats();
 
 // i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
-    const { rootModPath, modDestPath, divinePath, autoConvertLocalization, autoLaunchOnPack } = getConfig();
+    const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
 
     // Check if BG3 is running
     const isRunning = await isGameRunning();

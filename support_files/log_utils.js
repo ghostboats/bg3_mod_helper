@@ -1,8 +1,8 @@
 const path = require('path');
 const vscode = require('vscode');
 
-const divinePath = require('./config').getConfig().divinePath;
-const logPath = path.normalize(divinePath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
+const lslibPath = require('./config').getConfig().lslibPath;
+const logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
 
 // TODO: clear logs function
 

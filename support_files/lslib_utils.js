@@ -23,8 +23,8 @@ const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
 const compatRootModPath = path.join(getConfig().rootModPath + "\\");
-const divinePath = path.join(getConfig().divinePath);
-const divineToolsPath = path.join(getConfig().divinePath, TOOL_SUBDIR);
+const lslibPath = path.join(getConfig().lslibPath);
+const lslibToolsPath = path.join(getConfig().lslibPath, TOOL_SUBDIR);
 
 const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
 const storyCompilerDll = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
@@ -103,15 +103,15 @@ function loadDlls() {
 
 // handles the finding of LSLib. logs will be created wherever this laods from.
 function LOAD_LSLIB() {
-    if (fs.existsSync(path.join(divinePath, LSLIB_DLL))) {
-        DLL_PATHS = FIND_FILES(divinePath, getFormats().dll, false);
+    if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
+        DLL_PATHS = FIND_FILES(lslibPath, getFormats().dll, false);
     }
-    else if (fs.existsSync(path.join(divineToolsPath, LSLIB_DLL))) {
-        DLL_PATHS = FIND_FILES(divineToolsPath, getFormats().dll, false);
+    else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
+        DLL_PATHS = FIND_FILES(lslibToolsPath, getFormats().dll, false);
     } 
     else {
-        raiseError("LSLib.dll not found at " + divinePath + ".", false);
-        vscode.window.showErrorMessage(`LSLib.dll not found at ${divinePath}.`)
+        raiseError("LSLib.dll not found at " + lslibPath + ".", false);
+        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}.`)
         return null;
     }
         processDllPaths();    
