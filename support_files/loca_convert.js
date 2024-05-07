@@ -2,7 +2,7 @@ const path = require('path');
 const vscode = require('vscode');
 
 const { LSLIB, getFormats } = require('./lslib_utils');
-const { CREATE_LOGGER } = require('./log_utils');
+const { CREATE_LOGGER, raiseError } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
 const { xml, loca } = getFormats();
@@ -39,18 +39,15 @@ function processLoca(file, targetExt) {
 
     try {
         file_output = getLocaOutputPath(file);
-        bg3mh_logger.debug("Converting %s file %s to format %s", targetExt, file, to_loca);
+        bg3mh_logger.info("Converting %s file %s to format %s", targetExt, file, to_loca);
 
         temp_loca = LocaUtils.Load(file);
 
         LocaUtils.Save(temp_loca, file_output);
-        bg3mh_logger.debug("Exported %s file: %s", to_loca, file_output);
+        bg3mh_logger.info("Exported %s file: %s", to_loca, file_output);
     }
-    catch (Error) {
-
-        vscode.window.showErrorMessage(`${Error}`);
-        console.error(Error);
-        bg3mh_logger.debug(Error);
+    catch (Error) { 
+        raiseError(Error);
     }
 }
 

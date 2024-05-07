@@ -37,7 +37,7 @@ const { getFullPath } = require('./support_files/helper_functions');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    bg3mh_logger.debug('Displaying extension activation message');
+    bg3mh_logger.info('Displaying extension activation message');
 
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders && workspaceFolders.length > 0) {
@@ -76,7 +76,7 @@ function activate(context) {
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame')
     });
-    bg3mh_logger.debug('Initial configs set:' + JSON.stringify(config, null, 2))
+    bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
             'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'

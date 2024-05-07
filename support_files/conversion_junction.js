@@ -6,7 +6,8 @@ const vscode = require('vscode');
 const { FIND_FILES, getFormats } = require('./lslib_utils');
 const { lsx, xml, pak } = getFormats();
 
-const { CREATE_LOGGER } = require('./log_utils');
+const { CREATE_LOGGER, raiseError } = require('./log_utils');
+const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig } = require('./config.js');
 const { rootModPath, modName, modDestPath } = getConfig();
@@ -31,11 +32,10 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
         }
         else if (targetExt == pak) { 
             prepareTempDir();
+
             convert(rootModPath, xml);
             convert(rootModPath, lsx);
             processPak(rootModPath);
-
-            vscode.window.showInformationMessage(`${modExtName} packed correctly and moved to ${modDestPath}.`);
         }
         else if (isLoca(targetExt)) {
             if (fs.lstatSync(convertPath).isDirectory()) {
@@ -50,8 +50,8 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
                 vscode.window.showInformationMessage(`Exported ${getLocaOutputPath(convertPath)} correctly.`);
             }
             else {
+                raiseError(convertPath + " is not a recognized directory or loca file.", false);
                 vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or loca file.`);
-                console.error("%s is not a recognized directory or loca file.", convertPath);
                 return;
             }
         }
@@ -68,14 +68,14 @@ function convert(convertPath = getActiveTabPath(), targetExt = path.extname(conv
                 vscode.window.showInformationMessage(`Exported ${getLsfOutputPath(convertPath)} correctly.`);
             }
             else {
+                raiseError(convertPath + " is not a recognized directory or lsf file.", false);
                 vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or lsf file.`);
-                console.error("%s is not a recognized directory or lsf file.", convertPath);
                 return;
             }
         }
     }
-    catch (error) {
-        console.error(error);
+    catch (error) { 
+        raiseError(error);
     }
 }
 

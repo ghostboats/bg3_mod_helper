@@ -5,7 +5,7 @@ const fs = require('fs');
 const { LSLIB, getFormats, moveFileAcrossDevices, compatRootModPath } = require('./lslib_utils');
 const { pak } = getFormats();
 
-const { CREATE_LOGGER } = require('./log_utils');
+const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig } = require('./config.js');
@@ -49,14 +49,12 @@ async function processPak(modPath) {
         moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
         prepareTempDir(true);
         
+        raiseInfo(modName + pak + " exported to " + modDestPath + ".", false);
+        vscode.window.showInformationMessage(`${modName + pak} packed correctly and moved to ${modDestPath}.`);
     }
     catch (Error) {
-        vscode.window.showErrorMessage(`${Error}`);
-        console.error(Error);
-        bg3mh_logger.debug(Error);
+        raiseError(Error);
     }
-
-    // bg3mh_logger.debug("%s%s exported to %s", modName, pak, modDestPath);
 }
 
 

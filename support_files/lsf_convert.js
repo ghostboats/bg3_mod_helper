@@ -10,7 +10,7 @@ const Game = LSLIB.Enums.Game;
 const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
 const lsfFormats = [lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx];
 
-const { CREATE_LOGGER } = require('./log_utils');
+const { CREATE_LOGGER, raiseError } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 var to_lsf;
@@ -93,18 +93,16 @@ function processLsf(file, targetExt) {
     var file_output = "";
     var temp_lsf = "";
         file_output = getLsfOutputPath(file);
-        bg3mh_logger.debug("Converting %s file %s to format %s", targetExt, file, to_lsf);
+        bg3mh_logger.info("Converting %s file %s to format %s", targetExt, file, to_lsf);
 
     try {
         temp_lsf = ResourceUtils.LoadResource(file, load_params);
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
 
-        bg3mh_logger.debug("Exported %s file: %s", to_lsf, file_output);
+        bg3mh_logger.info("Exported %s file: %s", to_lsf, file_output);
     }
-    catch (Error) {
-        vscode.window.showErrorMessage(`${Error}`);
-        console.error(Error);
-        bg3mh_logger.debug(Error);
+    catch (Error) { 
+        raiseError(Error);
     }
 }
  

@@ -3,9 +3,10 @@
     
     TODO: auto-update LSLib from github 
 */
-
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
+const vscode = require('vscode');
+
 
 // loads the api
 const dotnet = require('node-api-dotnet/net8.0');
@@ -17,13 +18,14 @@ const dotnet = require('node-api-dotnet/net8.0');
 
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
-const { CREATE_LOGGER } = require('./log_utils.js')
+const { CREATE_LOGGER, raiseError } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
 const compatRootModPath = path.join(getConfig().rootModPath + "\\");
 const divinePath = path.join(getConfig().divinePath);
 const divineToolsPath = path.join(getConfig().divinePath, TOOL_SUBDIR);
+
 const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
 const storyCompilerDll = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
 const converterAppDll = ['ConverterApp.dll'];
@@ -57,10 +59,10 @@ function processDllPaths() {
 
         try {
             DLLS.push(temp_path);
-            bg3mh_logger.debug("%s found at %s", temp_name, temp_path);
+            bg3mh_logger.info("%s found at %s", temp_name, temp_path);
         }
         catch (Error) {
-            console.error(Error);
+            raiseError(Error);
         }
     }
 }
@@ -89,11 +91,11 @@ function loadDlls() {
 
             if (!converterAppDll.includes(temp_name) && !storyCompilerDll.includes(temp_name) && !elasticDlls.includes(temp_name)) {
                 dotnet.load(DLLS[i]);
-                bg3mh_logger.debug("%s loaded.", DLLS[i]);
+                bg3mh_logger.info("%s loaded.", DLLS[i]);
             }
         }
         catch (Error) {
-            console.error(Error);
+            raiseError(Error);
         }
     }
 }
@@ -108,7 +110,8 @@ function LOAD_LSLIB() {
         DLL_PATHS = FIND_FILES(divineToolsPath, getFormats().dll, false);
     } 
     else {
-        console.error("LSLib.dll not found at " + divinePath + ".");
+        raiseError("LSLib.dll not found at " + divinePath + ".", false);
+        vscode.window.showErrorMessage(`LSLib.dll not found at ${divinePath}.`)
         return null;
     }
         processDllPaths();    
@@ -141,7 +144,7 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
 }
 
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
-function moveFileAcrossDevices(sourcePath, destPath, callback = error => console.error(error)) {
+function moveFileAcrossDevices(sourcePath, destPath, callback = error => raiseError(error)) {
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
             callback(readErr);

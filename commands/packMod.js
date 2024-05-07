@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
 const { modName, rootModPath } = getConfig();
 
-const { CREATE_LOGGER } = require('../support_files/log_utils');
+const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
 const bg3mh_logger = CREATE_LOGGER();
 
 const vscodeDirPath = path.join(rootModPath, '.vscode');
@@ -45,7 +45,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
 
-    bg3mh_logger.debug("Grabbed mod name %s from %s.", modName, rootModPath);
+    bg3mh_logger.info("Grabbed mod name %s from %s.", modName, rootModPath);
 
 /*
     let modName = '';
@@ -100,7 +100,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             vscode.window.showInformationMessage('meta.lsx created successfully.');
         } 
         else {
-            bg3mh_logger.debug(metaPath);
+            bg3mh_logger.info(metaPath);
             
             return;
         }
@@ -172,7 +172,7 @@ function isGameRunning() {
     return new Promise((resolve, reject) => {
         exec('tasklist', (error, stdout, stderr) => {
             if (error || stderr) {
-                console.error('Error checking running processes', error || stderr);
+                raiseError("Error checking running processes" + error || stderr);
                 resolve(false); // Assuming game is not running in case of error
                 return;
             }
