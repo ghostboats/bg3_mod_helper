@@ -293,8 +293,8 @@ if __name__ == "__main__":
         icons_dir:Path = args.icons
         atlas_output:Path = args.atlas
         texture_output:Path = args.texture
-        resource_output:Path = args.resource
-        resource_lsx_output:Path = args.resourcelsx
+        # resource_output:Path = args.resource
+        # resource_lsx_output:Path = args.resourcelsx
         atlas_uuid:str = args.uuid
         dds_format:str = args.ddsformat
         icon_size:tuple[int,int] = args.iconsize
@@ -306,7 +306,7 @@ if __name__ == "__main__":
         if totalIcons > 0:
             generate_atlas_lsx(icons, atlas_output, texture_output, atlas_uuid, icon_size, texture_size)
             generate_texture(icons, texture_output, texture_size, dds_format, do_mipmaps)
-        if resource_output:
-            generate_texture_lsf(atlas_uuid, texture_output, resource_output, lslib_dll, resource_lsx_output)
+        # if resource_output:
+            # generate_texture_lsf(atlas_uuid, texture_output, resource_output, lslib_dll, resource_lsx_output)
         
     print("Created atlas in {} seconds for {} icons.".format(timeit.timeit(run_cmd, number=1), totalIcons))
