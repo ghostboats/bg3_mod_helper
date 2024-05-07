@@ -1,7 +1,7 @@
 const path = require('path');
 const vscode = require('vscode');
 
-const { LSLIB, getFormats } = require('./lslib_utils');
+const { LSLIB, getFormats, baseNamePath } = require('./lslib_utils');
 const { CREATE_LOGGER, raiseError } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
@@ -16,10 +16,10 @@ function isLoca(ext) {
 
 
 function getLocaOutputPath(filePath) {
+    to_loca = "";
     var source_ext = path.extname(filePath);
+    var temp = baseNamePath(filePath, source_ext);
 
-    var temp = filePath.substring(0, (filePath.length - source_ext.length));
-    
     if (source_ext == xml) {
         to_loca = loca;
     }

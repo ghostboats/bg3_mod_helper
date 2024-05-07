@@ -51,6 +51,20 @@ function getFormats() {
 }
 
 
+function dirSeparator(filePath) {
+    filePath = path.normalize(filePath);
+    if (filePath[0] == "/" || filePath[0] == "\\") {
+        return filePath.slice(1, filePath.length).toString();
+    }
+    return filePath.toString();
+}
+
+// returns the given path, minus the file extension (ie. \home\shiela\doc.txt > \home\shiela\doc)
+function baseNamePath(filePath, ext) {
+    return filePath.substring(0, (filePath.length - ext.length));
+}
+
+
 // makes sure the path is normalized to the user's system, and then pushes that on to DLLS
 function processDllPaths() {
     for (let i = 0; i < DLL_PATHS.length; i++) {
@@ -114,8 +128,9 @@ function LOAD_LSLIB() {
         vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}.`)
         return null;
     }
-        processDllPaths();    
-        loadDlls();
+
+    processDllPaths();    
+    loadDlls();
 
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
@@ -146,12 +161,11 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
                 bg3mh_logger.info(`Included: ${fullPath}`);
                 filesToConvert.push(fullPath);
             } 
-    else {
+            else {
                 bg3mh_logger.info(`Excluded: ${fullPath}`);
             }
         }
     }
-
     return filesToConvert;
 }
 
@@ -176,7 +190,6 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
             });
         });
     });
-
     raiseInfo(path.basename(sourcePath) + " moved to " + destPath, false);
     vscode.window.showInformationMessage(`${path.basename(sourcePath)} moved to ${destPath}.`);
 }
@@ -184,4 +197,4 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
 
 const LSLIB = LOAD_LSLIB();
 
-module.exports = { LSLIB, FIND_FILES, getFormats, moveFileAcrossDevices, compatRootModPath };
+module.exports = { LSLIB, FIND_FILES, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };

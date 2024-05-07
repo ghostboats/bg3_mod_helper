@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
 
-const { LSLIB, getFormats } = require('./lslib_utils');
+const { LSLIB, getFormats, baseNamePath } = require('./lslib_utils');
 const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
 const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
 const Game = LSLIB.Enums.Game;
@@ -54,7 +54,7 @@ function checkForLsbs(tempPath) {
 function getLsfOutputPath(filePath) {
     to_lsf = "";
     var source_ext = path.extname(filePath);
-    var temp = filePath.substring(0, (filePath.length - source_ext.length));
+    var temp = baseNamePath(filePath, source_ext);
 
     if (source_ext == lsx) {
         if (checkForLsb(temp)) {

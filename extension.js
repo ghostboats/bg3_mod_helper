@@ -60,7 +60,6 @@ function activate(context) {
             });
     }
 
-
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
     setConfig({
         maxFilesToShow: config.get('hover.maxFiles'),
@@ -124,7 +123,6 @@ function activate(context) {
 
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
 
-
     context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand);
 }
 
@@ -170,7 +168,9 @@ function aSimpleDataProvider() {
     };
 }
 
+
 function deactivate() {}
+
 
 module.exports = {
     activate,

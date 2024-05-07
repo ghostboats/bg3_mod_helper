@@ -25,7 +25,8 @@
             },
             {
                 "command": "bg3-mod-helper.smartConvert",
-                "title": "Convert the currently active tab",
+                "title": "Convert this file",
+                "category": "BG3 Mod Helper",
                 "iconPath": "$(zap)"
             },
             {
@@ -260,6 +261,11 @@
                     "when": "resourceExtname == .png",
                     "command": "extension.addIconBackground",
                     "group": "9_modification"
+                },
+                {
+                    "when": "resourceExtname == .dll || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsb || resourceExtname == .lsf || resourceExtname == .lsj || resourceExtname == .lsfx || resourceExtname == .lsbc || resourceExtname == .lsbs || resourceExtname == .lsx",
+                    "command": "bg3-mod-helper.smartConvert",
+                    "group": "navigation"
                 }
             ],
             "editor/context": [

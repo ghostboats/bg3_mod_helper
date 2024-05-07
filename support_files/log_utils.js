@@ -70,6 +70,7 @@ function raiseError(error, popup = true) {
     bg3mh_logger.error(error);
 }
 
+
 function raiseInfo(info, popup = true) {
     var bg3mh_logger = CREATE_LOGGER();
 

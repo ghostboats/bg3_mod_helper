@@ -8,9 +8,6 @@ let debugCommand = vscode.commands.registerCommand('bg3-mod-helper.debugCommand'
     vscode.window.showWarningMessage(
         'cmon dude i said no :('
     )
-    bg3mh_logger.error("test");
-    bg3mh_logger.info("test");
-    // bg3mh_logger.info("test");
     console.log('__debugCommand__');
 });
 
