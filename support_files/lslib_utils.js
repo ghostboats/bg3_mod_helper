@@ -132,13 +132,16 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
         withFileTypes: false,
         recursive: isRecursive
     });
-
+    console.log(`Excluded Files: ${excludedFiles}`);
     for (let i = 0; i < filesList.length; i++) {
         const temp = filesList[i].toString();
         if (path.extname(temp) === targetExt) {
             const fullPath = path.join(filesPath, filesList[i].toString());
-            if (!excludedFiles.includes(path.basename(fullPath))) {
+            if (!excludedFiles.includes(fullPath)) {
+                console.log(`Included: ${fullPath}`);
                 filesToConvert.push(fullPath);
+            } else {
+                console.log(`Excluded: ${fullPath}`);
             }
         }
     }

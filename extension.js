@@ -154,6 +154,7 @@ function aSimpleDataProvider() {
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
+                    { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
                 ]);
             } else if (element.id === 'conversion') {

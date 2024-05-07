@@ -25,8 +25,8 @@ function getActiveTabPath() {
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
     const { excludedFiles } = getConfig();
-    bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
-    console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
+    //bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
+    //console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
     try {
         if (Array.isArray(convertPath) && targetExt == "arr") {
             for (var i = 0; i < convertPath.length; i++) {
