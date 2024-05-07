@@ -76,15 +76,15 @@ function loadDlls() {
 
             /* leaving this here for now, in case i find a quick solution
                 if (elasticDlls.includes(temp_name)) {
-                    console.log("%s going into dotnet_elastic", temp_name);
+                    bg3mh_logger.info("%s going into dotnet_elastic", temp_name);
                     // dotnet_elastic.load(DLLS[i]);
                 }
                 else if (storyCompilerDll.includes(temp_name)) {
-                    console.log("%s going into story_compiler", temp_name);
+                    bg3mh_logger.info("%s going into story_compiler", temp_name);
                     // story_compiler.load(DLLS[i]);
                 }
                 else if (converterAppDll.includes(temp_name)) {
-                    console.log("%s going into converter_app", temp_name);
+                    bg3mh_logger.info("%s going into converter_app", temp_name);
                     // converter_app.load(DLLS[i]);
                 } 
             */
@@ -126,22 +126,28 @@ function LOAD_LSLIB() {
 // returns an array with the absolute paths to every file found with the target file extension.
 // maybe replace with findFiles()? 
 function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
-    const { excludedFiles } = getConfig();
     let filesToConvert = [];
+
+    const { excludedFiles } = getConfig();
     const filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
         recursive: isRecursive
     });
-    console.log(`Excluded Files: ${excludedFiles}`);
+
+    bg3mh_logger.info(`Excluded Files: ${excludedFiles}`);
+
     for (let i = 0; i < filesList.length; i++) {
         const temp = filesList[i].toString();
+
         if (path.extname(temp) === targetExt) {
             const fullPath = path.join(filesPath, filesList[i].toString());
+
             if (!excludedFiles.includes(fullPath)) {
-                console.log(`Included: ${fullPath}`);
+                bg3mh_logger.info(`Included: ${fullPath}`);
                 filesToConvert.push(fullPath);
-            } else {
-                console.log(`Excluded: ${fullPath}`);
+            } 
+    else {
+                bg3mh_logger.info(`Excluded: ${fullPath}`);
             }
         }
     }
