@@ -126,17 +126,20 @@ function LOAD_LSLIB() {
 // returns an array with the absolute paths to every file found with the target file extension.
 // maybe replace with findFiles()? 
 function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
-    var filesToConvert = [];
-    var filesList = fs.readdirSync(filesPath, {
+    const { excludedFiles } = getConfig();
+    let filesToConvert = [];
+    const filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
-        recursive: isRecursive,
+        recursive: isRecursive
     });
 
-    for (var i = 0; i < filesList.length; i++) {
-        var temp = filesList[i].toString();
-        if (path.extname(temp) == targetExt) {
-            // toString() is needed here to conver the string[] | Buffer[] from readdirSync
-            filesToConvert.push(path.join(filesPath, filesList[i].toString()));
+    for (let i = 0; i < filesList.length; i++) {
+        const temp = filesList[i].toString();
+        if (path.extname(temp) === targetExt) {
+            const fullPath = path.join(filesPath, filesList[i].toString());
+            if (!excludedFiles.includes(path.basename(fullPath))) {
+                filesToConvert.push(fullPath);
+            }
         }
     }
 

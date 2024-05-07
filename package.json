@@ -200,6 +200,14 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Automatically continue the most recent game on launch."
+                },
+                "bg3ModHelper.excludedFiles": {
+                    "type": "array",
+                    "description": "List of files to exclude from conversion.",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

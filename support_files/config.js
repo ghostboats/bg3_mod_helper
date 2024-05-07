@@ -22,7 +22,8 @@ function getConfig() {
         divinePath: config.get('divinePath'),
         modPackTime: config.get('modPackTime'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
-        launchContinueGame: config.get('launchContinueGame')
+        launchContinueGame: config.get('launchContinueGame'),
+        excludedFiles: config.get('excludedFiles') || []
     };
 }
 module.exports = { setConfig, getConfig };

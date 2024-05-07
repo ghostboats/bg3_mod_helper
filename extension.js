@@ -74,7 +74,8 @@ function activate(context) {
         divinePath: config.get('divinePath'),
         modPackTime: config.get('modPackTime'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
-        launchContinueGame: config.get('launchContinueGame')
+        launchContinueGame: config.get('launchContinueGame'),
+        excludedFiles: config.get('excludedFiles') || []
     });
     bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {

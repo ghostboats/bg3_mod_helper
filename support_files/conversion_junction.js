@@ -10,7 +10,7 @@ const { CREATE_LOGGER, raiseError } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig } = require('./config.js');
-const { rootModPath, modName, modDestPath } = getConfig();
+const { rootModPath, modName, modDestPath, excludedFiles } = getConfig();
 const modExtName  = modName + pak;
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
@@ -24,9 +24,13 @@ function getActiveTabPath() {
 
 
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
+    const { excludedFiles } = getConfig();
+    bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
+    console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
     try {
         if (Array.isArray(convertPath) && targetExt == "arr") {
             for (var i = 0; i < convertPath.length; i++) {
+                console.log(convertPath[i])
                 convert(convertPath[i], path.extname(convertPath[i]));
             }
         }
