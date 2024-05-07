@@ -141,11 +141,6 @@
         "configuration": {
             "title": "BG3 Mod Helper",
             "properties": {
-                "bg3ModHelper.singleFileConversion": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Allows you to select what xml file to convert to loca instead of all files in the localization folder."
-                },
                 "bg3ModHelper.maxCacheSize": {
                     "type": "number",
                     "default": 100,
@@ -186,11 +181,6 @@
                     "default": true,
                     "description": "Automatically convert localization files when packing the mod. //MAYBE NOT FUNCTIONAL/NEEDED AT CURRENT"
                 },
-                "bg3ModHelper.modPackTime": {
-                    "type": "number",
-                    "default": 5,
-                    "description": "Time in seconds to pack the mod, if mod changes are not reflecting in game and you know your files are correct increase the time on this. Sometime seems to not wait and send files before pack is made, increasing this adds a delay so it will."
-                },
                 "bg3ModHelper.autoLaunchOnPack": {
                     "type": "boolean",
                     "default": false,
@@ -203,7 +193,7 @@
                 },
                 "bg3ModHelper.excludedFiles": {
                     "type": "array",
-                    "description": "List of files to exclude from conversion.",
+                    "description": "List of files to exclude from conversion, ie [c:/path/to/ur/file.lsx]",
                     "default": [],
                     "items": {
                         "type": "string"

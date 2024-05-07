@@ -1,8 +1,8 @@
 const vscode = require('vscode');
 const path = require('path');
 
-const { convert, compatRootModPath} = require('../support_files/conversion_junction.js');
-const { getFormats } = require('../support_files/lslib_utils.js');
+const { convert} = require('../support_files/conversion_junction.js');
+const { getFormats, compatRootModPath } = require('../support_files/lslib_utils.js');
 
 const { getConfig } = require('../support_files/config');
 const { lsf, lsx } = getFormats();

@@ -22,7 +22,7 @@ const { pak } = getFormats();
 
 // i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
-    const { rootModPath, modDestPath, divinePath, autoConvertLocalization, modPackTime, autoLaunchOnPack } = getConfig();
+    const { rootModPath, modDestPath, divinePath, autoConvertLocalization, autoLaunchOnPack } = getConfig();
 
     // Check if BG3 is running
     const isRunning = await isGameRunning();
@@ -105,12 +105,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
             return;
         }
     }
-
-    // Add a delay before executing the packaging command
-    //const packDelay = modPackTime * 1000 || 7000; // Convert seconds to milliseconds, default to 5000ms (5 seconds)
-    //const delaySeconds = packDelay / 1000; // Convert milliseconds back to seconds for display
-    //vscode.window.showInformationMessage(`A short ${delaySeconds} second(s) delay to allow conversion (if your merged files don't reflect in-game, try packing two times in a row and let me know).`);
-    //await new Promise(resolve => setTimeout(resolve, packDelay));
 
     // Path to .vscode directory and settings file
     const vscodeDirPath = path.join(rootModPath, '.vscode');

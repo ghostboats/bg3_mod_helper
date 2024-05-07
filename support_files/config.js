@@ -12,7 +12,6 @@ function getConfig() {
     const config = vscode.workspace.getConfiguration('bg3ModHelper');
     return {
         autoConvertLocalization: config.get('autoConvertLocalization'),
-        singleFileConversion: config.get('singleFileConversion'),
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
@@ -20,7 +19,6 @@ function getConfig() {
         modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
         divinePath: config.get('divinePath'),
-        modPackTime: config.get('modPackTime'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         excludedFiles: config.get('excludedFiles') || []

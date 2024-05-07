@@ -64,7 +64,6 @@ function activate(context) {
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
     setConfig({
         autoConvertLocalization: config.get('autoConvertLocalization'),
-        singleFileConversion: config.get('singleFileConversion'),
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
@@ -72,7 +71,6 @@ function activate(context) {
         modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
         divinePath: config.get('divinePath'),
-        modPackTime: config.get('modPackTime'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         excludedFiles: config.get('excludedFiles') || []
@@ -150,8 +148,8 @@ function aSimpleDataProvider() {
             if (!element) {
                 // Root level
                 return Promise.resolve([
-                    { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
