@@ -39,7 +39,7 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
                     case 'convertSelected':
                     case 'convertAll':
                         const pathsString = message.paths.join(", ");
-                        const result = convert(message.paths, "arr");
+                        const result = convert(message.paths);
                         panel.webview.postMessage({ command: 'alert', text: 'Conversion successful!' });
                         await refreshFileList(panel);
                         break;
@@ -183,7 +183,7 @@ function convertSelected() {
 function convertAll() {
     let allFiles = Array.from(document.querySelectorAll('.file-item'));
     let filePaths = allFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert all files with paths:', filePaths);
+    bg3mh_logger.info('Attempting to convert all files with paths: %s', filePaths);
     vscode.postMessage({
         command: 'convertAll',
         paths: filePaths

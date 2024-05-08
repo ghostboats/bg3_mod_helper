@@ -6,7 +6,7 @@ const vscode = require('vscode');
 const { FIND_FILES, getFormats } = require('./lslib_utils');
 const { lsx, xml, pak } = getFormats();
 
-const { raiseError } = require('./log_utils');
+const { raiseError, raiseInfo } = require('./log_utils');
 
 const { getConfig } = require('./config.js');
 const { rootModPath, modName, modDestPath, excludedFiles } = getConfig();
@@ -15,100 +15,123 @@ const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
 const { processPak, prepareTempDir } = require('./pack_mod');
 
+let isList = false;
+let isPak = false;
 
 function getActiveTabPath() {
     return vscode.window.activeTextEditor.document.fileName;
 }
 
 
+function getDynamicPath(filePath) {
+    let temp_path;
+    if (Array.isArray(filePath)) {
+        temp_path = filePath[0];
+    }
+    else if (typeof(filePath) == 'string') {
+        temp_path = filePath;
+    }
+    else {
+        temp_path = getActiveTabPath();
+    }
+
+    return temp_path;
+}
+
+
+function lastFileCheck(index, length) {
+    return (index == length - 1)
+}
+
+
 // this should be refactored in next release
-function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
+function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), lastFile = false) {
     const { excludedFiles } = getConfig();
-    convertPath = convertPath.toString();
+    //convertPath = convertPath.toString();
+
     //bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
     //console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
-    try {
-        if (Array.isArray(convertPath) && targetExt == "arr") {
+
+    if (targetExt == pak) {
+        isPak = true;
+        prepareTempDir();
+
+        convert(rootModPath, xml);
+        convert(rootModPath, lsx);
+        processPak(rootModPath);
+    }
+    else if (Array.isArray(convertPath)) {
+        console.log("to be converted: %s", convertPath)
+        if (convertPath.length == 1) {
+            lastFile = lastFileCheck(0, convertPath.length);
+            convert(convertPath[0], path.extname(convertPath[0]));
+        }
+        else if (convertPath.length > 1) {
+            console.log("array length is %s", convertPath.length);
+            isList = true;
             for (var i = 0; i < convertPath.length; i++) {
-                convert(convertPath[i], path.extname(convertPath[i]));
+                lastFile = lastFileCheck(i, convertPath.length);
+                convert(convertPath[i], path.extname(convertPath[i]), lastFile);
             }
         }
-        else if (targetExt == pak) { 
-            prepareTempDir();
-
-            convert(rootModPath, xml);
-            convert(rootModPath, lsx);
-            processPak(rootModPath);
-        }
-        else if (isLoca(targetExt)) {
-            if (fs.statSync(convertPath).isDirectory()) {
-                var filesToConvert = FIND_FILES(convertPath, targetExt);
-
-                for (var i = 0; i < filesToConvert.length; i++) {
-                    try {
-                        processLoca(filesToConvert[i], targetExt); 
-                    }
-                    catch (Error) {
-                        raiseError(Error);
-                        return;
-                    }
-                }
+    }
+    else if (fs.statSync(convertPath).isDirectory()) {
+        convert(FIND_FILES(convertPath, targetExt));
+    }
+    else if (fs.statSync(convertPath).isFile()) {
+        if (isLoca(targetExt)) {
+            try {
+                processLoca(convertPath, targetExt);
             }
-            else if (fs.statSync(convertPath).isFile()) {
-                try {
-                    processLoca(convertPath, targetExt); 
-
-                    if (!Error) {
-                        vscode.window.showInformationMessage(`Exported ${getLocaOutputPath(convertPath)} correctly.`);
-                    }
-                }
-                catch (Error) {
-                    raiseError(Error);
-                    return;
-                }
-            }
-            else {
-                raiseError(convertPath + " is not a recognized directory or loca file.", false);
-                vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or loca file.`);
+            catch (Error) {
+                raiseError(Error);
                 return;
             }
         }
         else if (isLsf(targetExt)) {
-            if (fs.statSync(convertPath).isDirectory()) {
-                var filesToConvert = FIND_FILES(convertPath, targetExt);
-
-                for (var i = 0; i < filesToConvert.length; i++) {  
-                    try {
-                        processLsf(filesToConvert[i], targetExt); 
-                    }
-                    catch (Error) {
-                        raiseError(Error);
-                        return;
-                    }
-                }
+            try {
+                processLsf(convertPath, targetExt); 
             }
-            else if (fs.statSync(convertPath).isFile()) {
-                try {
-                    processLsf(convertPath, targetExt); 
-
-                    if (!Error) {
-                        vscode.window.showInformationMessage(`Exported ${getLsfOutputPath(convertPath)} correctly.`);
-                    }
-                }
-                catch (Error) {
-                    raiseError(Error);
-                    return;
-                }
-            }
-            else {
-                raiseError(convertPath + " is not a recognized directory or lsf file.", false);
-                vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or lsf file.`);
+            catch (Error) {
+                raiseError(Error);
                 return;
             }
         }
+        
+        if (!lastFile && !isList && !isPak) {
+            lastFile = true;
+        }
     }
-    catch (error) { 
-        raiseError(error);
+
+    console.log("%s\n%s\n%s", lastFile, isPak, isList);
+
+    if (!lastFile) {
+        if (!isPak && isList) {
+            console.log("%s is not a pak and is a list", convertPath);
+            raiseInfo(`${modName} ${targetExt} files converted successfully`);
+        }
+        else if (!isPak && !isList) {
+            console.log("%s is not a pak and is not a list", convertPath);
+            raiseInfo(`${convertPath} converted successfully`);
+        }
+    }
+    
+    if (lastFile) {
+        if (!isPak && isList) {
+            console.log("%s is not a pak and is a list", convertPath);
+            raiseInfo(`${modName} ${targetExt} files converted successfully`);
+        }
+        else if (!isPak && !isList) {
+            console.log("%s is not a pak and is not a list", convertPath);
+            raiseInfo(`${convertPath} converted successfully`);
+        }
+
+        if (isPak && isList) {
+            isPak = false;
+            isList = true;
+        }
+
+        lastFile = false;
     }
 }
 
