@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const PNGToDDSCommand = vscode.commands.registerCommand('bg3-mod-helper.PNGToDDS', async (uri) => {
     console.log('‾‾PNGToDDSCommand‾‾');
     const checkWandScriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'check_wand.py');
-    const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'PNG_to_DDS.py');
+    const scriptPath = path.join(__dirname, '..', 'support_files', 'scripts', 'python', 'PNG_to_DDS.py');
     const filePath = uri.fsPath;
 
     // Normalize file path and determine output format

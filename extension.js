@@ -1,11 +1,9 @@
-//vsce package
 const vscode = require('vscode');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const { setConfig, getConfig } = require('./support_files/config');
 const packModImport = require('./commands/packMod');
-const xmlToLocaImport = require('./commands/xmlToLoca');
 const launchGameImport = require('./commands/launchGame');
 const createAtlasImport = require('./commands/createAtlas');
 const insertHandleUUIDImport = require('./commands/insertHandleUUID');
@@ -17,8 +15,15 @@ const PNGToDDSCommand = require('./commands/PNGToDDS');
 const addIconBackground  = require('./commands/addIconBackground');
 const createModTemplateImport = require('./commands/createModTemplate/createModTemplate');
 const getAttributesCommand = require('./commands/getAttributes');
+const smartConvertCommand = require('./commands/smartConvert');
+const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } = require('./commands/commands')
+
+const openConverterCommand = require('./commands/openConverter');
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
+
+const { CREATE_LOGGER } = require('./support_files/log_utils');
+var bg3mh_logger = CREATE_LOGGER();
 
 const debugCommand = require('./commands/debug');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
@@ -28,22 +33,11 @@ const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImag
 const { getFullPath } = require('./support_files/helper_functions');
 
 
-// test comment for 
-
-
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    console.log('Displaying extension activation message')
-    vscode.window.showInformationMessage(
-        'bg3-mod-helper extension is now active! Click here to change settings for this extension.',
-        'Open Settings'
-    ).then(selection => {
-        if (selection === 'Open Settings') {
-            vscode.commands.executeCommand('workbench.action.openSettings', 'bg3ModHelper');
-        }
-    });
+    bg3mh_logger.info('Displaying extension activation message');
 
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders && workspaceFolders.length > 0) {
@@ -51,30 +45,36 @@ function activate(context) {
 
         // Update the extension configuration
         const config = vscode.workspace.getConfiguration('bg3ModHelper');
-        config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace)
-            .then(() => {
-                vscode.window.showInformationMessage(`Workspace set to ${mainFolderPath}. When packing your mod and converting xml->loca, it will use this folder.`);
+        config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace
+            ).then(() => {
+                vscode.window.showInformationMessage(`Workspace set to: 
+                ${mainFolderPath}.`,
+                'Open Settings'
+            ).then(selection => {
+                if (selection === 'Open Settings') {
+                vscode.commands.executeCommand('workbench.action.openSettings', 'bg3ModHelper');
+                }
+            });
             }, (error) => {
                 vscode.window.showErrorMessage(`Error setting workspace: ${error}`);
             });
     }
 
-
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
+    
     setConfig({
-        autoConvertLocalization: config.get('autoConvertLocalization'),
-        singleFileConversion: config.get('singleFileConversion'),
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: config.get('rootModPath'),
+        modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
-        divinePath: config.get('divinePath'),
-        modPackTime: config.get('modPackTime'),
+        lslibPath: config.get('lslibPath'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
-        launchContinueGame: config.get('launchContinueGame')
+        launchContinueGame: config.get('launchContinueGame'),
+        excludedFiles: config.get('excludedFiles') || []
     });
-    console.log('Initial configs set:' + JSON.stringify(config, null, 2))
+    bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
             'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'
@@ -131,30 +131,47 @@ function activate(context) {
 function aSimpleDataProvider() {
     return {
         getTreeItem: (element) => {
-            return {
-                label: element.label,
-                command: {
-                    command: element.command,
-                    title: '',
-                    arguments: [element.label]
-                }
-            };
+            const treeItem = new vscode.TreeItem(element.label);
+            if (element.id === 'conversion') {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+            } else if (element.children) {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+            } else {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            }
+            treeItem.command = element.command ? { command: element.command, title: "", arguments: [element.label] } : undefined;
+            return treeItem;
         },
         getChildren: (element) => {
-            return Promise.resolve([
-                { label: 'Pack Mod (Ensure LSLib.dll is unblocked in its properties)', command: 'bg3-mod-helper.packMod' },
-                { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
-                { label: 'Xml To Loca (Ensure LSLib.dll is unblocked in its properties)', command: 'bg3-mod-helper.xmlToLoca' },
-                { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
-                { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
-                { label: 'Get attributes and an example value for the currently opened file', command: 'bg3-mod-helper.getAttributes' },
-                { label: 'Debug Command, dont press unless you are me :)', command: 'bg3-mod-helper.debugCommand' }
-            ]);
+            if (!element) {
+                // Root level
+                return Promise.resolve([
+                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
+                    { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
+                    { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
+                    { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
+                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
+                ]);
+            } else if (element.id === 'conversion') {
+                // Conversion submenu
+                return Promise.resolve([
+                    { label: 'Convert all XML to LOCA', command: 'bg3-mod-helper.xmlToLoca' },
+                    { label: 'Convert all LOCA to XML', command: 'bg3-mod-helper.locaToXml' },
+                    { label: 'Convert all LSX to LSF', command: 'bg3-mod-helper.lsxToLsf' },
+                    { label: 'Convert all LSF to LSX', command: 'bg3-mod-helper.lsfToLsx' }
+                ]);
+            } else {
+                // No further nesting
+                return Promise.resolve([]);
+            }
         }
     };
 }
 
+
 function deactivate() {}
+
 
 module.exports = {
     activate,

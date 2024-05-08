@@ -1,6 +1,9 @@
 const vscode = require('vscode');
 const path = require('path');
 
+const { CREATE_LOGGER } = require('./log_utils');
+var bg3mh_logger = CREATE_LOGGER();
+
 // Function to insert text, replacing the current selection
 function insertText(text) {
     const editor = vscode.window.activeTextEditor;
@@ -29,8 +32,8 @@ function getFullPath(relativePath) {
 
 // Function to find instances in workspace
 async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
-    console.log('‾‾findInstanceInWorkspace‾‾');
-    console.log('word: ',word,'\ncurrentFilePath: ',currentFilePath,'\nmaxFilesToShow: ',maxFilesToShow);
+    bg3mh_logger.debug('‾‾findInstanceInWorkspace‾‾');
+    bg3mh_logger.debug('word: ',word,'\ncurrentFilePath: ',currentFilePath,'\nmaxFilesToShow: ',maxFilesToShow);
     let instances = [];
     const workspaceFolder = vscode.workspace.workspaceFolders[0];
     const workspacePath = workspaceFolder.uri.fsPath;
@@ -55,8 +58,8 @@ async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
         }
         if (instances.length >= maxFilesToShow) break;
     }
-    console.log('Found Instances:\n',instances)
-    console.log('__findInstanceInWorkspace__')
+    bg3mh_logger.debug('Found Instances:\n',instances)
+    bg3mh_logger.debug('__findInstanceInWorkspace__')
     return instances;
 }
 

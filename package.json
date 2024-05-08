@@ -3,10 +3,10 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "1.3.100",
+    "version": "2.0.0",
     "icon": "media/marketplace_icon.png",
     "engines": {
-        "vscode": "^1.86.0"
+        "vscode": "^1.88.0"
     },
     "categories": [
         "Other"
@@ -19,6 +19,17 @@
     "contributes": {
         "commands": [
             {
+                "command": "bg3-mod-helper.packMod",
+                "title": "Pack Mod",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.smartConvert",
+                "title": "Convert this file",
+                "category": "BG3 Mod Helper",
+                "iconPath": "$(zap)"
+            },
+            {
                 "command": "bg3-mod-helper.goToHandleUUID",
                 "title": "Go to UUID/Handle"
             },
@@ -28,7 +39,8 @@
             },
             {
                 "command": "bg3-mod-helper.insertHandle",
-                "title": "Generate Handle"
+                "title": "Generate Handle",
+                "iconPath": "$(chip)"
             },
             {
                 "command": "bg3-mod-helper.openStatsValidator",
@@ -60,7 +72,22 @@
             },
             {
                 "command": "bg3-mod-helper.xmlToLoca",
-                "title": "Convert xml file to loca file (or vice versa)",
+                "title": "Convert all xml files to loca files",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.locaToXml",
+                "title": "Convert all loca files to xml files",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.lsxToLsf",
+                "title": "Convert all lsx files to lsf files",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.lsfToLsx",
+                "title": "Convert all lsf files to lsx files",
                 "category": "BG3 Mod Helper"
             },
             {
@@ -104,6 +131,10 @@
                 "title": "View attributes and an example value for the currently opened file"
             },
             {
+                "command": "bg3-mod-helper.openConverter",
+                "title": "Open Converter"
+            }, 
+            {
                 "command": "bg3-mod-helper.debugCommand",
                 "title": "For dev use, dont press the button"
             }
@@ -111,11 +142,6 @@
         "configuration": {
             "title": "BG3 Mod Helper",
             "properties": {
-                "bg3ModHelper.singleFileConversion": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Allows you to select what xml file to convert to loca instead of all files in the localization folder."
-                },
                 "bg3ModHelper.maxCacheSize": {
                     "type": "number",
                     "default": 100,
@@ -144,22 +170,12 @@
                 "bg3ModHelper.modDestPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Mod destination folder path (Where your games mods are held)"
+                    "description": "Path where your mod should end up, ie [C:/Users/<username>/AppData/Local/Larian Studios/Baldur's Gate 3/Mods]"
                 },
-                "bg3ModHelper.divinePath": {
+                "bg3ModHelper.lslibPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Path to the divine tool executable (whenever you downloaded your exporttools (lslib) to. Inside that \\tools\\divine.exe)"
-                },
-                "bg3ModHelper.autoConvertLocalization": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Automatically convert localization files when packing the mod."
-                },
-                "bg3ModHelper.modPackTime": {
-                    "type": "number",
-                    "default": 5,
-                    "description": "Time in seconds to pack the mod, if mod changes are not reflecting in game and you know your files are correct increase the time on this. Sometime seems to not wait and send files before pack is made, increasing this adds a delay so it will."
+                    "description": "Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5\\Packed]:"
                 },
                 "bg3ModHelper.autoLaunchOnPack": {
                     "type": "boolean",
@@ -170,6 +186,14 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Automatically continue the most recent game on launch."
+                },
+                "bg3ModHelper.excludedFiles": {
+                    "type": "array",
+                    "description": "List of files to exclude from conversion, ie [c:/path/to/ur/file.lsx]",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -203,13 +227,16 @@
                 "command": "bg3-mod-helper.insertClipboard",
                 "key": "ctrl+shift+2",
                 "when": "editorTextFocus"
-            },
-            {
-                "command": "bg3-mod-helper.packMod",
-                "title": "Pack Mod"
             }
         ],
         "menus": {
+            "view/title" : [
+                {
+                    "when": "view == bg3ModHelperView",
+                    "command": "bg3-mod-helper.packMod",
+                    "group": "navigation"
+                }
+            ],
             "explorer/context": [
                 {
                     "when": "resourceExtname == .dds || resourceExtname == .DDS",
@@ -234,6 +261,11 @@
                     "when": "resourceExtname == .png",
                     "command": "extension.addIconBackground",
                     "group": "9_modification"
+                },
+                {
+                    "when": "resourceExtname == .dll || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsb || resourceExtname == .lsf || resourceExtname == .lsj || resourceExtname == .lsfx || resourceExtname == .lsbc || resourceExtname == .lsbs || resourceExtname == .lsx",
+                    "command": "bg3-mod-helper.smartConvert",
+                    "group": "navigation"
                 }
             ],
             "editor/context": [
@@ -331,22 +363,19 @@
     "scripts": {
         "lint": "eslint .",
         "pretest": "npm run lint",
-        "test": "vscode-test"
-    },
-    "devDependencies": {
-        "@types/mocha": "^10.0.6",
-        "@types/node": "18.x",
-        "@types/vscode": "^1.86.0",
-        "@vscode/test-cli": "^0.0.4",
-        "@vscode/test-electron": "^2.3.9",
-        "eslint": "^8.56.0",
-        "typescript": "^5.3.3"
+        "test": "vscode-test",
+        "dependencies": "npm install"
     },
     "dependencies": {
+        "@img/sharp-win32-x64": "^0.33.3",
+        "log4js": "^6.9.1",
+        "magickwand.js": "^1.1.0",
+        "node-api-dotnet": "^0.7.8",
         "node-fetch": "^3.3.2",
-        "sharp": "^0.33.2",
+        "node-gyp": "^10.1.0",
+        "sharp": "^0.33.3",
         "uuid": "^9.0.1",
         "xmlbuilder": "^15.1.1"
     },
-    "license": "MIT"
+    "license": "LGPL-3.0-or-later"
 }
