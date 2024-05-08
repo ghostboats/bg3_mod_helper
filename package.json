@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "3.1.0",
+    "version": "2.0.0",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.88.0"
@@ -175,7 +175,7 @@
                 "bg3ModHelper.lslibPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5]:"
+                    "description": "Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5\\Packed]:"
                 },
                 "bg3ModHelper.autoLaunchOnPack": {
                     "type": "boolean",
