@@ -18,6 +18,8 @@ const getAttributesCommand = require('./commands/getAttributes');
 const smartConvertCommand = require('./commands/smartConvert');
 const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } = require('./commands/commands')
 
+const openConverterCommand = require('./commands/openConverter');
+
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
 const { CREATE_LOGGER } = require('./support_files/log_utils');
@@ -35,7 +37,7 @@ const { getFullPath } = require('./support_files/helper_functions');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    bg3mh_logger.debug('Displaying extension activation message');
+    bg3mh_logger.info('Displaying extension activation message');
 
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders && workspaceFolders.length > 0) {
@@ -58,23 +60,21 @@ function activate(context) {
             });
     }
 
-
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
+    
     setConfig({
-        autoConvertLocalization: config.get('autoConvertLocalization'),
-        singleFileConversion: config.get('singleFileConversion'),
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: config.get('rootModPath'),
         modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
-        divinePath: config.get('divinePath'),
-        modPackTime: config.get('modPackTime'),
+        lslibPath: config.get('lslibPath'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
-        launchContinueGame: config.get('launchContinueGame')
+        launchContinueGame: config.get('launchContinueGame'),
+        excludedFiles: config.get('excludedFiles') || []
     });
-    bg3mh_logger.debug('Initial configs set:' + JSON.stringify(config, null, 2))
+    bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
             'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'
@@ -131,34 +131,47 @@ function activate(context) {
 function aSimpleDataProvider() {
     return {
         getTreeItem: (element) => {
-            return {
-                label: element.label,
-                command: {
-                    command: element.command,
-                    title: '',
-                    arguments: [element.label]
-                }
-            };
+            const treeItem = new vscode.TreeItem(element.label);
+            if (element.id === 'conversion') {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+            } else if (element.children) {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+            } else {
+                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            }
+            treeItem.command = element.command ? { command: element.command, title: "", arguments: [element.label] } : undefined;
+            return treeItem;
         },
         getChildren: (element) => {
-            return Promise.resolve([
-                { label: 'Convert the currently active tab', command: 'bg3-mod-helper.smartConvert' },
-                { label: 'Pack Mod (Ensure LSLib.dll is unblocked in its properties)', command: 'bg3-mod-helper.packMod' },
-                { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
-                { label: 'Convert all XML files to LOCA', command: 'bg3-mod-helper.xmlToLoca' },
-                { label: 'Convert all LOCA files to XML', command: 'bg3-mod-helper.locaToXml' },
-                { label: 'Convert all LSX files to LSF', command: 'bg3-mod-helper.lsxToLsf' },
-                { label: 'Convert all LSF files to LSX', command: 'bg3-mod-helper.lsfToLsx' },
-                { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
-                { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
-                { label: 'Get attributes and an example value for the currently opened file', command: 'bg3-mod-helper.getAttributes' },
-                { label: "Debug Command, don't press unless you are me :)", command: 'bg3-mod-helper.debugCommand' }
-            ]);
+            if (!element) {
+                // Root level
+                return Promise.resolve([
+                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
+                    { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
+                    { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
+                    { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
+                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
+                ]);
+            } else if (element.id === 'conversion') {
+                // Conversion submenu
+                return Promise.resolve([
+                    { label: 'Convert all XML to LOCA', command: 'bg3-mod-helper.xmlToLoca' },
+                    { label: 'Convert all LOCA to XML', command: 'bg3-mod-helper.locaToXml' },
+                    { label: 'Convert all LSX to LSF', command: 'bg3-mod-helper.lsxToLsf' },
+                    { label: 'Convert all LSF to LSX', command: 'bg3-mod-helper.lsfToLsx' }
+                ]);
+            } else {
+                // No further nesting
+                return Promise.resolve([]);
+            }
         }
     };
 }
 
+
 function deactivate() {}
+
 
 module.exports = {
     activate,

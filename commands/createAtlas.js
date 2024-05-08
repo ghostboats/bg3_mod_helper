@@ -5,14 +5,55 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const { getConfig } = require('../support_files/config');
 
+function findDivineExe(lslibPath) {
+    let divinePath = null;
+
+    function searchDir(dir) {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+            const filePath = path.join(dir, file);
+            const stat = fs.lstatSync(filePath);
+            if (stat.isDirectory()) {
+                searchDir(filePath);
+            } else if (file === 'Divine.exe') {
+                divinePath = filePath;
+                return;
+            }
+        }
+    }
+
+    if (fs.existsSync(lslibPath) && fs.lstatSync(lslibPath).isDirectory()) {
+        searchDir(lslibPath);
+    } else {
+        vscode.window.showErrorMessage('lslib directory not found.');
+        throw new Error('lslib directory not found.');
+    }
+
+    if (!divinePath) {
+        vscode.window.showErrorMessage('No divine.exe found in lslib directory.');
+        throw new Error('No divine.exe found in lslib directory.');
+    }
+
+    return divinePath;
+}
+
+
 let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createAtlas', async function () { // Made the function async
     console.log('‾‾createAtlasCommand‾‾');
-    const { rootModPath, divinePath } = getConfig();
+    const { rootModPath, lslibPath } = getConfig();
 
-    const scriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'add_icons_to_atlas.py');
+    const scriptPath = path.join(__dirname, '..', 'support_files', 'scripts', 'python', 'add_icons_to_atlas.py');
     const modsDirPath = path.join(rootModPath, 'Mods');
     let modName = '';
     let import_test = false
+
+    let divinePath_;
+    try {
+        divinePath_ = findDivineExe(lslibPath);
+    } catch (error) {
+        console.log(error)
+        return;
+    }
 
     // Check if Mods directory exists and get the first subfolder name
     if (fs.existsSync(modsDirPath) && fs.lstatSync(modsDirPath).isDirectory()) {
@@ -85,7 +126,7 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
             '-a', `"${atlasPath}"`,
             '-t', `"${texturesPath}"`,
             '-u', `"${newUuid}"`,
-            '--divine', `"${divinePath}"`
+            '--divine', `"${divinePath_}"`
         ].join(' ');
 
         // Before writing the modified content to the new merged.lsx file

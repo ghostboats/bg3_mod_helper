@@ -3,24 +3,33 @@
     
     TODO: auto-update LSLib from github 
 */
-
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
+const vscode = require('vscode');
 
+
+// loads the api
 const dotnet = require('node-api-dotnet/net8.0');
+/*
+    const dotnet_elastic = require('node-api-dotnet/net8.0');
+    const story_compiler = require('node-api-dotnet/net8.0');
+    const converter_app = require('node-api-dotnet/net8.0');
+*/
 
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
-const { CREATE_LOGGER } = require('./log_utils.js')
+const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
-const divinePath = path.normalize(getConfig().divinePath + "\\");
-const divineToolsPath = path.normalize(getConfig().divinePath + "\\" + TOOL_SUBDIR);
-const BANNED_DLLS = ['ConverterApp.dll'];
+const compatRootModPath = path.join(getConfig().rootModPath + "\\");
+const lslibPath = path.join(getConfig().lslibPath);
+const lslibToolsPath = path.join(getConfig().lslibPath, TOOL_SUBDIR);
 
+const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
+const storyCompilerDll = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
+const converterAppDll = ['ConverterApp.dll'];
 
-// const DLLS = [LSLIB_DLL, LSLIBNATIVE_DLL, ZSTDSHARP_DLL, LZ4_DLL];
 var DLLS = [];
 var DLL_PATHS = [];
 
@@ -42,83 +51,150 @@ function getFormats() {
 }
 
 
+function dirSeparator(filePath) {
+    filePath = path.normalize(filePath);
+    if (filePath[0] == "/" || filePath[0] == "\\") {
+        return filePath.slice(1, filePath.length).toString();
+    }
+    return filePath.toString();
+}
+
+// returns the given path, minus the file extension (ie. \home\shiela\doc.txt > \home\shiela\doc)
+function baseNamePath(filePath, ext) {
+    return filePath.substring(0, (filePath.length - ext.length));
+}
+
+
+// makes sure the path is normalized to the user's system, and then pushes that on to DLLS
 function processDllPaths() {
     for (let i = 0; i < DLL_PATHS.length; i++) {
         var temp_path = path.normalize(DLL_PATHS[i]);
         var temp_name = path.basename(temp_path);
 
         try {
-            if (fs.existsSync(temp_path) && (!BANNED_DLLS.includes(temp_name))) {
-                DLLS.push(temp_path);
-                bg3mh_logger.debug("%s found at %s", temp_name, temp_path);
-            }
+            DLLS.push(temp_path);
+            bg3mh_logger.info("%s found at %s", temp_name, temp_path);
         }
-        catch {
-            console.error("Error!");
-            console.error(Error);
+        catch (Error) {
+            raiseError(Error);
         }
     }
 }
 
 
+// run through the created DLLS array and load each one
 function loadDlls() {
     for (let i = 0; i < DLLS.length; i++) {
         try {
-            dotnet.load(DLLS[i]);
-            bg3mh_logger.debug("%s loaded.", DLLS[i]);
+            let temp_name = path.basename(DLLS[i]);
+
+            /* leaving this here for now, in case i find a quick solution
+                if (elasticDlls.includes(temp_name)) {
+                    bg3mh_logger.info("%s going into dotnet_elastic", temp_name);
+                    // dotnet_elastic.load(DLLS[i]);
+                }
+                else if (storyCompilerDll.includes(temp_name)) {
+                    bg3mh_logger.info("%s going into story_compiler", temp_name);
+                    // story_compiler.load(DLLS[i]);
+                }
+                else if (converterAppDll.includes(temp_name)) {
+                    bg3mh_logger.info("%s going into converter_app", temp_name);
+                    // converter_app.load(DLLS[i]);
+                } 
+            */
+
+            if (!converterAppDll.includes(temp_name) && !storyCompilerDll.includes(temp_name) && !elasticDlls.includes(temp_name)) {
+                dotnet.load(DLLS[i]);
+                bg3mh_logger.info("%s loaded.", DLLS[i]);
+            }
         }
-        catch {
-            console.error("Error!");
-            console.error(Error);
+        catch (Error) {
+            raiseError(Error);
         }
     }
 }
 
 
+// handles the finding of LSLib. logs will be created wherever this laods from.
 function LOAD_LSLIB() {
-    var tempLSLIB;
-
-    if (fs.existsSync(path.normalize(divinePath + LSLIB_DLL))) {
-        DLL_PATHS = FIND_FILES(divinePath, getFormats().dll, false);
+    if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
+        DLL_PATHS = FIND_FILES(lslibPath, getFormats().dll, false);
     }
-    else if (fs.existsSync(path.normalize(divineToolsPath + LSLIB_DLL))) {
-        DLL_PATHS = FIND_FILES(divineToolsPath, getFormats().dll, false);
+    else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
+        DLL_PATHS = FIND_FILES(lslibToolsPath, getFormats().dll, false);
     } 
     else {
-        console.error("LSLib.dll not found at " + divinePath + ".");
-        tempLSLIB = null;
-        return;
+        raiseError("LSLib.dll not found at " + lslibPath + ".", false);
+        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you arent using the legacy option using divine.exe?`)
+        return null;
     }
-        processDllPaths();    
-        loadDlls();
-        
-        // @ts-ignore
-        // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege: 
-        tempLSLIB = dotnet.LSLib.LS;
 
-    return tempLSLIB;
+    processDllPaths();    
+    loadDlls();
+
+    // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
+    // @ts-ignore 
+    return dotnet.LSLib.LS;
 }
 
 
+// returns an array with the absolute paths to every file found with the target file extension.
+// maybe replace with findFiles()? 
 function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
-    var filesToConvert = [];
-    var filesList = fs.readdirSync(filesPath, {
+    let filesToConvert = [];
+
+    const { excludedFiles } = getConfig();
+    const filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
-        recursive: isRecursive,
+        recursive: isRecursive
     });
 
-    for (var i = 0; i < filesList.length; i++) {
-        var temp = filesList[i].toString();
-        if (path.extname(temp) == targetExt) {
-            filesToConvert.push(filesPath + filesList[i]);
+    bg3mh_logger.info(`Excluded Files: ${excludedFiles}`);
+
+    for (let i = 0; i < filesList.length; i++) {
+        const temp = filesList[i].toString();
+
+        if (path.extname(temp) === targetExt) {
+            const fullPath = path.join(filesPath, filesList[i].toString());
+
+            if (!excludedFiles.includes(fullPath)) {
+                bg3mh_logger.info(`Included: ${fullPath}`);
+                filesToConvert.push(fullPath);
+            } 
+            else {
+                bg3mh_logger.info(`Excluded: ${fullPath}`);
+            }
         }
     }
-
     return filesToConvert;
+}
+
+// here in case people (i'm people) have their working directory and their AppData on different hard drives.
+function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
+    fs.readFile(sourcePath, (readErr, data) => {
+        if (readErr) {
+            raiseError(readErr);
+            return;
+        }
+        fs.writeFile(destPath, data, (writeErr) => {
+            if (writeErr) {
+                raiseError(writeErr);
+                return;
+            }
+            fs.unlink(sourcePath, unlinkErr => {
+                // added the check because it was raising an error every time the func was called
+                if (unlinkErr) {
+                    raiseError(unlinkErr);
+                    return;
+                }
+            });
+        });
+    });
+    raiseInfo(path.basename(sourcePath) + " moved to " + destPath, false);
+    vscode.window.showInformationMessage(`${path.basename(sourcePath)} moved to ${destPath}.`);
 }
 
 
 const LSLIB = LOAD_LSLIB();
 
-
-module.exports = { LSLIB, FIND_FILES, getFormats };
+module.exports = { LSLIB, FIND_FILES, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };

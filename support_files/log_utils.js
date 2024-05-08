@@ -1,7 +1,8 @@
 const path = require('path');
-const divinePath = require('./config').getConfig().divinePath;
+const vscode = require('vscode');
 
-const logPath = path.normalize(divinePath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
+const lslibPath = require('./config').getConfig().lslibPath;
+const logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
 
 // TODO: clear logs function
 
@@ -39,13 +40,46 @@ function CREATE_LOGGER() {
                     ["bg3mh_logger"], 
                     level: "debug",
                     enableCallStack: true
-            } 
+            },
+            error: {
+                appenders: 
+                    ["bg3mh_logger"], 
+                    level: "error",
+                    enableCallStack: true
+            },
+            info: {
+                appenders: 
+                    ["bg3mh_logger"], 
+                    level: "info",
+                    enableCallStack: true
+            },
         },
     });
-    const bg3mh_logger = log4js.getLogger("bg3mh_logger");
 
-    return bg3mh_logger;
+    return log4js.getLogger("bg3mh_logger");
 }
 
 
-module.exports = { LOGDATE, logPath, CREATE_LOGGER }
+function raiseError(error, popup = true) {
+    var bg3mh_logger = CREATE_LOGGER();
+
+    if (popup) {
+        vscode.window.showErrorMessage(`${error}`);
+    }
+    console.error(error);
+    bg3mh_logger.error(error);
+}
+
+
+function raiseInfo(info, popup = true) {
+    var bg3mh_logger = CREATE_LOGGER();
+
+    if (popup) {
+        vscode.window.showInformationMessage(`${info}`);
+    }
+    console.info(info);
+    bg3mh_logger.info(info);
+}
+
+
+module.exports = { LOGDATE, logPath, CREATE_LOGGER, raiseError, raiseInfo };

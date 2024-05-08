@@ -1,20 +1,18 @@
 // what's your function
-const path = require('path')
+const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
 
 const { FIND_FILES, getFormats } = require('./lslib_utils');
 const { lsx, xml, pak } = getFormats();
 
-const { getConfig } = require('./config.js');
-const { rootModPath } = getConfig();
-const compatRootModPath = path.normalize(rootModPath + "\\");
+const { raiseError } = require('./log_utils');
 
-const { CREATE_LOGGER } = require('./log_utils');
-var bg3mh_logger = CREATE_LOGGER();
+const { getConfig } = require('./config.js');
+const { rootModPath, modName, modDestPath, excludedFiles } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
-const { isLsf, processLsf, getLsfOutputPath, to_lsf } = require('./lsf_convert');
+const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
 const { processPak, prepareTempDir } = require('./pack_mod');
 
 
@@ -23,46 +21,96 @@ function getActiveTabPath() {
 }
 
 
+// this should be refactored in next release
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
-    if (targetExt == pak) {
-        prepareTempDir();
-        convert(compatRootModPath, xml);
-        convert(compatRootModPath, lsx);
-        processPak(compatRootModPath);
-    }
-    else if (isLoca(targetExt)) {
-        if (fs.lstatSync(convertPath).isDirectory()) {
-            var filesToConvert = FIND_FILES(convertPath, targetExt);
-
-            for (var i = 0; i < filesToConvert.length; i++) {
-                processLoca(filesToConvert[i], targetExt);
+    const { excludedFiles } = getConfig();
+    convertPath = convertPath.toString();
+    //bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
+    //console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
+    try {
+        if (Array.isArray(convertPath) && targetExt == "arr") {
+            for (var i = 0; i < convertPath.length; i++) {
+                convert(convertPath[i], path.extname(convertPath[i]));
             }
         }
-        else if (fs.lstatSync(convertPath).isFile()) {
-            processLoca(convertPath, targetExt);
-        }
-        else {
-            bg3mh_logger.error("%s is not a recognized directory or loca file.", convertPath);
-            return;
-        }
-    }
-    else if (isLsf(targetExt)) {
-        if (fs.lstatSync(convertPath).isDirectory()) {
-            var filesToConvert = FIND_FILES(convertPath, targetExt);
+        else if (targetExt == pak) { 
+            prepareTempDir();
 
-            for (var i = 0; i < filesToConvert.length; i++) {
-                processLsf(filesToConvert[i], targetExt);
+            convert(rootModPath, xml);
+            convert(rootModPath, lsx);
+            processPak(rootModPath);
+        }
+        else if (isLoca(targetExt)) {
+            if (fs.statSync(convertPath).isDirectory()) {
+                var filesToConvert = FIND_FILES(convertPath, targetExt);
+
+                for (var i = 0; i < filesToConvert.length; i++) {
+                    try {
+                        processLoca(filesToConvert[i], targetExt); 
+                    }
+                    catch (Error) {
+                        raiseError(Error);
+                        return;
+                    }
+                }
+            }
+            else if (fs.statSync(convertPath).isFile()) {
+                try {
+                    processLoca(convertPath, targetExt); 
+
+                    if (!Error) {
+                        vscode.window.showInformationMessage(`Exported ${getLocaOutputPath(convertPath)} correctly.`);
+                    }
+                }
+                catch (Error) {
+                    raiseError(Error);
+                    return;
+                }
+            }
+            else {
+                raiseError(convertPath + " is not a recognized directory or loca file.", false);
+                vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or loca file.`);
+                return;
             }
         }
-        else if (fs.lstatSync(convertPath).isFile()) {
-            processLsf(convertPath, targetExt);
+        else if (isLsf(targetExt)) {
+            if (fs.statSync(convertPath).isDirectory()) {
+                var filesToConvert = FIND_FILES(convertPath, targetExt);
+
+                for (var i = 0; i < filesToConvert.length; i++) {  
+                    try {
+                        processLsf(filesToConvert[i], targetExt); 
+                    }
+                    catch (Error) {
+                        raiseError(Error);
+                        return;
+                    }
+                }
+            }
+            else if (fs.statSync(convertPath).isFile()) {
+                try {
+                    processLsf(convertPath, targetExt); 
+
+                    if (!Error) {
+                        vscode.window.showInformationMessage(`Exported ${getLsfOutputPath(convertPath)} correctly.`);
+                    }
+                }
+                catch (Error) {
+                    raiseError(Error);
+                    return;
+                }
+            }
+            else {
+                raiseError(convertPath + " is not a recognized directory or lsf file.", false);
+                vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or lsf file.`);
+                return;
+            }
         }
-        else {
-            bg3mh_logger.error("%s is not a recognized directory or lsf file.", convertPath);
-            return;
-        }
+    }
+    catch (error) { 
+        raiseError(error);
     }
 }
 
 
-module.exports = { convert, compatRootModPath }
+module.exports = { convert };

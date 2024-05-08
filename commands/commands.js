@@ -4,9 +4,9 @@ const util = require('util');
 // const { exec } = require('child_process')
 // const execAsync = util.promisify(require('child_process').exec);
 
-const { convert, compatRootModPath} = require('../support_files/conversion_junction.js');
+const { convert } = require('../support_files/conversion_junction.js');
 
-const { getFormats } = require('../support_files/lslib_utils.js');
+const { getFormats, compatRootModPath } = require('../support_files/lslib_utils.js');
 const { loca, xml, lsf, lsx } = getFormats();
 
 
@@ -29,5 +29,5 @@ const lsfToLsxCommand = vscode.commands.registerCommand('bg3-mod-helper.lsfToLsx
     convert(compatRootModPath, lsf);
 });
 
-
+// we should look into having a single file that exposes most commands :catyes:
 module.exports = { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand };

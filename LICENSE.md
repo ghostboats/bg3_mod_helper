@@ -1,5 +1,3 @@
-
-
 ## A little VSCode/VSCodium extension to aid in modding Baldur's Gate Three.
 ### Copyright (C) 2024, Ghost Boats and khbsd
 
