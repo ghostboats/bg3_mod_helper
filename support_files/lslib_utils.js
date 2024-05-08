@@ -125,7 +125,7 @@ function LOAD_LSLIB() {
     } 
     else {
         raiseError("LSLib.dll not found at " + lslibPath + ".", false);
-        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}.`)
+        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you arent using the legacy option using divine.exe?`)
         return null;
     }
 
