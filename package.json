@@ -175,7 +175,7 @@
                 "bg3ModHelper.lslibPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Path where your LSLib.dll file lives, ie [C:/Documents/ExportTool-v1.19.5/]:"
+                    "description": "Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5]:"
                 },
                 "bg3ModHelper.autoLaunchOnPack": {
                     "type": "boolean",

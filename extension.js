@@ -61,6 +61,21 @@ function activate(context) {
     }
 
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
+    const lslibPath = config.get('lslibPath');
+    const lslibPathIsEmpty = !lslibPath || lslibPath.trim() === '';
+    const endsWithDivine = lslibPath && /(divine\.exe)$/i.test(lslibPath);
+
+    // check if lslibpath is empty or ends with divine.exe, clean it up though later
+    if (lslibPathIsEmpty || endsWithDivine) {
+        vscode.window.showWarningMessage(
+            "Warning: `divine.exe` is no longer used. Please select the folder containing `LSLib.dll` (ExportTool folder) instead.",
+            "Open Settings"
+        ).then(selection => {
+            if (selection === "Open Settings") {
+                vscode.commands.executeCommand('workbench.action.openSettings', 'bg3ModHelper');
+            }
+        });
+    }
     setConfig({
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),

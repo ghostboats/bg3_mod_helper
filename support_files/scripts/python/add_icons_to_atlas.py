@@ -119,46 +119,7 @@ texture_resource_template = """<?xml version="1.0" encoding="utf-8"?>
 	</region>
 </save>"""
 
-def generate_texture_lsf(uuid:str, dds_path:Path, resource_path:Path, lslib_path:Path, resource_lsx_output:Path = None):
-    if not common.import_lslib(lslib_path):
-        print(f"Path to lslib is invalid: {lslib_path}")
-        return False
-    resource_path.parent.mkdir(exist_ok=True, parents=True)
-    dds_path_str = str(dds_path)
-    public_index = dds_path_str.index("Public")
-    local_dds_path = dds_path_str[public_index:]
-    texture_lsx = texture_resource_template.format(uuid=uuid, name=dds_path.name, dds=local_dds_path)
-    
-    if resource_lsx_output:
-        resource_lsx_output.parent.mkdir(exist_ok=True, parents=True)
-        resource_lsx_output.write_text(texture_lsx)
-        print(f"Saved resource as an .lsx to {resource_lsx_output}")
-    
-    from LSLib.LS import ResourceUtils, ResourceConversionParameters # type: ignore 
-    from LSLib.LS.Enums import Game, ResourceFormat # type: ignore 
-    from System.IO import StreamWriter, MemoryStream # type: ignore 
-    
-    stream:MemoryStream = None
-    writer:StreamWriter = None
-    result = False
-    try:
-        stream = MemoryStream()
-        writer = StreamWriter(stream)
-        writer.Write(texture_lsx)
-        writer.Flush()
-        stream.Position = 0
-        
-        resource = ResourceUtils.LoadResource(stream, ResourceFormat.LSX)
-        conversionParams = ResourceConversionParameters.FromGameVersion(Game.BaldursGate3)
-        ResourceUtils.SaveResource(resource, str(resource_path.absolute()), ResourceFormat.LSF, conversionParams)
-        print(f"Created {resource_path}")
-        result = True
-    finally:
-        if stream != None:
-            stream.Dispose()
-        if writer != None:
-            writer.Dispose()
-        return result
+
 
 def get_icons(icons_dir:Path, icon_size:tuple[int,int], texture_size:tuple[int,int])->list[Icon]:
     icons = []
