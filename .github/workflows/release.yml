@@ -18,8 +18,10 @@ jobs:
           node-version: '20.11.1'
       - name: Install dependencies
         run: npm install
-      - name: Install VSCE
-        run: npm install -g vsce
+      - name: Install VSCE and OVSX
+        run: |
+          npm install -g vsce
+          npm install -g ovsx
       - name: Build and package VS Code extension
         run: vsce package
         id: package_extension
@@ -42,6 +44,8 @@ jobs:
           path: ${{ steps.set_vsix_name.outputs.vsix_filename }}
       - name: Log VSCE version
         run: vsce --version
+      - name: Log OVSX version
+        run: ovsx --version
 
       - name: Log .vscodeignore contents
         run: cat .vscodeignore
@@ -49,16 +53,23 @@ jobs:
       - name: Log npm dependencies
         run: npm list
 
-  release:
+  publish:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Download VSIX artifact
         uses: actions/download-artifact@v2
         with:
           name: vsix-file
           path: ./
+      - name: Publish to Visual Studio Code Marketplace
+        env:
+          VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+        run: vsce publish --pat $VSCODE_MARKETPLACE_TOKEN --packagePath ${{ needs.build.outputs.vsix_filename }}
+      - name: Publish to VSCodium (Open VSX Registry)
+        env:
+          OPEN_VSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
+        run: ovsx publish -p $OPEN_VSX_TOKEN --packagePath ${{ needs.build.outputs.vsix_filename }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
