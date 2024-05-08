@@ -14,10 +14,10 @@ function getConfig() {
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
-        rootModPath: config.get('rootModPath'),
+        rootModPath: path.normalize(config.get('rootModPath')),
         modName: path.basename(config.get('rootModPath')),
-        modDestPath: config.get('modDestPath'),
-        lslibPath: config.get('lslibPath'),
+        modDestPath: path.normalize(config.get('modDestPath')),
+        lslibPath: path.normalize(config.get('lslibPath')),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         excludedFiles: config.get('excludedFiles') || []

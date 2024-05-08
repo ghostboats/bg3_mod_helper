@@ -20,6 +20,7 @@ function getActiveTabPath() {
     return vscode.window.activeTextEditor.document.fileName;
 }
 
+
 // this should be refactored in next release
 function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
     const { excludedFiles } = getConfig();
