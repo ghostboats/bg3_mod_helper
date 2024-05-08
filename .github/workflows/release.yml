@@ -3,7 +3,7 @@ name: Release Workflow
 on:
   push:
     branches:
-      - prod
+      #- prod
 
 jobs:
   build:
