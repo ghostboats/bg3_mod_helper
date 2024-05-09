@@ -15,8 +15,6 @@ const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
 const { processPak, prepareTempDir } = require('./pack_mod');
 
-let isList = false;
-let isPak = false;
 
 function getActiveTabPath() {
     return vscode.window.activeTextEditor.document.fileName;
@@ -39,21 +37,16 @@ function getDynamicPath(filePath) {
 }
 
 
-function lastFileCheck(index, length) {
-    return (index == length - 1)
-}
-
-
 // this should be refactored in next release
-function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), lastFile = false) {
+function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
     const { excludedFiles } = getConfig();
+    console.log(convertPath);
     //convertPath = convertPath.toString();
 
     //bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
     //console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
 
     if (targetExt == pak) {
-        isPak = true;
         prepareTempDir();
 
         convert(rootModPath, xml);
@@ -61,21 +54,12 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         processPak(rootModPath);
     }
     else if (Array.isArray(convertPath)) {
-        console.log("to be converted: %s", convertPath)
-        if (convertPath.length == 1) {
-            lastFile = lastFileCheck(0, convertPath.length);
-            convert(convertPath[0], path.extname(convertPath[0]));
-        }
-        else if (convertPath.length > 1) {
-            console.log("array length is %s", convertPath.length);
-            isList = true;
-            for (var i = 0; i < convertPath.length; i++) {
-                lastFile = lastFileCheck(i, convertPath.length);
-                convert(convertPath[i], path.extname(convertPath[i]), lastFile);
-            }
+        for (var i = 0; i < convertPath.length; i++) {
+            convert(convertPath[i], path.extname(convertPath[i]));
         }
     }
     else if (fs.statSync(convertPath).isDirectory()) {
+        console.log("finding %s files in %s directory", targetExt, convertPath)
         convert(FIND_FILES(convertPath, targetExt));
     }
     else if (fs.statSync(convertPath).isFile()) {
@@ -97,41 +81,7 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
                 return;
             }
         }
-        
-        if (!lastFile && !isList && !isPak) {
-            lastFile = true;
-        }
-    }
 
-    console.log("%s\n%s\n%s", lastFile, isPak, isList);
-
-    if (!lastFile) {
-        if (!isPak && isList) {
-            console.log("%s is not a pak and is a list", convertPath);
-            raiseInfo(`${modName} ${targetExt} files converted successfully`);
-        }
-        else if (!isPak && !isList) {
-            console.log("%s is not a pak and is not a list", convertPath);
-            raiseInfo(`${convertPath} converted successfully`);
-        }
-    }
-    
-    if (lastFile) {
-        if (!isPak && isList) {
-            console.log("%s is not a pak and is a list", convertPath);
-            raiseInfo(`${modName} ${targetExt} files converted successfully`);
-        }
-        else if (!isPak && !isList) {
-            console.log("%s is not a pak and is not a list", convertPath);
-            raiseInfo(`${convertPath} converted successfully`);
-        }
-
-        if (isPak && isList) {
-            isPak = false;
-            isList = true;
-        }
-
-        lastFile = false;
     }
 }
 

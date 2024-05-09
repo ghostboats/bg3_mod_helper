@@ -21,6 +21,7 @@ async function refreshFiles() {
 
 let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openConverter', async function () {
     bg3mh_logger.info('‾‾openConverterCommand‾‾');
+    console.log('‾‾openConverterCommand‾‾');
     const panel = vscode.window.createWebviewPanel(
         'converterView',
         'Converter',
@@ -39,7 +40,7 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
                     case 'convertSelected':
                     case 'convertAll':
                         const pathsString = message.paths.join(", ");
-                        const result = convert(message.paths);
+                        convert(message.paths);
                         panel.webview.postMessage({ command: 'alert', text: 'Conversion successful!' });
                         await refreshFileList(panel);
                         break;
@@ -173,7 +174,7 @@ function clearSelections(filesList) {
 function convertSelected() {
     let selectedFiles = Array.from(document.querySelectorAll('.file-item.selected'));
     let filePaths = selectedFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert selected files with paths:', filePaths);
+    bg3mh_logger.info('Attempting to convert selected files with paths: %s', filePaths);
     vscode.postMessage({
         command: 'convertSelected',
         paths: filePaths
@@ -183,7 +184,7 @@ function convertSelected() {
 function convertAll() {
     let allFiles = Array.from(document.querySelectorAll('.file-item'));
     let filePaths = allFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert all files with paths: %s', filePaths);
+    bg3mh_logger.info('Attempting to convert all files with paths: %s', paths);
     vscode.postMessage({
         command: 'convertAll',
         paths: filePaths
