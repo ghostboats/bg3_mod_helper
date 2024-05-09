@@ -173,7 +173,7 @@ function clearSelections(filesList) {
 function convertSelected() {
     let selectedFiles = Array.from(document.querySelectorAll('.file-item.selected'));
     let filePaths = selectedFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert selected files with paths:', filePaths);
+    console.log('Attempting to convert selected files with paths:', filePaths);
     vscode.postMessage({
         command: 'convertSelected',
         paths: filePaths
@@ -183,7 +183,7 @@ function convertSelected() {
 function convertAll() {
     let allFiles = Array.from(document.querySelectorAll('.file-item'));
     let filePaths = allFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert all files with paths:', filePaths);
+    console.log('Attempting to convert all files with paths:', filePaths);
     vscode.postMessage({
         command: 'convertAll',
         paths: filePaths
