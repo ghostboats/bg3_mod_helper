@@ -40,8 +40,6 @@ function getDynamicPath(filePath) {
 // this should be refactored in next release
 function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
     const { excludedFiles } = getConfig();
-    console.log(convertPath);
-    //convertPath = convertPath.toString();
 
     //bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
     //console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
@@ -59,7 +57,6 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         }
     }
     else if (fs.statSync(convertPath).isDirectory()) {
-        console.log("finding %s files in %s directory", targetExt, convertPath)
         convert(FIND_FILES(convertPath, targetExt));
     }
     else if (fs.statSync(convertPath).isFile()) {
