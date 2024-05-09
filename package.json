@@ -133,7 +133,11 @@
             {
                 "command": "bg3-mod-helper.openConverter",
                 "title": "Open Converter"
-            }, 
+            },
+            {
+                "command": "bg3-mod-helper.versionGenerator",
+                "title": "Version Generator"
+            },
             {
                 "command": "bg3-mod-helper.debugCommand",
                 "title": "For dev use, dont press the button"
