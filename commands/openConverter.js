@@ -21,7 +21,7 @@ async function refreshFiles() {
 
 let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openConverter', async function () {
     bg3mh_logger.info('‾‾openConverterCommand‾‾');
-    console.log('‾‾openConverterCommand‾‾');
+    console.log('help');
     const panel = vscode.window.createWebviewPanel(
         'converterView',
         'Converter',
@@ -30,8 +30,11 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
     );
 
     await refreshFiles();
+    console.log('files refreshed');
 
     panel.webview.html = getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles);
+    console.log('got webview content');
+
     panel.webview.onDidReceiveMessage(
         async message => {
             bg3mh_logger.info('Received message:', message);
@@ -77,7 +80,7 @@ async function refreshFileList(panel) {
 
 function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
     const makeListItems = files => files.map(file => 
-        `<div class='file-item' data-path="${normalizePath(file.path)}" onclick='selectFile(this)'>${file.path.split('/').pop()}</div>`
+        `<div class="file-item" data-path="${normalizePath(file.path)}" onclick="selectFile(this)">${file.path.split('/').pop()}</div>`
     ).join('');
 
     return `
@@ -174,7 +177,8 @@ function clearSelections(filesList) {
 function convertSelected() {
     let selectedFiles = Array.from(document.querySelectorAll('.file-item.selected'));
     let filePaths = selectedFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert selected files with paths: %s', filePaths);
+    console.log('Attempting to convert selected files with paths: %s', filePaths);
+    console.log("help");
     vscode.postMessage({
         command: 'convertSelected',
         paths: filePaths
@@ -184,7 +188,8 @@ function convertSelected() {
 function convertAll() {
     let allFiles = Array.from(document.querySelectorAll('.file-item'));
     let filePaths = allFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert all files with paths: %s', paths);
+    console.log('Attempting to convert all files with paths: %s', paths);
+    console.log("help");
     vscode.postMessage({
         command: 'convertAll',
         paths: filePaths
