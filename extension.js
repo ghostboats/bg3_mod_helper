@@ -19,6 +19,7 @@ const smartConvertCommand = require('./commands/smartConvert');
 const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } = require('./commands/commands')
 
 const openConverterCommand = require('./commands/openConverter');
+const versionGeneratorCommand = require('./commands/versionGenerator');
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
@@ -124,7 +125,7 @@ function activate(context) {
 
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
 
-    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand);
+    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand);
 }
 
 
@@ -151,6 +152,7 @@ function aSimpleDataProvider() {
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
+                    { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
                 ]);
             } else if (element.id === 'conversion') {
