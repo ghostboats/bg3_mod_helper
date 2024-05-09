@@ -1,7 +1,10 @@
 const vscode = require('vscode');
 const { convert } = require('../support_files/conversion_junction.js');
+const { CREATE_LOGGER, raiseError } = require('../support_files/log_utils.js');
+const bg3mh_logger = CREATE_LOGGER();
+
 let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openConverter', async function () {
-    console.log('‾‾openConverterCommand‾‾');
+    bg3mh_logger.info('‾‾openConverterCommand‾‾');
     const panel = vscode.window.createWebviewPanel(
         'converterView',
         'Converter',
@@ -17,7 +20,7 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
     panel.webview.html = getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles);
     panel.webview.onDidReceiveMessage(
         (message) => {
-            console.log('Received message:', message);
+            bg3mh_logger.info('Received message:', message);
             try {
                 switch (message.command) {
                     case 'convertSelected':
@@ -32,12 +35,12 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
                 }
             } catch (err) {
                 panel.webview.postMessage({ command: 'alert', text: 'Error during conversion: ' + err.message });
-                console.error('Error during message processing:', err);
+                raiseError("Error during message processing: " + err, false);
             }
         }
     );
     
-    console.log('__openConverterCommand__');
+    bg3mh_logger.info('__openConverterCommand__');
 });
 
 function normalizePath(path) {

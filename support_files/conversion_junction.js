@@ -6,7 +6,7 @@ const vscode = require('vscode');
 const { FIND_FILES, getFormats } = require('./lslib_utils');
 const { lsx, xml, pak } = getFormats();
 
-const { raiseError } = require('./log_utils');
+const { raiseError, raiseInfo } = require('./log_utils');
 
 const { getConfig } = require('./config.js');
 const { rootModPath, modName, modDestPath, excludedFiles } = getConfig();
@@ -21,94 +21,67 @@ function getActiveTabPath() {
 }
 
 
+function getDynamicPath(filePath) {
+    let temp_path;
+    if (Array.isArray(filePath)) {
+        temp_path = filePath[0];
+    }
+    else if (typeof(filePath) == 'string') {
+        temp_path = filePath;
+    }
+    else {
+        temp_path = getActiveTabPath();
+    }
+
+    return temp_path;
+}
+
+
 // this should be refactored in next release
-function convert(convertPath = getActiveTabPath(), targetExt = path.extname(convertPath)) {
+function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
     const { excludedFiles } = getConfig();
-    convertPath = convertPath.toString();
+    console.log(convertPath);
+    //convertPath = convertPath.toString();
+
     //bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
     //console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
-    try {
-        if (Array.isArray(convertPath) && targetExt == "arr") {
-            for (var i = 0; i < convertPath.length; i++) {
-                convert(convertPath[i], path.extname(convertPath[i]));
-            }
+
+    if (targetExt == pak) {
+        prepareTempDir();
+
+        convert(rootModPath, xml);
+        convert(rootModPath, lsx);
+        processPak(rootModPath);
+    }
+    else if (Array.isArray(convertPath)) {
+        for (var i = 0; i < convertPath.length; i++) {
+            convert(convertPath[i], path.extname(convertPath[i]));
         }
-        else if (targetExt == pak) { 
-            prepareTempDir();
-
-            convert(rootModPath, xml);
-            convert(rootModPath, lsx);
-            processPak(rootModPath);
-        }
-        else if (isLoca(targetExt)) {
-            if (fs.statSync(convertPath).isDirectory()) {
-                var filesToConvert = FIND_FILES(convertPath, targetExt);
-
-                for (var i = 0; i < filesToConvert.length; i++) {
-                    try {
-                        processLoca(filesToConvert[i], targetExt); 
-                    }
-                    catch (Error) {
-                        raiseError(Error);
-                        return;
-                    }
-                }
+    }
+    else if (fs.statSync(convertPath).isDirectory()) {
+        console.log("finding %s files in %s directory", targetExt, convertPath)
+        convert(FIND_FILES(convertPath, targetExt));
+    }
+    else if (fs.statSync(convertPath).isFile()) {
+        if (isLoca(targetExt)) {
+            try {
+                processLoca(convertPath, targetExt);
             }
-            else if (fs.statSync(convertPath).isFile()) {
-                try {
-                    processLoca(convertPath, targetExt); 
-
-                    if (!Error) {
-                        vscode.window.showInformationMessage(`Exported ${getLocaOutputPath(convertPath)} correctly.`);
-                    }
-                }
-                catch (Error) {
-                    raiseError(Error);
-                    return;
-                }
-            }
-            else {
-                raiseError(convertPath + " is not a recognized directory or loca file.", false);
-                vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or loca file.`);
+            catch (Error) {
+                raiseError(Error);
                 return;
             }
         }
         else if (isLsf(targetExt)) {
-            if (fs.statSync(convertPath).isDirectory()) {
-                var filesToConvert = FIND_FILES(convertPath, targetExt);
-
-                for (var i = 0; i < filesToConvert.length; i++) {  
-                    try {
-                        processLsf(filesToConvert[i], targetExt); 
-                    }
-                    catch (Error) {
-                        raiseError(Error);
-                        return;
-                    }
-                }
+            try {
+                processLsf(convertPath, targetExt); 
             }
-            else if (fs.statSync(convertPath).isFile()) {
-                try {
-                    processLsf(convertPath, targetExt); 
-
-                    if (!Error) {
-                        vscode.window.showInformationMessage(`Exported ${getLsfOutputPath(convertPath)} correctly.`);
-                    }
-                }
-                catch (Error) {
-                    raiseError(Error);
-                    return;
-                }
-            }
-            else {
-                raiseError(convertPath + " is not a recognized directory or lsf file.", false);
-                vscode.window.showErrorMessage(`${convertPath} is not a recognized directory or lsf file.`);
+            catch (Error) {
+                raiseError(Error);
                 return;
             }
         }
-    }
-    catch (error) { 
-        raiseError(error);
+
     }
 }
 
