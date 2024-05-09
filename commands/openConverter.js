@@ -1,26 +1,7 @@
-const { convert } = require('../support_files/conversion_junction.js');
 const vscode = require('vscode');
-
-const { CREATE_LOGGER, raiseError } = require('../support_files/log_utils.js');
-const bg3mh_logger = CREATE_LOGGER();
-
-var lsxFiles;
-var lsfFiles;
-var xmlFiles;
-var locaFiles;
-
-
-async function refreshFiles() {
-    lsxFiles = await vscode.workspace.findFiles('**/*.lsx');
-    // added extra files that should be shown in the lsf panel of the webview
-    lsfFiles = await vscode.workspace.findFiles('**/*.{lsf,lsfx,lsc,lsj,lsbc,lsbs}');
-    xmlFiles = await vscode.workspace.findFiles('**/*.xml');
-    locaFiles = await vscode.workspace.findFiles('**/*.loca');
-}
-
-
+const { convert } = require('../support_files/conversion_junction.js');
 let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openConverter', async function () {
-    bg3mh_logger.info('‾‾openConverterCommand‾‾');
+    console.log('‾‾openConverterCommand‾‾');
     const panel = vscode.window.createWebviewPanel(
         'converterView',
         'Converter',
@@ -28,29 +9,35 @@ let openConverterCommand = vscode.commands.registerCommand('bg3-mod-helper.openC
         { enableScripts: true }
     );
 
-    await refreshFiles();
+    const lsxFiles = await vscode.workspace.findFiles("**/*.lsx");
+    const lsfFiles = await vscode.workspace.findFiles("**/*.{lsf,lsfx,lsj,lsb,lsbs,lsbc}");
+    const xmlFiles = await vscode.workspace.findFiles("**/*.xml");
+    const locaFiles = await vscode.workspace.findFiles("**/*.loca");
 
     panel.webview.html = getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles);
     panel.webview.onDidReceiveMessage(
-        async message => {
-            bg3mh_logger.info('Received message:', message);
+        (message) => {
+            console.log('Received message:', message);
             try {
                 switch (message.command) {
                     case 'convertSelected':
                     case 'convertAll':
                         const pathsString = message.paths.join(", ");
-                        const result = convert(message.paths, "arr");
+                        vscode.window.showInformationMessage(`Converting files: ${pathsString}`);
+                        console.log(message.paths);
+    
+                        convert(message.paths, "arr");
                         panel.webview.postMessage({ command: 'alert', text: 'Conversion successful!' });
-                        await refreshFileList(panel);
                         break;
                 }
             } catch (err) {
                 panel.webview.postMessage({ command: 'alert', text: 'Error during conversion: ' + err.message });
-                raiseError("Error during message processing: " + err, false);
+                console.error('Error during message processing:', err);
             }
         }
     );
-    bg3mh_logger.info('__openConverterCommand__');
+    
+    console.log('__openConverterCommand__');
 });
 
 function normalizePath(path) {
@@ -59,20 +46,6 @@ function normalizePath(path) {
     }
     return path;
 }
-
-async function refreshFileList(panel) {
-
-    await refreshFiles();
-
-    panel.webview.postMessage({
-        command: 'updateFiles',
-        lsxFiles: lsxFiles.map(file => file.path),
-        lsfFiles: lsfFiles.map(file => file.path),
-        xmlFiles: xmlFiles.map(file => file.path),
-        locaFiles: locaFiles.map(file => file.path)
-    });
-}
-
 
 function getWebviewContent(lsxFiles, lsfFiles, xmlFiles, locaFiles) {
     const makeListItems = files => files.map(file => 
@@ -173,7 +146,7 @@ function clearSelections(filesList) {
 function convertSelected() {
     let selectedFiles = Array.from(document.querySelectorAll('.file-item.selected'));
     let filePaths = selectedFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert selected files with paths:', filePaths);
+    console.log('Attempting to convert selected files with paths:', filePaths);
     vscode.postMessage({
         command: 'convertSelected',
         paths: filePaths
@@ -183,15 +156,12 @@ function convertSelected() {
 function convertAll() {
     let allFiles = Array.from(document.querySelectorAll('.file-item'));
     let filePaths = allFiles.map(file => file.getAttribute('data-path'));
-    bg3mh_logger.info('Attempting to convert all files with paths:', filePaths);
+    console.log('Attempting to convert all files with paths:', filePaths);
     vscode.postMessage({
         command: 'convertAll',
         paths: filePaths
     });
 }
-
-
-
 </script>
 </body>
 </html>
@@ -199,26 +169,3 @@ function convertAll() {
 }
 
 module.exports = openConverterCommand;
-
-
-//add this in html once we figure out the syntax stuff, hopoefully it helps update the window upon conversion. Its to add listener to update webview for new files
-/*
-window.addEventListener('message', event => {
-    const message = event.data;
-    switch (message.command) {
-        case 'updateFiles':
-            updateFileList('lsxFilesList', message.lsxFiles);
-            updateFileList('lsfFilesList', message.lsfFiles);
-            updateFileList('xmlFilesList', message.xmlFiles);
-            updateFileList('locaFilesList', message.locaFiles);
-            break;
-    }
-});
-
-function updateFileList(elementId, files) {
-    const fileList = document.getElementById(elementId);
-    fileList.innerHTML = files.map(file => 
-        <div class='file-item' data-path='${file}' onclick='selectFile(this)'>${file.split('/').pop()}</div>
-    ).join('');
-}
-*/
