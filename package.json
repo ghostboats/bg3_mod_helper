@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.1.0",
+    "version": "2.1.10",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.88.0"
@@ -139,6 +139,11 @@
                 "title": "Version Generator"
             },
             {
+                "command": "bg3-mod-helper.addToExcludeList",
+                "title": "Add to Conversion Exclusion List",
+                "category": "BG3 Mod Helper"
+            },
+            {
                 "command": "bg3-mod-helper.debugCommand",
                 "title": "For dev use, dont press the button"
             }
@@ -193,7 +198,7 @@
                 },
                 "bg3ModHelper.excludedFiles": {
                     "type": "array",
-                    "description": "List of files to exclude from conversion, ie [c:/path/to/ur/file.lsx]",
+                    "description": "List of files to exclude from conversion. You can quick add items to this via right click on a file in the file tree ->  Add to Conversion Exclusion List.  Example: [c:/path/to/ur/file.lsx]",
                     "default": [],
                     "items": {
                         "type": "string"
@@ -269,6 +274,11 @@
                 {
                     "when": "resourceExtname == .dll || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsb || resourceExtname == .lsf || resourceExtname == .lsj || resourceExtname == .lsfx || resourceExtname == .lsbc || resourceExtname == .lsbs || resourceExtname == .lsx",
                     "command": "bg3-mod-helper.smartConvert",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceExtname == .lsx || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsf",
+                    "command": "bg3-mod-helper.addToExcludeList",
                     "group": "navigation"
                 }
             ],

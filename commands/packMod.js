@@ -131,7 +131,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
 
 
 function createMetaContent(templateContent, author, description, folder, major, minor, revision, build, uuid, version64) {
-    // Replace placeholders in templateContent with actual values
     return templateContent
         .replace('{AUTHOR}', author)
         .replace('{DESCRIPTION}', description)
@@ -148,16 +147,13 @@ function createMetaContent(templateContent, author, description, folder, major, 
 
 
 function createVersion64(major, minor, build, revision) {
-    // Convert input numbers to BigInt
     const majorBigInt = BigInt(major);
     const minorBigInt = BigInt(minor);
     const buildBigInt = BigInt(build);
     const revisionBigInt = BigInt(revision);
 
-    // Shift bits and combine them
     const version64 = (majorBigInt << BigInt(55)) | (minorBigInt << BigInt(47)) | (revisionBigInt << BigInt(31)) | buildBigInt;
 
-    // Return the version as a string
     return version64;
     
 }

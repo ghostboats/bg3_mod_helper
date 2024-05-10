@@ -40,48 +40,57 @@ function getDynamicPath(filePath) {
 // this should be refactored in next release
 function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
     const { excludedFiles } = getConfig();
-    //convertPath = convertPath.toString();
+    const normalizedExcludedFiles = excludedFiles.map(file => path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':'));
 
-    //bg3mh_logger.info(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
-    //console.log(`Excluded Files: ${JSON.stringify(excludedFiles, null, 2)}`);
+    console.log(`Normalized Excluded Files: ${JSON.stringify(normalizedExcludedFiles, null, 2)}`);
 
-    if (targetExt == pak) {
+    const isExcluded = (file) => {
+        const normalizedFile = path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':');
+        return normalizedExcludedFiles.includes(normalizedFile);
+    };
+
+    if (targetExt === '.pak') {
         prepareTempDir();
 
-        convert(rootModPath, xml);
-        convert(rootModPath, lsx);
+        convert(rootModPath, '.xml');
+        convert(rootModPath, '.lsx');
         processPak(rootModPath);
-    }
-    else if (Array.isArray(convertPath)) {
-        for (var i = 0; i < convertPath.length; i++) {
-            convert(convertPath[i], path.extname(convertPath[i]));
-        }
-    }
-    else if (fs.statSync(convertPath).isDirectory()) {
-        convert(FIND_FILES(convertPath, targetExt));
-    }
-    else if (fs.statSync(convertPath).isFile()) {
-        if (isLoca(targetExt)) {
-            try {
-                processLoca(convertPath, targetExt);
-            }
-            catch (Error) {
-                raiseError(Error);
-                return;
+    } else if (Array.isArray(convertPath)) {
+        for (let i = 0; i < convertPath.length; i++) {
+            if (!isExcluded(convertPath[i])) {
+                convert(convertPath[i], path.extname(convertPath[i]));
+            } else {
+                console.log(`Excluded: ${convertPath[i]}`);
             }
         }
-        else if (isLsf(targetExt)) {
-            try {
-                processLsf(convertPath, targetExt); 
+    } else if (fs.statSync(convertPath).isDirectory()) {
+        const filesToConvert = FIND_FILES(convertPath, targetExt);
+        const filteredFiles = filesToConvert.filter(file => !isExcluded(file));
+        console.log(`Files to convert (after exclusion): ${JSON.stringify(filteredFiles, null, 2)}`);
+        convert(filteredFiles);
+    } else if (fs.statSync(convertPath).isFile()) {
+        if (!isExcluded(convertPath)) {
+            if (isLoca(targetExt)) {
+                try {
+                    processLoca(convertPath, targetExt);
+                } catch (Error) {
+                    raiseError(Error);
+                    return;
+                }
+            } else if (isLsf(targetExt)) {
+                try {
+                    processLsf(convertPath, targetExt);
+                } catch (Error) {
+                    raiseError(Error);
+                    return;
+                }
             }
-            catch (Error) {
-                raiseError(Error);
-                return;
-            }
+        } else {
+            console.log(`Excluded: ${convertPath}`);
         }
-
     }
 }
+
 
 
 module.exports = { convert };
