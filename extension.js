@@ -33,6 +33,25 @@ const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImag
 
 const { getFullPath } = require('./support_files/helper_functions');
 
+/**
+ * Adds a file to the exclusion list.
+ * @param {vscode.Uri} fileUri - The URI of the file to be excluded.
+ */
+async function addToExcludeList(fileUri) {
+    const config = vscode.workspace.getConfiguration('bg3ModHelper');
+    let excludedFiles = config.get('excludedFiles') || [];
+
+    const filePath = fileUri.fsPath.replace(/\\/g, '/');
+
+    if (!excludedFiles.includes(filePath)) {
+        excludedFiles.push(filePath);
+        await config.update('excludedFiles', excludedFiles, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`${filePath} added to conversion exclusion list.`);
+    } else {
+        vscode.window.showWarningMessage(`${filePath} is already in the exclusion list.`);
+    }
+}
+
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -124,7 +143,7 @@ function activate(context) {
 
 
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
-
+    context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
     context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand);
 }
 
@@ -145,7 +164,6 @@ function aSimpleDataProvider() {
         },
         getChildren: (element) => {
             if (!element) {
-                // Root level
                 return Promise.resolve([
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
@@ -156,7 +174,6 @@ function aSimpleDataProvider() {
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
                 ]);
             } else if (element.id === 'conversion') {
-                // Conversion submenu
                 return Promise.resolve([
                     { label: 'Convert all XML to LOCA', command: 'bg3-mod-helper.xmlToLoca' },
                     { label: 'Convert all LOCA to XML', command: 'bg3-mod-helper.locaToXml' },
@@ -164,7 +181,6 @@ function aSimpleDataProvider() {
                     { label: 'Convert all LSF to LSX', command: 'bg3-mod-helper.lsfToLsx' }
                 ]);
             } else {
-                // No further nesting
                 return Promise.resolve([]);
             }
         }
