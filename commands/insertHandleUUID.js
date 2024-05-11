@@ -11,9 +11,22 @@ let uuidDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertUUID'
 });
 
 let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHandle', async function () {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        vscode.window.showErrorMessage('No active text editor!');
+        return;
+    }
+
     const { customWorkspacePath } = getConfig();
-    const handle = await generateHandle(customWorkspacePath);
-    insertText(handle);
+    // Generate a handle for each selection (cursor)
+    const handles = await Promise.all(editor.selections.map(() => generateHandle(customWorkspacePath)));
+
+    // Insert the handles into the editor for each selection
+    editor.edit((editBuilder) => {
+        editor.selections.forEach((selection, index) => {
+            editBuilder.replace(selection, handles[index]);
+        });
+    });
 });
 
 // Function to generate a handle with 'g' included and update .loca.xml file
