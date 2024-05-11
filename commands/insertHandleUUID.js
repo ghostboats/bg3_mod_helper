@@ -30,13 +30,12 @@ async function generateHandle(customWorkspacePath) {
     if (activeFilePath) {
         // Determine the workspace folder
         let workspaceFolder;
-        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-            const activeFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-            workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(activeFilePath));
-        }
+        const activeFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+        workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(activeFilePath));
+
         if (workspaceFolder) {
             // Find .loca.xml file in the workspace folder
-            const locaFilePattern = new vscode.RelativePattern(workspaceFolder, 'Localization/*/*.xml');
+            const locaFilePattern = new vscode.RelativePattern(workspaceFolder, '**/Localization/**/*.xml');
             const locaFiles = await vscode.workspace.findFiles(locaFilePattern, '**/node_modules/**', 1);
 
             if (locaFiles.length == 1) {
