@@ -18,8 +18,12 @@ let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHan
     }
 
     const { customWorkspacePath } = getConfig();
-    // Generate a handle for each selection (cursor)
-    const handles = await Promise.all(editor.selections.map(() => generateHandle(customWorkspacePath)));
+
+    // Capture the selected text and generate a handle for each selection (cursor), using the selected text as the content
+    const handles = await Promise.all(editor.selections.map(selection => {
+        const selectedText = editor.document.getText(selection);
+        return generateHandle(customWorkspacePath, selectedText);
+    }));
 
     // Insert the handles into the editor for each selection
     editor.edit((editBuilder) => {
@@ -29,8 +33,9 @@ let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHan
     });
 });
 
+
 // Function to generate a handle with 'g' included and update .loca.xml file
-async function generateHandle(customWorkspacePath) {
+async function generateHandle(customWorkspacePath, handleContent) {
     let tempHandle = 'h' + uuidv4().replace(/-/g, '') + generateRandomHexWithG(4);
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
@@ -58,7 +63,7 @@ async function generateHandle(customWorkspacePath) {
 
                 let indexToInsert = lines.findIndex(line => line.trim() === '</contentList>');
                 if (indexToInsert !== -1) {
-                    const contentToAdd = `    <content contentuid="${tempHandle}" version="1"></content>\n`;
+                    const contentToAdd = `    <content contentuid="${tempHandle}" version="1">${handleContent.trim()}</content>\n`;
                     const edit = new vscode.WorkspaceEdit();
                     const position = new vscode.Position(indexToInsert, 0);
                     edit.insert(document.uri, position, contentToAdd);
