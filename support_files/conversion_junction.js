@@ -17,8 +17,6 @@ const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
 const { processPak, prepareTempDir } = require('./pack_mod');
 
 
-
-
 function getActiveTabPath() {
     return vscode.window.activeTextEditor.document.fileName;
 }
@@ -101,7 +99,6 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         }
     }
 }
-
 
 
 module.exports = { convert };
