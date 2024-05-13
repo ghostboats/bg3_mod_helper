@@ -6,7 +6,7 @@
     "version": "2.1.10",
     "icon": "media/marketplace_icon.png",
     "engines": {
-        "vscode": "^1.88.0"
+        "vscode": "^1.86.0"
     },
     "categories": [
         "Other"
