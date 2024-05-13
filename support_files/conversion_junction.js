@@ -66,16 +66,14 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
     } 
     else if (Array.isArray(convertPath)) {
         for (let i = 0; i < convertPath.length; i++) {
-            if (!isExcluded(convertPath[i])) {
-                convert(convertPath[i], path.extname(convertPath[i]));
-            }
+            convert(convertPath[i], path.extname(convertPath[i]));
         }
     } 
     else if (fs.statSync(convertPath).isDirectory()) {
         const filesToConvert = FIND_FILES(convertPath, targetExt);
         convert(filesToConvert, targetExt);
     } 
-    else if (fs.statSync(convertPath).isFile() && !isExcluded(convertPath)) {
+    else if (fs.statSync(convertPath).isFile()) {
         if (isLoca(targetExt)) {
             try {
                 processLoca(convertPath, targetExt);
