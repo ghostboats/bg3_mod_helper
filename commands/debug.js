@@ -16,9 +16,6 @@ let debugCommand = vscode.commands.registerCommand('bg3-mod-helper.debugCommand'
         'cmon dude i said no :('
     )
 
-    test_paths = FIND_FILES(rootModPath, lsx);
-    raiseInfo(test_paths, false);
-
     console.log('__debugCommand__');
 });
 
