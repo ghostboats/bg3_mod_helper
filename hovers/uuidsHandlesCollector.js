@@ -43,19 +43,17 @@ function setupUuidsHandlesHoverProvider() {
 
                             const hoverText = instances.map(instance => {
                                 const [relativePath, lineNum, lineContent] = instance.split('#');
-                                let modifiedLineContent = lineContent.replace(/^<\/?|\/?>$/g, '');
-                                console.log('Instance Values Split:\nrelative path: ',relativePath,'\nline number: ', lineNum,'\nline content: ',lineContent)
-                                let highlightedLineContent = modifiedLineContent.replace(/(id="[^"]*")/g, '**$1**');
-                                if (highlightedLineContent.startsWith('content')) {
-                                    highlightedLineContent = highlightedLineContent.replace(/^content/, '');
-                                    highlightedLineContent = highlightedLineContent.replace(/<\/content\s*$/, '');
-                                }
-                                //highlightedLineContent = escapeHtml(highlightedLineContent);
+
+                                // Extract the handle content inside the <content> tags, if any
+                                const contentMatch = lineContent.match(/<content[^>]*>(.*?)<\/content>/);
+                                let highlightedLineContent = contentMatch ? contentMatch[1] : '';
+
                                 const openFileCommandUri = vscode.Uri.parse(`command:extension.openFileAtLine?${encodeURIComponent(JSON.stringify({ relativePath, lineNum }))}`);
-                                let currentLine = `Line: ${highlightedLineContent}  \nFile: [**${relativePath}**](${openFileCommandUri})  \n---  \n`;
+
+                                let currentLine = `Content: ***${highlightedLineContent}***  \nFile: [${relativePath}](${openFileCommandUri})  \n---  \n`;
                                 return currentLine;
                             }).join('\n');
-    
+
                             // Update the cache with a check for max size
                             if (Object.keys(instancesCache).length >= maxCacheSize) {
                                 const keys = Object.keys(instancesCache);
@@ -78,5 +76,3 @@ function setupUuidsHandlesHoverProvider() {
 }
 
 module.exports = setupUuidsHandlesHoverProvider;
-
-
