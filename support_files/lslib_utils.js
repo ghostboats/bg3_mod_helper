@@ -74,11 +74,9 @@ function baseNamePath(filePath, ext) {
 function processDllPaths() {
     for (let i = 0; i < DLL_PATHS.length; i++) {
         var temp_path = path.normalize(DLL_PATHS[i]);
-        var temp_name = path.basename(temp_path);
 
         try {
             DLLS.push(temp_path);
-            bg3mh_logger.info("%s found at %s", temp_name, temp_path);
         }
         catch (Error) {
             raiseError(Error);
@@ -162,7 +160,6 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
     }
 
     return FILTER_PATHS(filesToConvert);
-    
 }
 
 

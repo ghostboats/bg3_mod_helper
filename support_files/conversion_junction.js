@@ -46,8 +46,7 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
     if (targetExt === "empty") {
         return;
     }
-
-    const { excludedFiles } = getConfig();
+    
     const normalizedExcludedFiles = excludedFiles.map(file => path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':'));
 
     // bg3mh_logger.info(`Normalized Excluded Files: ${JSON.stringify(normalizedExcludedFiles, null, 2)}`);
@@ -67,15 +66,16 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
     } 
     else if (Array.isArray(convertPath)) {
         for (let i = 0; i < convertPath.length; i++) {
-            convert(convertPath[i], path.extname(convertPath[i]));
+            if (!isExcluded(convertPath[i])) {
+                convert(convertPath[i], path.extname(convertPath[i]));
+            }
         }
     } 
     else if (fs.statSync(convertPath).isDirectory()) {
         const filesToConvert = FIND_FILES(convertPath, targetExt);
-        // const filteredFiles = filesToConvert.filter(file => !isExcluded(file));
         convert(filesToConvert, targetExt);
     } 
-    else if (fs.statSync(convertPath).isFile() && !(convertPath == [])) {
+    else if (fs.statSync(convertPath).isFile() && !isExcluded(convertPath)) {
         if (isLoca(targetExt)) {
             try {
                 processLoca(convertPath, targetExt);
@@ -92,7 +92,6 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
                 raiseError(Error);
                 return;
             }
-
         }
     }
 }
