@@ -33,7 +33,7 @@ const converterAppDll = ['ConverterApp.dll'];
 const illegalDlls = [].concat(elasticDlls, storyCompilerDlls, converterAppDll);
 
 // the list of directories that need lsx > lsf conversion
-const convertDirs = ["[PAK]", "RootTemplates", "MultiEffectInfos", "UI", "GUI", "Effects", "LevelMapValues"];
+const convertDirs = ["[PAK]", "RootTemplates", "MultiEffectInfos", "UI", "GUI", "Effects", "LevelMapValues", "Localization"];
 
 var DLLS = [];
 var DLL_PATHS = [];
