@@ -190,6 +190,7 @@ function FILTER_PATHS(filesPath) {
     }
 }
 
+
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
 function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
     fs.readFile(sourcePath, (readErr, data) => {
