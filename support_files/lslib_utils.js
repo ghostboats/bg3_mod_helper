@@ -190,29 +190,6 @@ function FILTER_PATHS(filesPath) {
     }
 }
 
-
-function FILTER_PATHS(filesPath) {
-    if (Array.isArray(filesPath)) {
-        let filteredPaths = [];
-
-        for (let i = 0; i < filesPath.length; i++) {
-            filteredPaths.push(FILTER_PATHS(filesPath[i]));
-        }
-        return filteredPaths;
-    }
-    else if (typeof(filesPath == 'string')) {
-        let temp_path = filesPath.split(path.sep);
-
-        for (let i = 0; i < temp_path.length; i++) {
-            if (!excludedFiles.includes(temp_path[i]) && convertDirs.includes(temp_path[i])) {
-                return filesPath;
-            }
-        }
-    }
-}
-
-
-
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
 function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
     fs.readFile(sourcePath, (readErr, data) => {
