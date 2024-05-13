@@ -64,20 +64,25 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         convert(rootModPath, xml);
         convert(rootModPath, lsx);
         processPak(rootModPath);
-    } else if (Array.isArray(convertPath)) {
+    } 
+    else if (Array.isArray(convertPath)) {
         for (let i = 0; i < convertPath.length; i++) {
             if (!isExcluded(convertPath[i])) {
                 convert(convertPath[i], path.extname(convertPath[i]));
-            } else {
+            } 
+            else {
                 bg3mh_logger.info(`Excluded: ${convertPath[i]}`);
             }
         }
-    } else if (fs.statSync(convertPath).isDirectory()) {
+    } 
+    else if (fs.statSync(convertPath).isDirectory()) {
         const filesToConvert = FIND_FILES(convertPath, targetExt);
         const filteredFiles = filesToConvert.filter(file => !isExcluded(file));
+
         bg3mh_logger.info(`Files to convert (after exclusion): ${JSON.stringify(filteredFiles, null, 2)}`);
         convert(filteredFiles);
-    } else if (fs.statSync(convertPath).isFile() && !(convertPath == [])) {
+    } 
+    else if (fs.statSync(convertPath).isFile() && !(convertPath == [])) {
         if (!isExcluded(convertPath)) {
             if (isLoca(targetExt)) {
                 try {
@@ -86,15 +91,18 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
                     raiseError(Error);
                     return;
                 }
-            } if (isLsf(targetExt)) {
+            } 
+            if (isLsf(targetExt)) {
                 try {
                     processLsf(convertPath, targetExt);
-                } catch (Error) {
+                } 
+                catch (Error) {
                     raiseError(Error);
                     return;
                 }
             }
-        } else {
+        } 
+        else {
             raiseInfo(`Excluded: ${convertPath}`, false);
         }
     }

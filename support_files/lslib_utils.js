@@ -26,12 +26,14 @@ const { lslibPath, excludedFiles } = getConfig();
 const compatRootModPath = path.join(getConfig().rootModPath + "\\");
 const lslibToolsPath = path.join(getConfig().lslibPath, TOOL_SUBDIR);
 
+// separated for future use
 const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
-const storyCompilerDll = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
+const storyCompilerDlls = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
 const converterAppDll = ['ConverterApp.dll'];
+const illegalDlls = [].concat(elasticDlls, storyCompilerDlls, converterAppDll);
 
 // the list of directories that need lsx > lsf conversion
-const convertDirs = ["[PAK]", "RootTemplates", "MultiEffectInfos", "UI", "GUI", "Effects"];
+const convertDirs = ["[PAK]", "RootTemplates", "MultiEffectInfos", "UI", "GUI", "Effects", "LevelMapValues"];
 
 var DLLS = [];
 var DLL_PATHS = [];
@@ -106,10 +108,8 @@ function loadDlls() {
                 } 
             */
 
-            if (!converterAppDll.includes(temp_name) && !storyCompilerDll.includes(temp_name) && !elasticDlls.includes(temp_name)) {
-                dotnet.load(DLLS[i]);
-                bg3mh_logger.info("%s loaded.", DLLS[i]);
-            }
+        dotnet.load(DLLS[i]);
+        bg3mh_logger.info("%s loaded.", DLLS[i]);
         }
         catch (Error) {
             raiseError(Error);
@@ -128,7 +128,7 @@ function LOAD_LSLIB() {
     } 
     else {
         raiseError("LSLib.dll not found at " + lslibPath + ".", false);
-        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you arent using the legacy option using divine.exe?`)
+        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
         return null;
     }
 
@@ -157,35 +157,36 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
         const temp = filesList[i].toString();
 
         if (path.extname(temp) === targetExt) {
-            const fullPath = path.join(filesPath, filesList[i].toString());
-
-            if (!excludedFiles.includes(fullPath)) {
-                bg3mh_logger.info(`Included: ${fullPath}`);
-                filesToConvert.push(fullPath);
-            } 
-            else {
-                bg3mh_logger.info(`Excluded: ${fullPath}`);
-            }
+           filesToConvert.push(path.join(filesPath, temp));
         }
     }
-    return filesToConvert;
+
+    return FILTER_PATHS(filesToConvert);
+    
 }
 
 
 function FILTER_PATHS(filesPath) {
+    //raiseInfo(excludedFiles);
     if (Array.isArray(filesPath)) {
         let filteredPaths = [];
 
         for (let i = 0; i < filesPath.length; i++) {
-            filteredPaths.push(FILTER_PATHS(filesPath[i]));
+            let temp_path = FILTER_PATHS(filesPath[i]);
+
+            if (temp_path) {
+                filteredPaths.push(temp_path);
+            }
         }
         return filteredPaths;
     }
-    else if (typeof(filesPath == 'string')) {
+    else if (typeof(filesPath) == 'string') {
         let temp_path = filesPath.split(path.sep);
+        let temp_ext = path.extname(filesPath);
 
         for (let i = 0; i < temp_path.length; i++) {
-            if (!excludedFiles.includes(temp_path[i]) && convertDirs.includes(temp_path[i])) {
+            if ((!excludedFiles.includes(filesPath) && convertDirs.includes(temp_path[i])) || (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath)))) {
+                bg3mh_logger.info(`${filesPath} included`);
                 return filesPath;
             }
         }
@@ -221,4 +222,4 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
 
 const LSLIB = LOAD_LSLIB();
 
-module.exports = { LSLIB, FIND_FILES, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
+module.exports = { LSLIB, FIND_FILES, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
