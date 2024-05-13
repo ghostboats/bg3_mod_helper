@@ -228,6 +228,8 @@ function getWebviewContent() {
                 const build = document.getElementById('build').value;
                 const version = createVersion64(major, minor, revision, build);
                 document.getElementById('version').value = version;
+
+                // Save current state
                 vscode.setState({ major, minor, revision, build, version });
             }
 
@@ -279,7 +281,7 @@ function getWebviewContent() {
                 });
             });
 
-            // Restore ssaved set if possible
+            // Restore saved state if available
             const state = vscode.getState();
             if (state) {
                 document.getElementById('major').value = state.major;

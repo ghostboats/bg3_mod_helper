@@ -2,7 +2,7 @@ const path = require('path');
 const vscode = require('vscode');
 
 const { LSLIB, getFormats, baseNamePath } = require('./lslib_utils');
-const { CREATE_LOGGER, raiseError } = require('./log_utils');
+const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
 const { xml, loca } = getFormats();
@@ -44,7 +44,7 @@ function processLoca(file, targetExt) {
         temp_loca = LocaUtils.Load(file);
 
         LocaUtils.Save(temp_loca, file_output);
-        bg3mh_logger.info("Exported %s file: %s", to_loca, file_output);
+        raiseInfo(`Exported ${to_loca} file: ${file_output}`)
     }
     catch (Error) { 
         raiseError(Error);
