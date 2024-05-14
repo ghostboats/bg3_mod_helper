@@ -35,10 +35,7 @@ const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImag
 
 const { getFullPath } = require('./support_files/helper_functions');
 
-/**
- * Adds a file to the exclusion list.
- * @param {vscode.Uri} fileUri - The URI of the file to be excluded.
- */
+
 async function addToExcludeList(fileUri) {
     const config = vscode.workspace.getConfiguration('bg3ModHelper');
     let excludedFiles = config.get('excludedFiles') || [];
@@ -54,6 +51,19 @@ async function addToExcludeList(fileUri) {
     }
 }
 
+async function removeFromExcludeList(fileUri) {
+    const config = vscode.workspace.getConfiguration('bg3ModHelper');
+    let excludedFiles = config.get('excludedFiles') || [];
+    const filePath = fileUri.fsPath.replace(/\\/g, '/');
+
+    if (excludedFiles.includes(filePath)) {
+        excludedFiles = excludedFiles.filter(p => p !== filePath); // Remove the file from the list
+        await config.update('excludedFiles', excludedFiles, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`${filePath} removed from conversion exclusion list.`);
+    } else {
+        vscode.window.showWarningMessage(`${filePath} not in the exclusion list.`);
+    }
+}
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -146,6 +156,7 @@ function activate(context) {
 
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
+    context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.removeFromExcludeList', removeFromExcludeList));
     context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand);
 }
 

@@ -152,6 +152,11 @@
                 "category": "BG3 Mod Helper"
             },
             {
+                "command": "bg3-mod-helper.removeFromExcludeList",
+                "title": "Remove from Conversion Exclusion List",
+                "category": "BG3 Mod Helper"
+            },
+            {
                 "command": "bg3-mod-helper.debugCommand",
                 "title": "For dev use, dont press the button"
             }
@@ -285,8 +290,13 @@
                     "group": "navigation"
                 },
                 {
-                    "when": "resourceExtname == .lsx || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsf",
+                    "when": "resourceExtname == .lsx || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsf && !isExcluded",
                     "command": "bg3-mod-helper.addToExcludeList",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceExtname == .lsx || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsf && isExcluded",
+                    "command": "bg3-mod-helper.removeFromExcludeList",
                     "group": "navigation"
                 }
             ],
