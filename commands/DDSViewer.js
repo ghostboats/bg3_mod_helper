@@ -8,15 +8,14 @@ const { modName, rootModPath } = getConfig();
 const modsDirPath = path.normalize(rootModPath + "\\Mods");
 const bg3mh_logger = CREATE_LOGGER();
 
-// Constants for DDS header parsing
+
 const DDS_MAGIC = 0x20534444;
 const DDSD_MIPMAPCOUNT = 0x20000;
 const DDPF_FOURCC = 0x4;
-const DDSCAPS2_CUBEMAP = 0x200;  // Definition for the cubemap flag
+const DDSCAPS2_CUBEMAP = 0x200;
 
-const headerLengthInt = 31;  // Length of the DDS header in 32-bit integers
+const headerLengthInt = 31;
 
-// Offsets into the header array (in 32-bit integers)
 const off_magic = 0;
 const off_size = 1;
 const off_flags = 2;
@@ -94,7 +93,7 @@ let DDSViewerCommand = vscode.commands.registerCommand('bg3-mod-helper.DDSViewer
         vscode.ViewColumn.One,
         {
             enableScripts: true,
-            retainContextWhenHidden: true  // Optional, based on your needs
+            retainContextWhenHidden: true
         }
     );
 
@@ -176,7 +175,6 @@ function getWebviewContent(ddsDetails) {
     }
     content += '</table>';
 
-    // Add script to handle file opening
     content += `
     <script>
         const vscode = acquireVsCodeApi();
