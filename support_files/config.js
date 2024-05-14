@@ -8,6 +8,18 @@ function setConfig(newConfig) {
 }
 
 
+function normalizeExcludedFiles(excludedFiles) {
+
+    if (Array.isArray(excludedFiles)) {
+        let normalizeExcludedFiles = excludedFiles.map((temp_file) => path.normalize(temp_file));
+        return normalizeExcludedFiles;
+    }
+    else {
+        return path.normalize(excludedFiles);
+    }
+}
+
+
 function getConfig() {
     const config = vscode.workspace.getConfiguration('bg3ModHelper');
     return {
@@ -20,7 +32,7 @@ function getConfig() {
         lslibPath: path.normalize(config.get('lslibPath')),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
-        excludedFiles: config.get('excludedFiles') || []
+        excludedFiles: normalizeExcludedFiles(config.get('excludedFiles'))
     };
 }
 module.exports = { setConfig, getConfig };

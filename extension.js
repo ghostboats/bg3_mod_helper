@@ -20,6 +20,8 @@ const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } =
 
 const openConverterCommand = require('./commands/openConverter');
 const versionGeneratorCommand = require('./commands/versionGenerator');
+const rotationToolCommand = require('./commands/rotationTool');
+const DDSViewerCommand = require('./commands/DDSViewer');
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
@@ -33,10 +35,7 @@ const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImag
 
 const { getFullPath } = require('./support_files/helper_functions');
 
-/**
- * Adds a file to the exclusion list.
- * @param {vscode.Uri} fileUri - The URI of the file to be excluded.
- */
+
 async function addToExcludeList(fileUri) {
     const config = vscode.workspace.getConfiguration('bg3ModHelper');
     let excludedFiles = config.get('excludedFiles') || [];
@@ -52,6 +51,19 @@ async function addToExcludeList(fileUri) {
     }
 }
 
+async function removeFromExcludeList(fileUri) {
+    const config = vscode.workspace.getConfiguration('bg3ModHelper');
+    let excludedFiles = config.get('excludedFiles') || [];
+    const filePath = fileUri.fsPath.replace(/\\/g, '/');
+
+    if (excludedFiles.includes(filePath)) {
+        excludedFiles = excludedFiles.filter(p => p !== filePath); // Remove the file from the list
+        await config.update('excludedFiles', excludedFiles, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`${filePath} removed from conversion exclusion list.`);
+    } else {
+        vscode.window.showWarningMessage(`${filePath} not in the exclusion list.`);
+    }
+}
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -144,7 +156,8 @@ function activate(context) {
 
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
-    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand);
+    context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.removeFromExcludeList', removeFromExcludeList));
+    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand);
 }
 
 
@@ -171,6 +184,8 @@ function aSimpleDataProvider() {
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
+                    { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
+                    { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
                 ]);
             } else if (element.id === 'conversion') {
