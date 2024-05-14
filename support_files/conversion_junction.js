@@ -10,7 +10,7 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
 const { getConfig } = require('./config.js');
-const { rootModPath, modName, modDestPath, excludedFiles } = getConfig();
+const { rootModPath, modName, modDestPath } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
@@ -46,6 +46,7 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
     if (targetExt === "empty") {
         return;
     }
+    const { excludedFiles } = getConfig();
     
     const normalizedExcludedFiles = excludedFiles.map(file => path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':'));
 
