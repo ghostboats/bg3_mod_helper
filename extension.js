@@ -20,6 +20,7 @@ const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } =
 
 const openConverterCommand = require('./commands/openConverter');
 const versionGeneratorCommand = require('./commands/versionGenerator');
+const rotationToolCommand = require('./commands/rotationTool');
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
@@ -144,7 +145,7 @@ function activate(context) {
 
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
-    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand);
+    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand);
 }
 
 
@@ -171,6 +172,7 @@ function aSimpleDataProvider() {
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
+                    { label: 'Rotation Tool (not working, in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
                 ]);
             } else if (element.id === 'conversion') {
