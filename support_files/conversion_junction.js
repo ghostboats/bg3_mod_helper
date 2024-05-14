@@ -46,16 +46,19 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
     if (targetExt === "empty") {
         return;
     }
+    // we can leave this here for the moment, might be a good logic bit to keep in the future.
+    /*
+    // changed this to a const so nothing bothers it while the conversion is taking place
     const { excludedFiles } = getConfig();
-    
     const normalizedExcludedFiles = excludedFiles.map(file => path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':'));
 
-    // bg3mh_logger.info(`Normalized Excluded Files: ${JSON.stringify(normalizedExcludedFiles, null, 2)}`);
-
+    bg3mh_logger.info(`Normalized Excluded Files: ${JSON.stringify(normalizedExcludedFiles, null, 2)}`);
+    
     const isExcluded = (file) => {
         const normalizedFile = path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':');
         return normalizedExcludedFiles.includes(normalizedFile);
     };
+    */
 
     if (targetExt === pak) {
         prepareTempDir();
@@ -68,11 +71,12 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
     else if (Array.isArray(convertPath)) {
         for (let i = 0; i < convertPath.length; i++) {
             convert(convertPath[i], path.extname(convertPath[i]));
+            bg3mh_logger.info(`Excluded: ${convertPath[i]}`);
         }
     } 
     else if (fs.statSync(convertPath).isDirectory()) {
         const filesToConvert = FIND_FILES(convertPath, targetExt);
-        convert(filesToConvert, targetExt);
+        convert(filesToConvert);
     } 
     else if (fs.statSync(convertPath).isFile()) {
         if (isLoca(targetExt)) {
@@ -92,6 +96,9 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
                 return;
             }
         }
+    } 
+    else {
+        raiseInfo(`Excluded: ${convertPath}`, false);
     }
 }
 

@@ -22,7 +22,7 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
-const { lslibPath, excludedFiles } = getConfig();
+const { lslibPath } = getConfig();
 const compatRootModPath = path.join(getConfig().rootModPath + "\\");
 const lslibToolsPath = path.join(getConfig().lslibPath, TOOL_SUBDIR);
 
@@ -149,8 +149,6 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
         recursive: isRecursive
     });
 
-    bg3mh_logger.info(`Excluded Files: ${excludedFiles}`);
-
     for (let i = 0; i < filesList.length; i++) {
         const temp = filesList[i].toString();
 
@@ -164,12 +162,12 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
 
 
 function FILTER_PATHS(filesPath) {
-    //raiseInfo(excludedFiles);
+    let excludedFiles = getConfig().excludedFiles;
     if (Array.isArray(filesPath)) {
         let filteredPaths = [];
 
         for (let i = 0; i < filesPath.length; i++) {
-            let temp_path = FILTER_PATHS(filesPath[i]);
+            let temp_path = FILTER_PATHS(path.normalize(filesPath[i]));
 
             if (temp_path) {
                 filteredPaths.push(temp_path);
@@ -183,7 +181,6 @@ function FILTER_PATHS(filesPath) {
 
         for (let i = 0; i < temp_path.length; i++) {
             if ((!excludedFiles.includes(filesPath) && convertDirs.includes(temp_path[i])) || (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath)))) {
-                bg3mh_logger.info(`${filesPath} included`);
                 return filesPath;
             }
         }
