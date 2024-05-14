@@ -10,7 +10,7 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
 const { getConfig } = require('./config.js');
-const { rootModPath, modName, modDestPath, excludedFiles } = getConfig();
+const { rootModPath, modName, modDestPath } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
@@ -43,6 +43,7 @@ function getDynamicPath(filePath) {
 
 
 function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
+    let { excludedFiles } = getConfig();
     if (targetExt === "empty") {
         return;
     }
@@ -66,30 +67,40 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
     } 
     else if (Array.isArray(convertPath)) {
         for (let i = 0; i < convertPath.length; i++) {
-            convert(convertPath[i], path.extname(convertPath[i]));
+            if (!isExcluded(convertPath[i])) {
+                convert(convertPath[i], path.extname(convertPath[i]));
+            } else {
+                bg3mh_logger.info(`Excluded: ${convertPath[i]}`);
+            }
         }
     } 
     else if (fs.statSync(convertPath).isDirectory()) {
         const filesToConvert = FIND_FILES(convertPath, targetExt);
-        convert(filesToConvert, targetExt);
+        const filteredFiles = filesToConvert.filter(file => !isExcluded(file));
+        bg3mh_logger.info(`Files to convert (after exclusion): ${JSON.stringify(filteredFiles, null, 2)}`);
+        convert(filteredFiles);
     } 
     else if (fs.statSync(convertPath).isFile()) {
-        if (isLoca(targetExt)) {
-            try {
-                processLoca(convertPath, targetExt);
-            } catch (Error) {
-                raiseError(Error);
-                return;
-            }
-        } 
-        if (isLsf(targetExt)) {
-            try {
-                processLsf(convertPath, targetExt);
+        if (!isExcluded(convertPath)) {
+            if (isLoca(targetExt)) {
+                try {
+                    processLoca(convertPath, targetExt);
+                } catch (Error) {
+                    raiseError(Error);
+                    return;
+                }
             } 
-            catch (Error) {
-                raiseError(Error);
-                return;
+            if (isLsf(targetExt)) {
+                try {
+                    processLsf(convertPath, targetExt);
+                } 
+                catch (Error) {
+                    raiseError(Error);
+                    return;
+                }
             }
+        } else {
+            raiseInfo(`Excluded: ${convertPath}`, false);
         }
     }
 }
