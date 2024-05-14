@@ -143,6 +143,10 @@
                 "title": "Rotation Tool"
             },
             {
+                "command": "bg3-mod-helper.DDSViewer",
+                "title": "DDS Viewer"
+            },
+            {
                 "command": "bg3-mod-helper.addToExcludeList",
                 "title": "Add to Conversion Exclusion List",
                 "category": "BG3 Mod Helper"
