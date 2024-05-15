@@ -1,75 +1,33 @@
-// PNGToDDS.js
+//https://github.com/mmomtchev/magickwand.js/blob/main/example/example.mjs
 const vscode = require('vscode');
-const path = require('path');
-const { exec } = require('child_process');
+const { Magick } = require('magickwand.js');
 
 const PNGToDDSCommand = vscode.commands.registerCommand('bg3-mod-helper.PNGToDDS', async (uri) => {
-    console.log('‾‾PNGToDDSCommand‾‾');
-    const checkWandScriptPath = path.join(__dirname, '..', 'support_files', 'python_scripts', 'check_wand.py');
-    const scriptPath = path.join(__dirname, '..', 'support_files', 'scripts', 'python', 'PNG_to_DDS.py');
+    if (!uri) {
+        vscode.window.showErrorMessage('No file selected.');
+        return;
+    }
+
     const filePath = uri.fsPath;
+    const normalizedFilePath = filePath.toLowerCase().replace(/\\/g, '/');
 
-    // Normalize file path and determine output format
-    const normalizedFilePath = filePath.replace(/\\/g, '/').toLowerCase(); // Replace backslashes with forward slashes and convert to lower case
-    const outputFormat = normalizedFilePath.includes('assets/textures/icons') ? '.dds' : '.DDS';
-    const ddsCompression = outputFormat === '.dds' ? 'dxt5' : 'dxt1';
+    const ddsCompression = normalizedFilePath.includes('assets/textures/icons') ? 'DXT5' : 'DXT1';
+    const outputExtension = normalizedFilePath.includes('assets/textures') ? '.dds' : '.DDS';
+    const outputPath = filePath.replace(/\.[^/.]+$/, outputExtension);
 
-    // Check if Wand is installed
-    exec(`python "${checkWandScriptPath}"`, (error, stdout, stderr) => {
-        if (error) {
-            console.error('Error:', error);
-            return;
-        }
-        if (stderr) {
-            console.error('Script error:', stderr);
-            return;
-        }
-        if (stdout.trim() === "Wand not installed") {
-            vscode.window.showInformationMessage(
-                "Wand Python package is not installed. Open terminal to install wand? ENSURE PIP IS UPDATED, OTHERWISE RUN THIS MANUALLY IN TERMINAL: pip install wand", 
-                "Yes", 
-                "No"
-            ).then(selection => {
-                if (selection === "Yes") {
-                    // Open a new terminal with the command typed but not executed
-                    const terminal = vscode.window.createTerminal(`Wand Install`);
-                    terminal.show();
-                    terminal.sendText("pip install wand", false); // false means don't execute
+    try {
+        let image = new Magick.Image();
+        await image.readAsync(filePath);
 
-                    // Prompt user to press Enter in terminal
-                    vscode.window.showInformationMessage("The terminal has opened with the pip install command. Please press Enter in the terminal to install Wand, then rerun this command.");
-                }
-            });
-        } else if (stdout.trim() === "ImageMagick not installed") {
-            // Prompt user to download ImageMagick
-            vscode.window.showInformationMessage(
-                "ImageMagick is not installed, which is required by Wand. Would you like to download it (installed headers as well in options when downlaoding)?",
-                "Download ImageMagick"
-            ).then(selection => {
-                if (selection === "Download ImageMagick") {
-                    vscode.env.openExternal(vscode.Uri.parse("https://imagemagick.org/script/download.php"));
-                }
-            });
-        } else {
-            // Wand is installed, proceed with conversion
-            const convertCommand = `python "${scriptPath}" -o "${outputFormat}" --ddscompression "${ddsCompression}" -f "${filePath}"`;
-            exec(convertCommand, (convertError, convertStdout, convertStderr) => {
-                if (convertError) {
-                    console.error('Error:', convertError);
-                    vscode.window.showErrorMessage(`Error converting file: ${convertError.message}`);
-                    return;
-                }
-                if (convertStderr) {
-                    console.error('Script error:', convertStderr);
-                }
-                if (convertStdout) {
-                    console.log('Script output:', convertStdout);
-                }
-                vscode.window.showInformationMessage(`File converted successfully.`);
-            });
-        }
-    });
-    console.log('__PNGToDDSCommand__');
+        await image.magickAsync('DDS');
+
+        await image.writeAsync(outputPath);
+
+        vscode.window.showInformationMessage(`File converted successfully and saved as ${outputPath}`);
+    } catch (error) {
+        console.error('Error:', error);
+        vscode.window.showErrorMessage('Failed to convert image: ' + error.message);
+    }
 });
 
 module.exports = PNGToDDSCommand;
