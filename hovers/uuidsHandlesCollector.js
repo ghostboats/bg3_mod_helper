@@ -43,14 +43,22 @@ function setupUuidsHandlesHoverProvider() {
 
                             const hoverText = instances.map(instance => {
                                 const [relativePath, lineNum, lineContent] = instance.split('#');
-
-                                // Extract the handle content inside the <content> tags, if any
-                                const contentMatch = lineContent.match(/<content[^>]*>(.*?)<\/content>/);
-                                let highlightedLineContent = contentMatch ? contentMatch[1] : '';
-
                                 const openFileCommandUri = vscode.Uri.parse(`command:extension.openFileAtLine?${encodeURIComponent(JSON.stringify({ relativePath, lineNum }))}`);
-
-                                let currentLine = `Content: ***${highlightedLineContent}***  \nFile: [${relativePath}](${openFileCommandUri})  \n---  \n`;
+                                let currentLine;
+                                const normalizedPath = relativePath.replace(/\\/g, '/').toLowerCase();
+                                console.log(relativePath)
+                                console.log(normalizedPath)
+                                // Check if the file is within the Localization folder
+                                if (normalizedPath.includes('localization/')) {
+                                    // Process as a localization-related file
+                                    const contentMatch = lineContent.match(/<content[^>]*>(.*?)<\/content>/);
+                                    let highlightedLineContent = contentMatch ? contentMatch[1] : '';
+                                    currentLine = `Loca Content: ***${highlightedLineContent}***  \nFile: [${relativePath}](${openFileCommandUri})  \n---  \n`;
+                                } else {
+                                    let modifiedLineContent = lineContent.replace(/^<\/?|\/?>$/g, '');
+                                    let highlightedLineContent = modifiedLineContent.replace(/(id="[^"]*")/g, '**$1**');
+                                    currentLine = `Line: ${highlightedLineContent}  \nFile: [**${relativePath}**](${openFileCommandUri})  \n---  \n`;
+                                }
                                 return currentLine;
                             }).join('\n');
 
