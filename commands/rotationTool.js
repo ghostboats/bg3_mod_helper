@@ -1,11 +1,9 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
-const { getConfig } = require('../support_files/config');
+
 const { CREATE_LOGGER } = require('../support_files/log_utils.js');
-const { modName, rootModPath } = getConfig();
-const modsDirPath = path.normalize(rootModPath + "\\Mods");
-const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
+
 const bg3mh_logger = CREATE_LOGGER();
 
 let rotationToolCommand = vscode.commands.registerCommand('bg3-mod-helper.rotationTool', function () {

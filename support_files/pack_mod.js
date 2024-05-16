@@ -9,13 +9,12 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig } = require('./config.js');
-const { rootModPath, modName, modDestPath } = getConfig();
+const { rootModPath, modDestPath } = getConfig();
 const rootParentPath = path.dirname(rootModPath);
 
 const temp_folder = "\\temp_folder";
 const temp_path = path.join(rootParentPath, temp_folder);
-const modFinalDestPath = path.join(modDestPath, modName + pak);
-const modTempDestPath = path.join(temp_path, modName + pak);
+
 
 
 function prepareTempDir(movedPak = false) {
@@ -39,15 +38,17 @@ function prepareTempDir(movedPak = false) {
 
 
 // btw, sometimes this will log things before others because it's async.
-async function processPak(modPath) {
+async function processPak(modPath, modName_) {
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 
+    const modFinalDestPath = path.join(modDestPath, modName_ + pak);
+    const modTempDestPath = path.join(temp_path, modName_ + pak);
     try {
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
-        raiseInfo(modName + pak + " packed", false);
-        vscode.window.showInformationMessage(`${modName + pak} packed`);
+        raiseInfo(modName_ + pak + " packed", false);
+        vscode.window.showInformationMessage(`${modName_ + pak} packed`);
 
         // move files to chosen path and [in progress] clean up the empty directory
         moveFileAcrossDevices(modTempDestPath, modFinalDestPath);

@@ -10,7 +10,7 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
 const { getConfig } = require('./config.js');
-const { rootModPath, modName, modDestPath } = getConfig();
+const { rootModPath } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
@@ -42,7 +42,7 @@ function getDynamicPath(filePath) {
 }
 
 
-function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
+function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName_ = '') {
     if (targetExt === "empty") {
         return;
     }
@@ -66,7 +66,7 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         // changed these back, hope that's okay
         convert(rootModPath, xml);
         convert(rootModPath, lsx);
-        processPak(rootModPath);
+        processPak(rootModPath, modName_);
     } 
     else if (Array.isArray(convertPath)) {
         for (let i = 0; i < convertPath.length; i++) {

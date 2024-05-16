@@ -4,6 +4,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const { getConfig } = require('../support_files/config');
+const { getModName } = require('../support_files/helper_functions.js');
 
 function findDivineExe(lslibPath) {
     let divinePath = null;
@@ -43,8 +44,7 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
     const { rootModPath, lslibPath } = getConfig();
 
     const scriptPath = path.join(__dirname, '..', 'support_files', 'scripts', 'python', 'add_icons_to_atlas.py');
-    const modsDirPath = path.join(rootModPath, 'Mods');
-    let modName = '';
+
     let import_test = false
 
     let divinePath_;
@@ -55,16 +55,7 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
         return;
     }
 
-    // Check if Mods directory exists and get the first subfolder name
-    if (fs.existsSync(modsDirPath) && fs.lstatSync(modsDirPath).isDirectory()) {
-        const subfolders = fs.readdirSync(modsDirPath).filter(file => fs.lstatSync(path.join(modsDirPath, file)).isDirectory());
-        modName = subfolders.length > 0 ? subfolders[0] : '';
-    }
-
-    if (!modName) {
-        vscode.window.showErrorMessage('Mods directory not found or no subfolders to determine mod name.');
-        return;
-    }
+    const modName = await getModName();
 
     function checkPythonImports(packages) {
         return new Promise((resolve, reject) => {

@@ -93,13 +93,11 @@ function activate(context) {
     }
 
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
-    
     setConfig({
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: config.get('rootModPath'),
-        modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
         lslibPath: config.get('lslibPath'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
