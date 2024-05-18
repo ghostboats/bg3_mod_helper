@@ -79,7 +79,7 @@ function activate(context) {
         const config = vscode.workspace.getConfiguration('bg3ModHelper');
         config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace
             ).then(() => {
-                vscode.window.showInformationMessage(`Workspace set to: 
+                vscode.window.showInformationMessage(`Workspace set to:
                 ${mainFolderPath}.`,
                 'Open Settings'
             ).then(selection => {
@@ -93,7 +93,7 @@ function activate(context) {
     }
 
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
-    
+
     setConfig({
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
@@ -104,6 +104,7 @@ function activate(context) {
         lslibPath: config.get('lslibPath'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
+        addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
         excludedFiles: config.get('excludedFiles') || []
     });
     bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
@@ -118,7 +119,7 @@ function activate(context) {
     // Register the command to open file at a specific line
     context.subscriptions.push(vscode.commands.registerCommand('extension.openFileAtLine', ({ relativePath, lineNum }) => {
         const fullPath = getFullPath(relativePath)
-        
+
         const uri = vscode.Uri.file(fullPath);
         vscode.window.showTextDocument(uri, { preview: false }).then(editor => {
             const line = parseInt(lineNum, 10) - 1; // Convert line number to zero-based index
@@ -130,8 +131,8 @@ function activate(context) {
 
     // Register autocomplete provider for text files within 'Generated' folders
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
-        { scheme: 'file', pattern: '**/Generated/**/*.txt' }, 
-        new AutoCompleteProvider(), 
+        { scheme: 'file', pattern: '**/Generated/**/*.txt' },
+        new AutoCompleteProvider(),
         '"' // Trigger completion when `"` is typed
     ));
 
