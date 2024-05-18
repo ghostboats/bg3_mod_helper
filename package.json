@@ -220,7 +220,7 @@
                 "bg3ModHelper.addHandlesToAllLocas": {
                     "type": "boolean",
                     "default": true,
-                    "description": "When generating handles, add them to all loca files in the mod."
+                    "description": "When generating handles, add them to all loca files. If disabled, prompts for which files to add handles to."
                 }
             }
         },
