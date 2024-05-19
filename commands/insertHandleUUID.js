@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 const { insertText } = require('../support_files/helper_functions');
 const { getConfig } = require('../support_files/config');
 
-
 let uuidDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertUUID', function () {
     insertText(uuidv4());
 });
@@ -49,6 +48,8 @@ let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHan
 
 // Function to update all .loca.xml files in the workspace with the given changes
 async function updateLocaXmlFiles(changes) {
+    const { addHandlesToAllLocas } = getConfig();
+
     const activeFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
     if (!activeFilePath) {
         return;
@@ -70,13 +71,35 @@ async function updateLocaXmlFiles(changes) {
         return;
     }
 
+    let selectedLocaFiles = locaFiles;
+    // If user doesn't want to add handles to all loca files, prompt for selection from the list of all loca files
+    if (!addHandlesToAllLocas) {
+        const fileItems = locaFiles.map(file => ({
+            label: path.basename(file.fsPath),
+            description: path.relative(workspaceFolder.uri.fsPath, file.fsPath),
+            fileUri: file
+        }));
+
+        const selectedItems = await vscode.window.showQuickPick(fileItems, {
+            canPickMany: true,
+            placeHolder: 'Select .loca.xml files to update with handles'
+        });
+
+        if (!selectedItems || selectedItems.length === 0) {
+            vscode.window.showInformationMessage('No .loca.xml files selected. No handles were added to any files.');
+            return;
+        }
+
+        selectedLocaFiles = selectedItems.map(item => item.fileUri);
+    }
+
     const edit = new vscode.WorkspaceEdit();
 
     let nUpdatedFiles = 0;
-    for (const locaFile of locaFiles) {
+    for (const locaFile of selectedLocaFiles) {
         try {
             await updateLocaXmlFile(locaFile, changes, edit);
-            nUpdatedFiles += 1
+            nUpdatedFiles += 1;
         } catch (error) {
             console.error(error);
         }
@@ -86,7 +109,7 @@ async function updateLocaXmlFiles(changes) {
         if (!success) {
             vscode.window.showErrorMessage('Failed to update loca .xml files.');
         } else {
-            vscode.window.showInformationMessage(`Handles were added to ${nUpdatedFiles} loca .xml files.`)
+            vscode.window.showInformationMessage(`Handles were added to ${nUpdatedFiles} loca .xml files.`);
         }
     });
 }
@@ -111,7 +134,7 @@ async function updateLocaXmlFile(locaFileUri, changes, edit) {
 }
 
 function generateContent(handle, handleContent) {
-    return `    <content contentuid="${handle}" version="1">${handleContent.trim()}</content>\n`
+    return `    <content contentuid="${handle}" version="1">${handleContent.trim()}</content>\n`;
 }
 
 function generateHandle() {
