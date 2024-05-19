@@ -31,6 +31,7 @@ function getConfig() {
         lslibPath: path.normalize(config.get('lslibPath')),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
+        addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
         excludedFiles: normalizeExcludedFiles(config.get('excludedFiles'))
     };
 }
