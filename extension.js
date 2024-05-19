@@ -99,7 +99,6 @@ function activate(context) {
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: config.get('rootModPath'),
-        modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
         lslibPath: config.get('lslibPath'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),

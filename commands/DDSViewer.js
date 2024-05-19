@@ -4,7 +4,7 @@ const path = require('path');
 const { getConfig } = require('../support_files/config');
 const { CREATE_LOGGER } = require('../support_files/log_utils');
 
-const { modName, rootModPath } = getConfig();
+const { rootModPath } = getConfig();
 const modsDirPath = path.normalize(rootModPath + "\\Mods");
 const bg3mh_logger = CREATE_LOGGER();
 
