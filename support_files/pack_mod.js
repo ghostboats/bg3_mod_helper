@@ -18,6 +18,9 @@ const temp_path = path.join(rootParentPath, temp_folder);
 
 
 function prepareTempDir(movedPak = false) {
+    console.log('test11')
+    console.log(rootParentPath)
+    console.log(rootModPath)
     if (!(fs.existsSync(temp_path))) {
         console.log("making temp_path");
         fs.mkdirSync(temp_path, { recursive: true});
@@ -39,13 +42,27 @@ function prepareTempDir(movedPak = false) {
 
 // btw, sometimes this will log things before others because it's async.
 async function processPak(modPath, modName_) {
+    console.log('check')
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
     const lastFolderName = path.basename(rootModPath);
 
     const modFinalDestPath = path.join(modDestPath, lastFolderName + pak);
     const modTempDestPath = path.join(temp_path, lastFolderName + pak);
+
+    const metaPath = path.join(rootModPath, 'Mods', modName_, 'meta.lsx');
+    
+
     try {
+        // Read the XML content
+        let xmlContent = fs.readFileSync(metaPath, 'utf8');
+
+        // Modify the Name attribute in the XML
+        xmlContent = xmlContent.replace(/(<attribute id="Name" type="FixedString" value=")(.*?)("\/>)/, `$1${lastFolderName}$3`);
+
+        // Write the updated XML back to the file
+        fs.writeFileSync(metaPath, xmlContent, 'utf8');
+        bg3mh_logger.info('meta.lsx updated successfully.');
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
         raiseInfo(lastFolderName + pak + " packed", false);

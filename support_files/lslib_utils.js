@@ -143,12 +143,13 @@ function LOAD_LSLIB() {
 // maybe replace with findFiles()? 
 function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     let filesToConvert = [];
-
+    console.log(filesPath)
+    console.log('heree1')
     const filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
         recursive: isRecursive
     });
-
+    console.log('heree2')
     for (let i = 0; i < filesList.length; i++) {
         const temp = filesList[i].toString();
 

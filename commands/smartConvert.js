@@ -8,7 +8,7 @@ let smartConvertCommand = vscode.commands.registerCommand('bg3-mod-helper.smartC
     let temp_ext = path.extname(temp_dir);
     console.log("%s \n%s", temp_dir, temp_ext);
 
-    convert(temp_dir, temp_ext, true);
+    convert(temp_dir, temp_ext);
 });
 
 module.exports = smartConvertCommand;

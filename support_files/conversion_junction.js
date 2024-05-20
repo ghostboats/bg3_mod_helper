@@ -59,10 +59,10 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         return normalizedExcludedFiles.includes(normalizedFile);
     };
     */
-
+    console.log('test10')
     if (targetExt === pak) {
         prepareTempDir();
-
+        console.log('past prepare temp')
         // changed these back, hope that's okay
         convert(rootModPath, xml);
         convert(rootModPath, lsx);
@@ -75,10 +75,13 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         }
     } 
     else if (fs.statSync(convertPath).isDirectory()) {
+        console.log('plz1')
         const filesToConvert = FIND_FILES(convertPath, targetExt);
+        console.log('fdsfdsf')
         convert(filesToConvert);
     } 
     else if (fs.statSync(convertPath).isFile()) {
+        console.log('plz2')
         if (isLoca(targetExt)) {
             try {
                 processLoca(convertPath, targetExt);
