@@ -41,14 +41,15 @@ function prepareTempDir(movedPak = false) {
 async function processPak(modPath, modName_) {
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
+    const lastFolderName = path.basename(rootModPath);
 
-    const modFinalDestPath = path.join(modDestPath, modName_ + pak);
-    const modTempDestPath = path.join(temp_path, modName_ + pak);
+    const modFinalDestPath = path.join(modDestPath, lastFolderName + pak);
+    const modTempDestPath = path.join(temp_path, lastFolderName + pak);
     try {
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
-        raiseInfo(modName_ + pak + " packed", false);
-        vscode.window.showInformationMessage(`${modName_ + pak} packed`);
+        raiseInfo(lastFolderName + pak + " packed", false);
+        vscode.window.showInformationMessage(`${lastFolderName + pak} packed`);
 
         // move files to chosen path and [in progress] clean up the empty directory
         moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
