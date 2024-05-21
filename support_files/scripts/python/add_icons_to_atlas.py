@@ -9,10 +9,6 @@ import timeit
 from PIL import Image
 import numpy
 
-
-#script_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-#os.chdir(script_dir)
-
 atlas_template = """<?xml version="1.0" encoding="UTF-8" ?>
 <save>
     <version major="4" minor="0" revision="9" build="322"/>
@@ -95,7 +91,6 @@ def truncate(number, digits, round_num = True) -> float:
 script_dir = Path(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(script_dir)
 
-
 totalIcons = 0
 
 texture_resource_template = """<?xml version="1.0" encoding="utf-8"?>
@@ -130,14 +125,9 @@ def get_icons(icons_dir:Path, icon_size:tuple[int,int], texture_size:tuple[int,i
     x = 0
     y = 0
 
-    # For some reason, the editor appends the first two icons to the end
     icons_first = []
     images = get_images(icons_dir)
     for img in images:
-        # u1 = truncate(float(((icon_size * x) / texture_size) + padding), 9)
-        # v1 = truncate(float(((icon_size * y) / texture_size) + padding), 9)
-        # u2 = truncate(float(((icon_size * (x + 1)) / texture_size) - padding), 9)
-        # v2 = truncate(float(((icon_size * (y + 1)) / texture_size) - padding), 9)
         round_num = True
         truncate_u1 = 7
         truncate_v1 = 8
@@ -226,7 +216,6 @@ def generate_atlas_lsx(icons:list[Icon], atlas_output:Path, texture_output:Path,
     xml_str = create_atlas_output(icons_str, icon_size[0], icon_size[1], 
         texture_output.relative_to(root_data_dir), atlas_uuid, texture_size[0], texture_size[1])
 
-
     f = open(atlas_output, "w")
     f.write(xml_str)
 
@@ -250,12 +239,9 @@ if __name__ == "__main__":
     """
     def run_cmd():
         args = parser.parse_args()
-        lslib_dll:Path = args.divine.is_dir() and args.divine.joinpath("LSLib.dll") or args.divine.parent.joinpath("LSLib.dll")
         icons_dir:Path = args.icons
         atlas_output:Path = args.atlas
         texture_output:Path = args.texture
-        # resource_output:Path = args.resource
-        # resource_lsx_output:Path = args.resourcelsx
         atlas_uuid:str = args.uuid
         dds_format:str = args.ddsformat
         icon_size:tuple[int,int] = args.iconsize
@@ -267,7 +253,5 @@ if __name__ == "__main__":
         if totalIcons > 0:
             generate_atlas_lsx(icons, atlas_output, texture_output, atlas_uuid, icon_size, texture_size)
             generate_texture(icons, texture_output, texture_size, dds_format, do_mipmaps)
-        # if resource_output:
-            # generate_texture_lsf(atlas_uuid, texture_output, resource_output, lslib_dll, resource_lsx_output)
-        
+
     print("Created atlas in {} seconds for {} icons.".format(timeit.timeit(run_cmd, number=1), totalIcons))
