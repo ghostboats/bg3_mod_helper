@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const { setConfig, getConfig } = require('./support_files/config');
 const packModImport = require('./commands/packMod');
+const unpackModCommand = require('./commands/unpackMod');
 const launchGameImport = require('./commands/launchGame');
 const createAtlasImport = require('./commands/createAtlas');
 const insertHandleUUIDImport = require('./commands/insertHandleUUID');

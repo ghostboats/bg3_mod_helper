@@ -11,6 +11,8 @@ const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig } = require('./config.js');
 
+const { getModName } = require('./helper_functions.js');
+
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
 const { processPak, prepareTempDir } = require('./process_pak');
@@ -42,8 +44,9 @@ function getDynamicPath(filePath) {
 
 
 function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName_ = '') {
-    console.log('targetExt:' + targetExt)
     const { rootModPath } = getConfig();
+
+    console.log('targetExt:' + targetExt);
     if (targetExt === "empty") {
         return;
     }
@@ -60,15 +63,21 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         return normalizedExcludedFiles.includes(normalizedFile);
     };
     */
-    console.log('test10')
+    console.log('test10');
+
     if (targetExt === pak) {
-        prepareTempDir();
-        console.log('past prepare temp')
-        // changed these back, hope that's okay
-        console.log(rootModPath);
-        convert(rootModPath, xml);
-        convert(rootModPath, lsx);
-        processPak(rootModPath, modName_);
+        if (fs.statSync(convertPath).isDirectory()) {
+            prepareTempDir();
+            console.log('past prepare temp')
+            // changed these back, hope that's okay
+            console.log(rootModPath);
+            convert(rootModPath, xml);
+            convert(rootModPath, lsx);
+            processPak(rootModPath, modName_);
+        }
+        else if (fs.statSync(convertPath).isFile()) {
+            processPak(convertPath, modName_);
+        }
     } 
     else if (Array.isArray(convertPath)) {
         console.log('array1')

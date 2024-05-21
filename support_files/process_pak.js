@@ -16,7 +16,7 @@ const temp_folder = "\\temp_folder";
 // const temp_path = path.join(rootParentPath, temp_folder);
 
 
-// this function is going away next release.
+// this function is getting redone for next release
 function prepareTempDir(movedPak = false) {
     const { rootModPath } = getConfig();
     const rootParentPath = path.dirname(rootModPath);
@@ -47,20 +47,31 @@ function prepareTempDir(movedPak = false) {
 // btw, sometimes this will log things before others because it's async.
 async function processPak(modPath, modName_) {
     console.log('check')
-    const { rootModPath, modDestPath } = getConfig();
+    
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
+
+    const { rootModPath, modDestPath } = getConfig();
+
     const lastFolderName = path.basename(rootModPath);
     const rootParentPath = path.dirname(rootModPath);
     const temp_path = path.join(rootParentPath, temp_folder);
-
     const modFinalDestPath = path.join(modDestPath, lastFolderName + pak);
     const modTempDestPath = path.join(temp_path, lastFolderName + pak);
-
     const metaPath = path.join(rootModPath, 'Mods', modName_, 'meta.lsx');
     
 
     try {
+        if (path.extname(modPath) === pak && fs.statSync(modPath).isFile()) {
+            try {
+                await Packager.UncompressPackage(modPath, temp_path);
+            }
+            catch (Error) {
+                raiseError(Error);
+            }
+            raiseInfo(`Mod ${path.basename(modPath)} unpacked to ${temp_path}`)
+            return;
+        }
         // i'd like to refactor xml code into its own file for next release
 
         // Read the XML content
