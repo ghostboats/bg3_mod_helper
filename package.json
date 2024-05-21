@@ -221,6 +221,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "When generating handles, add them to all loca files. If disabled, prompts for which files to add handles to."
+                },
+                "bg3ModHelper.gameInstallLocation": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to where your Baulders Gate 3 is installed, ie [W:\\SteamLibrary\\steamapps\\common\\Baldurs Gate 3, C:\\Program Files (x86)\\Steam\\steamapps\\common\\Baldurs Gate 3, etc]:"
                 }
             }
         },

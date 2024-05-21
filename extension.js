@@ -104,7 +104,8 @@ function activate(context) {
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
-        excludedFiles: config.get('excludedFiles') || []
+        excludedFiles: config.get('excludedFiles') || [],
+        gameInstallLocation: config.get('gameInstallLocation')
     });
     bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {

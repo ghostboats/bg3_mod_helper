@@ -32,7 +32,8 @@ function getConfig() {
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
-        excludedFiles: normalizeExcludedFiles(config.get('excludedFiles'))
+        excludedFiles: normalizeExcludedFiles(config.get('excludedFiles')),
+        gameInstallLocation: path.normalize(config.get('gameInstallLocation'))
     };
 }
 module.exports = { setConfig, getConfig };

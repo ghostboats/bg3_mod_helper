@@ -1,16 +1,23 @@
 const vscode = require('vscode');
 const { spawn } = require('child_process');
+const path = require('path');
 
 const { getConfig } = require('../support_files/config');
 
 
 const launchGameCommand = vscode.commands.registerCommand('bg3-mod-helper.launchGame', function () {
-    const { launchContinueGame } = getConfig();
-    const gameDir = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Baldurs Gate 3\\bin";
-    const gamePath = "bg3.exe";
+    const { launchContinueGame, gameInstallLocation } = getConfig();
+    if (!gameInstallLocation || gameInstallLocation === "") {
+        vscode.window.showErrorMessage('Game installation location is not set. Please configure it correctly in settings.');
+        return; // Stop execution if the path is not set
+    }
+
+    // Construct the path to the executable
+    const binLocation = path.join(gameInstallLocation, 'bin');
+    const gamePath = path.join(binLocation, "bg3.exe");
     const args = launchContinueGame ? ["-continueGame"] : [];
 
-    const game = spawn(gamePath, args, { cwd: gameDir });
+    const game = spawn(gamePath, args, { cwd: binLocation });
 
     game.on('error', (err) => {
         console.error('Failed to start game:', err);

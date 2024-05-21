@@ -119,17 +119,23 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         if (fs.existsSync(settingsFilePath)) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
+        console.log('test1')
         fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
+        console.log('test2')
     }
     // send the directory to the convert() function, and let it know it's a pak
     convert(rootModPath, pak, modName);
 
     if (settingsContent) {
+        console.log('test3')
         if (!fs.existsSync(vscodeDirPath)) {
             fs.mkdirSync(vscodeDirPath, { recursive: true });
+            console.log('test4')
         }
         fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
+        console.log('test5')
     }
+    console.log('test6')
 });
 
 
