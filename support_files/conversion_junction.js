@@ -10,7 +10,6 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
 const { getConfig } = require('./config.js');
-const { rootModPath } = getConfig();
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
@@ -43,6 +42,8 @@ function getDynamicPath(filePath) {
 
 
 function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName_ = '') {
+    console.log('targetExt:' + targetExt)
+    const { rootModPath } = getConfig();
     if (targetExt === "empty") {
         return;
     }
@@ -69,6 +70,7 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         processPak(rootModPath, modName_);
     } 
     else if (Array.isArray(convertPath)) {
+        console.log('array1')
         for (let i = 0; i < convertPath.length; i++) {
             convert(convertPath[i], path.extname(convertPath[i]));
             bg3mh_logger.info(`Excluded: ${convertPath[i]}`);
@@ -101,6 +103,7 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         }
     } 
     else {
+        console.log('here???')
         raiseInfo(`Excluded: ${convertPath}`, false);
     }
 }

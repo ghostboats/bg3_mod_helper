@@ -9,15 +9,17 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig } = require('./config.js');
-const { rootModPath, modDestPath } = getConfig();
-const rootParentPath = path.dirname(rootModPath);
 
 const temp_folder = "\\temp_folder";
-const temp_path = path.join(rootParentPath, temp_folder);
+
 
 
 
 function prepareTempDir(movedPak = false) {
+    const { rootModPath } = getConfig();
+    const rootParentPath = path.dirname(rootModPath);
+
+    const temp_path = path.join(rootParentPath, temp_folder);
     console.log('test11')
     console.log(rootParentPath)
     console.log(rootModPath)
@@ -43,9 +45,12 @@ function prepareTempDir(movedPak = false) {
 // btw, sometimes this will log things before others because it's async.
 async function processPak(modPath, modName_) {
     console.log('check')
+    const { rootModPath, modDestPath } = getConfig();
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
     const lastFolderName = path.basename(rootModPath);
+    const rootParentPath = path.dirname(rootModPath);
+    const temp_path = path.join(rootParentPath, temp_folder);
 
     const modFinalDestPath = path.join(modDestPath, lastFolderName + pak);
     const modTempDestPath = path.join(temp_path, lastFolderName + pak);
