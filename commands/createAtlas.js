@@ -153,6 +153,27 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
     } catch (error) {
         vscode.window.showErrorMessage(`Failed to create atlas or texture: ${error.message}`);
     }
+
+    // Check if merged.lsx exists
+    if (fs.existsSync(mergedPath)) {
+        const overwrite = await vscode.window.showInformationMessage('A merged.lsx file already exists. Do you want to overwrite it?', 'Yes', 'No');
+        if (overwrite === 'No') {
+            return; // Stop execution if user chooses not to overwrite
+        }
+    }
+
+    // Use a skeleton merged.lsx file as a template
+    const skeletonMergedPath = path.join(__dirname, '../support_files/templates/long_skeleton_files/merged_atlas.lsx');
+    let mergedContent = fs.readFileSync(skeletonMergedPath, 'utf8');
+
+    // Replace placeholders in merged.lsx file
+    mergedContent = mergedContent.replace(/\{uuid\}/g, newUuid);
+    mergedContent = mergedContent.replace(/\{file_name\}/g, `Icons_${modName}`);
+    mergedContent = mergedContent.replace(/\{file_path\}/g, `Public/${modName}/Assets/Textures/Icons/Icons_${modName}.dds`);
+
+    // Write the modified content to the new merged.lsx file
+    fs.writeFileSync(mergedPath, mergedContent, 'utf8');
+    vscode.window.showInformationMessage(`merged.lsx file created/updated successfully at ${mergedDirPath}`);
 });
 
 module.exports = createAtlasCommand;
