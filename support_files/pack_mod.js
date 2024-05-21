@@ -8,10 +8,12 @@ const { pak } = getFormats();
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
+
+
 const { getConfig } = require('./config.js');
 
 const temp_folder = "\\temp_folder";
-const temp_path = path.join(rootParentPath, temp_folder);
+// const temp_path = path.join(rootParentPath, temp_folder);
 
 
 
