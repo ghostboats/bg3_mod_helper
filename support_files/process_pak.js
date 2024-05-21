@@ -16,7 +16,7 @@ const temp_folder = "\\temp_folder";
 // const temp_path = path.join(rootParentPath, temp_folder);
 
 
-
+// this function is going away next release.
 function prepareTempDir(movedPak = false) {
     const { rootModPath } = getConfig();
     const rootParentPath = path.dirname(rootModPath);
@@ -27,7 +27,7 @@ function prepareTempDir(movedPak = false) {
     console.log(rootModPath)
     if (!(fs.existsSync(temp_path))) {
         console.log("making temp_path");
-        // fs.mkdirSync(temp_path, { recursive: true});
+        fs.mkdirSync(temp_path, { recursive: true});
         return;
     }
     // this is being finicky :starege:
@@ -61,6 +61,8 @@ async function processPak(modPath, modName_) {
     
 
     try {
+        // i'd like to refactor xml code into its own file for next release
+
         // Read the XML content
         let xmlContent = fs.readFileSync(metaPath, 'utf8');
 

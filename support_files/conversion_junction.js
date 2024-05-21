@@ -13,7 +13,7 @@ const { getConfig } = require('./config.js');
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
-const { processPak, prepareTempDir } = require('./pack_mod');
+const { processPak, prepareTempDir } = require('./process_pak');
 
 
 function getActiveTabPath() {
