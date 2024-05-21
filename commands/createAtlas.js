@@ -7,11 +7,16 @@ const sharp = require('sharp');
 const xmlbuilder = require('xmlbuilder');
 const { getModName } = require('../support_files/helper_functions.js');
 
+const truncate = (number, digits) => {
+    const stepper = Math.pow(10.0, digits);
+    return Math.round(number * stepper) / stepper;
+}
+
 async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
     const { rootModPath } = getConfig();
     const modName = await getModName();
-    const iconSize = 64; // Assuming all icons are 64x64
-    const textureSize = 2048; // Final texture size
+    const iconSize = 64;
+    const textureSize = 2048;
     let atlas = sharp({
         create: {
             width: textureSize,
@@ -24,12 +29,19 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
     const icons = fs.readdirSync(iconsDir).filter(file => file.endsWith('.png'));
     let iconXMLNodes = [];
     let composites = [];
+    const padding = 0.5 / textureSize;
 
     for (let i = 0; i < icons.length; i++) {
         const iconPath = path.join(iconsDir, icons[i]);
         const iconName = path.parse(icons[i]).name;
         const x = (i % (textureSize / iconSize)) * iconSize;
         const y = Math.floor(i / (textureSize / iconSize)) * iconSize;
+
+        // Calculate UV coordinates with padding and truncation for precision
+        const u1 = truncate(x / textureSize + padding, 7);
+        const v1 = truncate(y / textureSize + padding, 7);
+        const u2 = truncate((x + iconSize) / textureSize - padding, 7);
+        const v2 = truncate((y + iconSize) / textureSize - padding, 7);
 
         // Prepare composite operation
         composites.push({ input: iconPath, left: x, top: y });
@@ -39,10 +51,10 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
             '@id': 'IconUV',
             attribute: [
                 { '@id': 'MapKey', '@value': iconName, '@type': 'FixedString' },
-                { '@id': 'U1', '@value': x / textureSize, '@type': 'float' },
-                { '@id': 'V1', '@value': y / textureSize, '@type': 'float' },
-                { '@id': 'U2', '@value': (x + iconSize) / textureSize, '@type': 'float' },
-                { '@id': 'V2', '@value': (y + iconSize) / textureSize, '@type': 'float' }
+                { '@id': 'U1', '@value': u1.toString(), '@type': 'float' },
+                { '@id': 'V1', '@value': v1.toString(), '@type': 'float' },
+                { '@id': 'U2', '@value': u2.toString(), '@type': 'float' },
+                { '@id': 'V2', '@value': v2.toString(), '@type': 'float' }
             ]
         });
     }
