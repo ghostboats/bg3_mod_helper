@@ -73,7 +73,7 @@ async function updateLocaXmlFiles(changes) {
 
     let selectedLocaFiles = locaFiles;
     // If user doesn't want to add handles to all loca files, prompt for selection from the list of all loca files
-    if (!addHandlesToAllLocas) {
+    if (!addHandlesToAllLocas && locaFiles.length > 1) {
         const fileItems = locaFiles.map(file => ({
             label: path.basename(file.fsPath),
             description: path.relative(workspaceFolder.uri.fsPath, file.fsPath),
@@ -134,7 +134,12 @@ async function updateLocaXmlFile(locaFileUri, changes, edit) {
 }
 
 function generateContent(handle, handleContent) {
-    return `    <content contentuid="${handle}" version="1">${handleContent.trim()}</content>\n`;
+    function convertNewlinesToBr(text) {
+        return text.replace(/(\\r\\n|\\n|\\r)/g, '&lt;br&gt;');
+    }
+
+    const preparedContent = convertNewlinesToBr(handleContent).trim();
+    return `    <content contentuid="${handle}" version="1">${preparedContent}</content>\n`;
 }
 
 function generateHandle() {
