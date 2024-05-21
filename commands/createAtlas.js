@@ -8,8 +8,10 @@ const xmlbuilder = require('xmlbuilder');
 const { getModName } = require('../support_files/helper_functions.js');
 
 async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
+    const { rootModPath } = getConfig();
+    const modName = await getModName();
     const iconSize = 64; // Assuming all icons are 64x64
-    const textureSize = 1024; // Final texture size
+    const textureSize = 2048; // Final texture size
     let atlas = sharp({
         create: {
             width: textureSize,
@@ -34,22 +36,23 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
 
         // Prepare XML node for this icon
         iconXMLNodes.push({
-            node: {
-                '@id': 'IconUV',
-                attribute: [
-                    { '@id': 'MapKey', '@value': iconName, '@type': 'FixedString' },
-                    { '@id': 'U1', '@value': x / textureSize, '@type': 'float' },
-                    { '@id': 'V1', '@value': y / textureSize, '@type': 'float' },
-                    { '@id': 'U2', '@value': (x + iconSize) / textureSize, '@type': 'float' },
-                    { '@id': 'V2', '@value': (y + iconSize) / textureSize, '@type': 'float' }
-                ]
-            }
+            '@id': 'IconUV',
+            attribute: [
+                { '@id': 'MapKey', '@value': iconName, '@type': 'FixedString' },
+                { '@id': 'U1', '@value': x / textureSize, '@type': 'float' },
+                { '@id': 'V1', '@value': y / textureSize, '@type': 'float' },
+                { '@id': 'U2', '@value': (x + iconSize) / textureSize, '@type': 'float' },
+                { '@id': 'V2', '@value': (y + iconSize) / textureSize, '@type': 'float' }
+            ]
         });
     }
 
     // Apply all composites to the atlas image
     atlas = atlas.composite(composites);
     await atlas.toFile(texturePath);
+
+    const ddsTexturePath = texturePath.replace('.png', '.dds');
+    const relativeTexturePath = modName + path.sep + path.relative(path.join(rootModPath, 'Public', modName), ddsTexturePath);
 
     // Generate XML content
     const xmlContent = xmlbuilder.create({
@@ -62,7 +65,9 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
                     '@id': 'IconUVList',
                     node: {
                         '@id': 'root',
-                        children: iconXMLNodes
+                        children: {
+                            node: iconXMLNodes  // Directly placing all nodes as siblings under <children>
+                        }
                     }
                 },
                 {
@@ -81,8 +86,15 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
                                 {
                                     '@id': 'TextureAtlasPath',
                                     attribute: [
-                                        { '@id': 'Path', '@value': texturePath, '@type': 'string' },
+                                        { '@id': 'Path', '@value': modName + "\\" + relativeTexturePath.replace(/\.png$/, '.dds'), '@type': 'string' },
                                         { '@id': 'UUID', '@value': textureUUID, '@type': 'FixedString' }
+                                    ]
+                                },
+                                {
+                                    '@id': 'TextureAtlasTextureSize',
+                                    attribute: [
+                                        { '@id': 'Height', '@value': textureSize, '@type': 'int32' },
+                                        { '@id': 'Width', '@value': textureSize, '@type': 'int32' }
                                     ]
                                 }
                             ]
@@ -91,7 +103,7 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
                 }
             ]
         }
-    }, { encoding: 'utf-8' }).end({ pretty: true });
+    }, { encoding: 'UTF-8' }).end({ pretty: true });
 
     // Save XML to file
     fs.writeFileSync(atlasPath, xmlContent);
