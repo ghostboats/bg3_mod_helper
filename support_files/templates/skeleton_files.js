@@ -1,6 +1,6 @@
 // skeleton_files.js
 const templates = {
-    'RENAME_ME.loca.xml': `<?xml version="1.0" encoding="utf-8"?>\n<contentList>\n</contentList>`,
+    'Localization loca.xml': `<?xml version="1.0" encoding="utf-8"?>\n<contentList>\n</contentList>`,
     'Progressions.lsx': `<?xml version="1.0" encoding="UTF-8"?>
 <save>
     <version major="4" minor="0" revision="10" build="100"/>
