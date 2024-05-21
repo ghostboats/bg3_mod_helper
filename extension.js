@@ -161,14 +161,11 @@ function activate(context) {
     context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand);
 }
 
-
 function aSimpleDataProvider() {
     return {
         getTreeItem: (element) => {
             const treeItem = new vscode.TreeItem(element.label);
-            if (element.id === 'conversion') {
-                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
-            } else if (element.children) {
+            if (element.id) {
                 treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
             } else {
                 treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
@@ -179,15 +176,20 @@ function aSimpleDataProvider() {
         getChildren: (element) => {
             if (!element) {
                 return Promise.resolve([
-                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openPacker', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
-                    { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
+                    { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
+                ]);
+            } else if (element.id === 'packer') {
+                return Promise.resolve([
+                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Unpack Mod (in development)', command: 'bg3-mod-helper.unpackMod' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([
@@ -202,7 +204,6 @@ function aSimpleDataProvider() {
         }
     };
 }
-
 
 function deactivate() {}
 

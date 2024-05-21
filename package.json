@@ -159,6 +159,14 @@
             {
                 "command": "bg3-mod-helper.debugCommand",
                 "title": "For dev use, dont press the button"
+            },
+            {
+                "command": "bg3-mod-helper.openPacker",
+                "title": "Open Packer"
+            },
+            {
+                "command": "bg3-mod-helper.unpackMod",
+                "title": "Unpack Mod"
             }
         ],
         "configuration": {
