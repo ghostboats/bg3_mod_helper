@@ -1,11 +1,11 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const { getConfig } = require('../support_files/config');
-const { v4: uuidv4 } = require('uuid');
-const sharp = require('sharp');
+const { Magick, MagickCore } = require('magickwand.js');
 const xmlbuilder = require('xmlbuilder');
+const { getConfig, setConfig } = require('../support_files/config');
 const { getModName } = require('../support_files/helper_functions.js');
+const { v4: uuidv4 } = require('uuid');
 
 const truncate = (number, digits) => {
     const stepper = Math.pow(10.0, digits);
@@ -17,36 +17,30 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
     const modName = await getModName();
     const iconSize = 64;
     const textureSize = 2048;
-    let atlas = sharp({
-        create: {
-            width: textureSize,
-            height: textureSize,
-            channels: 4,
-            background: { r: 0, g: 0, b: 0, alpha: 0 }
-        }
-    });
+    const textureSizeString = `${textureSize}x${textureSize}`;
 
-    const icons = fs.readdirSync(iconsDir).filter(file => file.endsWith('.png'));
-    let iconXMLNodes = [];
-    let composites = [];
-    const padding = 0.5 / textureSize;
+    let atlas = new Magick.Image(textureSizeString, 'rgba(0, 0, 0, 0)');
+
+    const icons = await fs.promises.readdir(iconsDir);
+    const iconXMLNodes = [];
 
     for (let i = 0; i < icons.length; i++) {
         const iconPath = path.join(iconsDir, icons[i]);
         const iconName = path.parse(icons[i]).name;
+        const iconImage = new Magick.Image();
+        await iconImage.readAsync(iconPath);
+
         const x = (i % (textureSize / iconSize)) * iconSize;
         const y = Math.floor(i / (textureSize / iconSize)) * iconSize;
+        
+        const u1 = truncate(x / textureSize, 7);
+        const v1 = truncate(y / textureSize, 7);
+        const u2 = truncate((x + iconSize) / textureSize, 7);
+        const v2 = truncate((y + iconSize) / textureSize, 7);
 
-        // Calculate UV coordinates with padding and truncation for precision
-        const u1 = truncate(x / textureSize + padding, 7);
-        const v1 = truncate(y / textureSize + padding, 7);
-        const u2 = truncate((x + iconSize) / textureSize - padding, 7);
-        const v2 = truncate((y + iconSize) / textureSize - padding, 7);
+        const geometry = new Magick.Geometry(iconSize, iconSize, x, y);
+        await atlas.compositeAsync(iconImage, geometry, MagickCore.OverCompositeOp);
 
-        // Prepare composite operation
-        composites.push({ input: iconPath, left: x, top: y });
-
-        // Prepare XML node for this icon
         iconXMLNodes.push({
             '@id': 'IconUV',
             attribute: [
@@ -59,14 +53,11 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
         });
     }
 
-    // Apply all composites to the atlas image
-    atlas = atlas.composite(composites);
-    await atlas.toFile(texturePath);
-
     const ddsTexturePath = texturePath.replace('.png', '.dds');
-    const relativeTexturePath = modName + path.sep + path.relative(path.join(rootModPath, 'Public', modName), ddsTexturePath);
+    await atlas.writeAsync(ddsTexturePath);
 
-    // Generate XML content
+    const relativeTexturePath = modName + path.sep + path.relative(path.join(rootModPath, 'Public', modName), ddsTexturePath);
+    
     const xmlContent = xmlbuilder.create({
         save: {
             version: {
@@ -78,7 +69,7 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
                     node: {
                         '@id': 'root',
                         children: {
-                            node: iconXMLNodes  // Directly placing all nodes as siblings under <children>
+                            node: iconXMLNodes
                         }
                     }
                 },
@@ -98,7 +89,7 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
                                 {
                                     '@id': 'TextureAtlasPath',
                                     attribute: [
-                                        { '@id': 'Path', '@value': modName + "\\" + relativeTexturePath.replace(/\.png$/, '.dds'), '@type': 'string' },
+                                        { '@id': 'Path', '@value': relativeTexturePath, '@type': 'string' },
                                         { '@id': 'UUID', '@value': textureUUID, '@type': 'FixedString' }
                                     ]
                                 },
@@ -117,7 +108,6 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
         }
     }, { encoding: 'UTF-8' }).end({ pretty: true });
 
-    // Save XML to file
     fs.writeFileSync(atlasPath, xmlContent);
 }
 
@@ -138,6 +128,9 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
     const texturePath = path.join(texturesDirPath, `Icons_${modName}.png`);
     const atlasDirPath = path.join(rootModPath, 'Public', modName, 'GUI');
     const atlasPath = path.join(atlasDirPath, `Icons_${modName}.lsx`);
+
+    const mergedDirPath = path.join(rootModPath, 'Public', modName, 'Content', 'UI', '[PAK]_UI');
+    const mergedPath = path.join(mergedDirPath, 'merged.lsx');
 
     // Ensure directories exist
     [texturesDirPath, atlasDirPath].forEach(dir => {
