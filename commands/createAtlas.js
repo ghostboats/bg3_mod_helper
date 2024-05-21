@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const { getConfig, setConfig } = require('../support_files/config');
+const { getConfig } = require('../support_files/config');
 const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const xmlbuilder = require('xmlbuilder');
@@ -10,7 +10,7 @@ const { getModName } = require('../support_files/helper_functions.js');
 async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
     const iconSize = 64; // Assuming all icons are 64x64
     const textureSize = 1024; // Final texture size
-    const atlas = sharp({
+    let atlas = sharp({
         create: {
             width: textureSize,
             height: textureSize,
@@ -21,6 +21,7 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
 
     const icons = fs.readdirSync(iconsDir).filter(file => file.endsWith('.png'));
     let iconXMLNodes = [];
+    let composites = [];
 
     for (let i = 0; i < icons.length; i++) {
         const iconPath = path.join(iconsDir, icons[i]);
@@ -28,8 +29,8 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
         const x = (i % (textureSize / iconSize)) * iconSize;
         const y = Math.floor(i / (textureSize / iconSize)) * iconSize;
 
-        // Composite each icon onto the atlas
-        await atlas.composite([{ input: iconPath, left: x, top: y }]);
+        // Prepare composite operation
+        composites.push({ input: iconPath, left: x, top: y });
 
         // Prepare XML node for this icon
         iconXMLNodes.push({
@@ -46,7 +47,8 @@ async function createAtlas(iconsDir, atlasPath, texturePath, textureUUID) {
         });
     }
 
-    // Save the final atlas image
+    // Apply all composites to the atlas image
+    atlas = atlas.composite(composites);
     await atlas.toFile(texturePath);
 
     // Generate XML content
@@ -109,7 +111,7 @@ let createAtlasCommand = vscode.commands.registerCommand('bg3-mod-helper.createA
     }
 
     const texturesDirPath = path.join(rootModPath, 'Public', modName, 'Assets', 'Textures', 'Icons');
-    const texturePath = path.join(texturesDirPath, `Icons_${modName}.dds`);
+    const texturePath = path.join(texturesDirPath, `Icons_${modName}.png`);
     const atlasDirPath = path.join(rootModPath, 'Public', modName, 'GUI');
     const atlasPath = path.join(atlasDirPath, `Icons_${modName}.lsx`);
 
