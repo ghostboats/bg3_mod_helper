@@ -13,14 +13,16 @@ const { rootModPath, modDestPath } = getConfig();
 const rootParentPath = path.dirname(rootModPath);
 
 const temp_folder = "\\temp_folder";
-const temp_path = path.join(rootParentPath, temp_folder);
+const temp_path = rootModPath;
+// const temp_path = path.join(rootParentPath, temp_folder);
+
 
 
 
 function prepareTempDir(movedPak = false) {
     if (!(fs.existsSync(temp_path))) {
         console.log("making temp_path");
-        fs.mkdirSync(temp_path, { recursive: true});
+        // fs.mkdirSync(temp_path, { recursive: true});
         return;
     }
     // this is being finicky :starege:

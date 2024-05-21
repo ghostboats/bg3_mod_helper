@@ -59,11 +59,14 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         return normalizedExcludedFiles.includes(normalizedFile);
     };
     */
+    const { rootModPath } = getConfig();
+    console.log(rootModPath);
 
     if (targetExt === pak) {
         prepareTempDir();
 
         // changed these back, hope that's okay
+        console.log(rootModPath);
         convert(rootModPath, xml);
         convert(rootModPath, lsx);
         processPak(rootModPath, modName_);
