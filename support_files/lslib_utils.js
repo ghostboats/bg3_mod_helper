@@ -147,14 +147,14 @@ function LOAD_LSLIB() {
 function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     let filesToConvert = [];
 
-    console.log(filesPath);
-    console.log(targetExt);
+    // console.log(filesPath);
+    // console.log(targetExt);
 
     const filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
         recursive: isRecursive
     });
-    console.log(filesList);
+    // console.log(filesList);
 
     for (let i = 0; i < filesList.length; i++) {
         const temp = filesList[i].toString();

@@ -161,6 +161,10 @@
                 "title": "For dev use, dont press the button"
             },
             {
+                "command": "bg3-mod-helper.debug2Command",
+                "title": "For dev use, do press the button ;)"
+            },
+            {
                 "command": "bg3-mod-helper.openPacker",
                 "title": "Open Packer"
             },
@@ -423,6 +427,7 @@
         "node-fetch": "^3.3.2",
         "node-gyp": "^10.1.0",
         "uuid": "^9.0.1",
+        "workerpool": "^9.1.1",
         "xmlbuilder": "^15.1.1"
     },
     "license": "LGPL-3.0-or-later"

@@ -30,6 +30,7 @@ const { CREATE_LOGGER } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const debugCommand = require('./commands/debug');
+const debug2Command = require('./commands/debug2');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
 const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
 const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
@@ -185,7 +186,8 @@ function aSimpleDataProvider() {
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
-                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
+                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
+                    { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' }
                 ]);
             } else if (element.id === 'packer') {
                 return Promise.resolve([
