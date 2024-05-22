@@ -6,6 +6,8 @@
 const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
+const findFiles = vscode.workspace.findFiles;
+const parse = vscode.Uri.parse;
 
 
 // loads the api
@@ -168,6 +170,13 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
 }
 
 
+// beautiful. still needs dll handling in lslib_utils though
+async function FIND_FILES_v2(targetExt = getFormats().lsf, filesPath = '**/*') {
+    const filesList = (await findFiles(filesPath + targetExt)).map(file => file.path);
+    return FILTER_PATHS(filesList);
+}
+
+
 function FILTER_PATHS(filesPath) {
     let excludedFiles = getConfig().excludedFiles;
     if (Array.isArray(filesPath)) {
@@ -232,4 +241,4 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
 
 const LSLIB = LOAD_LSLIB();
 
-module.exports = { LSLIB, FIND_FILES, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
+module.exports = { LSLIB, FIND_FILES, FIND_FILES_v2, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
