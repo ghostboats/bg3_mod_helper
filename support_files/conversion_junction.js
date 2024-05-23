@@ -64,7 +64,7 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
             processPak(rootModPath, modName_);
         }
         else if (fs.statSync(convertPath).isFile()) {
-            processPak(convertPath, modName_);
+            processPak(convertPath, modName_, 'n/a');
         }
     } 
     else if (Array.isArray(convertPath)) {

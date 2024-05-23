@@ -43,9 +43,8 @@ function prepareTempDir(movedPak = false) {
 
 
 // btw, sometimes this will log things before others because it's async.
-async function processPak(modPath, modName_) {
+async function processPak(modPath, modName_,  unpackLocation = '') {
     const LSLIB = await require('./lslib_utils').LOAD_LSLIB();
-    //console.log('check')
     
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
@@ -63,12 +62,12 @@ async function processPak(modPath, modName_) {
     try {
         if (path.extname(modPath) === pak && fs.statSync(modPath).isFile()) {
             try {
-                await Packager.UncompressPackage(modPath, temp_path);
+                await Packager.UncompressPackage(modPath, unpackLocation);
             }
             catch (Error) {
                 raiseError(Error);
             }
-            raiseInfo(`Mod ${path.basename(modPath)} unpacked to ${temp_path}`)
+            raiseInfo(`Mod ${path.basename(modPath)} unpacked to ${unpackLocation}`)
             return;
         }
         // i'd like to refactor xml code into its own file for next release
