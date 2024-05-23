@@ -73,10 +73,10 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
             console.log(rootModPath);
             convert(rootModPath, xml);
             convert(rootModPath, lsx);
-            processPak(rootModPath, modName_);
+            processPak(rootModPath, modName_, 'n/a');
         }
         else if (fs.statSync(convertPath).isFile()) {
-            processPak(convertPath, modName_);
+            processPak(convertPath, modName_, 'n/a');
         }
     } 
     else if (Array.isArray(convertPath)) {
