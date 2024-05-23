@@ -43,36 +43,24 @@ function getDynamicPath(filePath) {
 }
 
 
-function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName_ = '') {
+async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName_ = '') {
     const { rootModPath } = getConfig();
 
     console.log('targetExt:' + targetExt);
     if (targetExt === "empty") {
         return;
     }
-    // we can leave this here for the moment, might be a good logic bit to keep in the future.
-    /*
-    // changed this to a const so nothing bothers it while the conversion is taking place
-    const { excludedFiles } = getConfig();
-    const normalizedExcludedFiles = excludedFiles.map(file => path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':'));
-
-    bg3mh_logger.info(`Normalized Excluded Files: ${JSON.stringify(normalizedExcludedFiles, null, 2)}`);
-    
-    const isExcluded = (file) => {
-        const normalizedFile = path.normalize(file).replace(/^([a-zA-Z]):/, (match, drive) => drive.toUpperCase() + ':');
-        return normalizedExcludedFiles.includes(normalizedFile);
-    };
-    */
-    console.log('test10');
 
     if (targetExt === pak) {
         if (fs.statSync(convertPath).isDirectory()) {
             prepareTempDir();
-            console.log('past prepare temp')
-            // changed these back, hope that's okay
-            console.log(rootModPath);
-            convert(rootModPath, xml);
-            convert(rootModPath, lsx);
+
+            await convert(rootModPath, xml)
+                .then(() => raiseInfo(`xml conversion done`, false));
+
+            await convert(rootModPath, lsx)
+                .then(() => raiseInfo(`lsx conversion done`, false));
+
             processPak(rootModPath, modName_);
         }
         else if (fs.statSync(convertPath).isFile()) {
@@ -80,24 +68,23 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
         }
     } 
     else if (Array.isArray(convertPath)) {
-        console.log('array1')
+        // console.log('array1')
         for (let i = 0; i < convertPath.length; i++) {
             convert(convertPath[i], path.extname(convertPath[i]));
-            bg3mh_logger.info(`Excluded: ${convertPath[i]}`);
         }
     } 
     else if (fs.statSync(convertPath).isDirectory()) {
-        console.log('plz1')
-        const filesToConvert = FIND_FILES(convertPath, targetExt);
-        console.log('fdsfdsf')
+        // console.log('plz1')
+        const filesToConvert = await FIND_FILES(targetExt);
         convert(filesToConvert);
     } 
     else if (fs.statSync(convertPath).isFile()) {
-        console.log('plz2')
+        // console.log('plz2')
         if (isLoca(targetExt)) {
             try {
                 processLoca(convertPath, targetExt);
-            } catch (Error) {
+            } 
+            catch (Error) {
                 raiseError(Error);
                 return;
             }
@@ -111,10 +98,6 @@ function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPat
                 return;
             }
         }
-    } 
-    else {
-        console.log('here???')
-        raiseInfo(`Excluded: ${convertPath}`, false);
     }
 }
 

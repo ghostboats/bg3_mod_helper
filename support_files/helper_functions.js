@@ -80,9 +80,7 @@ async function getModName() {
             fs.statSync(path.join(modsDirPath, file)).isDirectory()
         );
 
-        if (directories.length === 0) {
-            return '';
-        } else if (directories.length === 1) {
+        if (directories.length === 1) {
             return directories[0];
         } else {
             return '';

@@ -21,8 +21,9 @@ const { pak } = getFormats();
 
 // i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
+    raiseInfo("pack button clicked");
     const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
-    const modName = await getModName()
+    const modName = await getModName();
 
     const modsDirPath = path.normalize(rootModPath + "\\Mods");
     const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
@@ -119,23 +120,23 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         if (fs.existsSync(settingsFilePath)) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
-        console.log('test1')
+        // console.log('test1')
         fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
-        console.log('test2')
+        // console.log('test2')
     }
     // send the directory to the convert() function, and let it know it's a pak
     convert(rootModPath, pak, modName);
 
     if (settingsContent) {
-        console.log('test3')
+        // console.log('test3')
         if (!fs.existsSync(vscodeDirPath)) {
             fs.mkdirSync(vscodeDirPath, { recursive: true });
-            console.log('test4')
+            // console.log('test4')
         }
         fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
-        console.log('test5')
+        // console.log('test5')
     }
-    console.log('test6')
+    // console.log('test6')
 });
 
 

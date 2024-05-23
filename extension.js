@@ -2,7 +2,10 @@ const vscode = require('vscode');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+
 const { setConfig, getConfig } = require('./support_files/config');
+console.log("in extension.js");
+
 const packModImport = require('./commands/packMod');
 const unpackModCommand = require('./commands/unpackMod');
 const launchGameImport = require('./commands/launchGame');
