@@ -1,5 +1,3 @@
-import { raiseInfo } from '../support_files/log_utils';
-
 const vscode = require('vscode');
 const fs = require('fs');
 const os = require('os');
@@ -13,6 +11,8 @@ const { getConfig } = require('../support_files/config');
 const { lslibPath, rootModPath } = getConfig();
 const compatRootModPath = path.join(rootModPath + "\\");
 const lslibToolsPath = path.join(lslibPath, TOOL_SUBDIR);
+
+const { raiseInfo } = require('../support_files/log_utils');
 
 
 const { FIND_FILES, getFormats } = require('../support_files/lslib_utils.js');

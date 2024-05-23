@@ -20,7 +20,7 @@ const { pak } = getFormats();
 
 // i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
-    raiseInfo("pack button clicked");
+    raiseInfo("pack button clicked", false);
     const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
     const modName = getModName();
 
