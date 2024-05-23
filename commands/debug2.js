@@ -1,3 +1,5 @@
+import { raiseInfo } from '../support_files/log_utils';
+
 const vscode = require('vscode');
 const fs = require('fs');
 const os = require('os');
@@ -16,9 +18,8 @@ const lslibToolsPath = path.join(lslibPath, TOOL_SUBDIR);
 const { FIND_FILES, getFormats } = require('../support_files/lslib_utils.js');
  
 const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', async function () {
-    let halfCoreCount = os.availableParallelism() / 2;
+    raiseInfo("hi dipshit! 💩")
 
-    // const vscode = require('vscode');
 });
 
 module.exports = { debug2 }
