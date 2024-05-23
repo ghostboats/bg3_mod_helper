@@ -2,10 +2,9 @@ const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
 
-const { LSLIB, getFormats, baseNamePath } = require('./lslib_utils');
-const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
-const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
-const Game = LSLIB.Enums.Game;
+console.log("in lsf_convert.js");
+const { getFormats, baseNamePath } = require('./lslib_utils');
+
 
 const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
 const lsfFormats = [lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx];
@@ -85,7 +84,12 @@ function getLsfOutputPath(filePath) {
 }
 
 
-function processLsf(file, targetExt) {
+async function processLsf(file, targetExt) {
+    const LSLIB = await require('./lslib_utils').LOAD_LSLIB();
+    const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
+    const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
+    const Game = LSLIB.Enums.Game;
+
     var load_params = ResourceLoadParameters.FromGameVersion(Game.BaldursGate3);
     var conversion_params = ResourceConversionParameters.FromGameVersion(Game.BaldursGate3);
     var ResourceUtils = LSLIB.ResourceUtils;

@@ -4,6 +4,8 @@ const vscode = require('vscode');
 const { CREATE_LOGGER, raiseError } = require('../support_files/log_utils.js');
 const bg3mh_logger = CREATE_LOGGER();
 
+const { lsx, lsf, xml, loca } = require('../support_files/lslib_utils.js').getFormats();
+
 var lsxFiles;
 var lsfFiles;
 var xmlFiles;
@@ -11,11 +13,11 @@ var locaFiles;
 
 
 async function refreshFiles() {
-    lsxFiles = await vscode.workspace.findFiles('**/*.lsx');
+    lsxFiles = await vscode.workspace.findFiles('**/*'.concat(lsx));
     // added extra files that should be shown in the lsf panel of the webview
     lsfFiles = await vscode.workspace.findFiles('**/*.{lsf,lsfx,lsc,lsj,lsbc,lsbs}');
-    xmlFiles = await vscode.workspace.findFiles('**/*.xml');
-    locaFiles = await vscode.workspace.findFiles('**/*.loca');
+    xmlFiles = await vscode.workspace.findFiles('**/*'.concat(xml));
+    locaFiles = await vscode.workspace.findFiles('**/*'.concat(loca));
 }
 
 

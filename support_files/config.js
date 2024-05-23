@@ -1,7 +1,9 @@
 const vscode = require('vscode');
+const fs = require('fs');
 const path = require('path');
 
 let config = {};
+
 
 function setConfig(newConfig) {
     config = newConfig;
@@ -16,6 +18,33 @@ function normalizeExcludedFiles(excludedFiles) {
     }
     else {
         return path.normalize(excludedFiles);
+    }
+}
+
+
+function getModName() {
+    const { rootModPath } = getConfig();
+    const modsDirPath = path.join(rootModPath, 'Mods');
+
+    try {
+        if (!fs.existsSync(modsDirPath)) {
+            vscode.window.showErrorMessage('Mods directory does not exist.');
+            return '';
+        }
+
+        const files = fs.readdirSync(modsDirPath);
+        const directories = files.filter(file => 
+            fs.statSync(path.join(modsDirPath, file)).isDirectory()
+        );
+
+        if (directories.length === 1) {
+            return directories[0];
+        } else {
+            return '';
+        }
+    } catch (error) {
+        vscode.window.showErrorMessage(`Error reading directories in ${modsDirPath}: ${error}`);
+        return '';
     }
 }
 
@@ -36,4 +65,4 @@ function getConfig() {
         gameInstallLocation: path.normalize(config.get('gameInstallLocation'))
     };
 }
-module.exports = { setConfig, getConfig };
+module.exports = { setConfig, getConfig, getModName };
