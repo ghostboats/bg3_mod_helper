@@ -27,6 +27,9 @@ const versionGeneratorCommand = require('./commands/versionGenerator');
 const rotationToolCommand = require('./commands/rotationTool');
 const DDSViewerCommand = require('./commands/DDSViewer');
 
+const { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand } = require('./commands/folderShortcuts');
+
+
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
 const { CREATE_LOGGER } = require('./support_files/log_utils');
@@ -163,7 +166,7 @@ function activate(context) {
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.removeFromExcludeList', removeFromExcludeList));
-    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand);
+    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand);
 }
 
 function aSimpleDataProvider() {
@@ -191,6 +194,7 @@ function aSimpleDataProvider() {
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
                     { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' }
+                    { label: 'Folder Shortcuts', command: 'bg3-mod-helper.folderShortcuts', id: 'folderShortcuts' }
                 ]);
             } else if (element.id === 'packer') {
                 return Promise.resolve([
@@ -203,6 +207,13 @@ function aSimpleDataProvider() {
                     { label: 'Convert all LOCA to XML', command: 'bg3-mod-helper.locaToXml' },
                     { label: 'Convert all LSX to LSF', command: 'bg3-mod-helper.lsxToLsf' },
                     { label: 'Convert all LSF to LSX', command: 'bg3-mod-helper.lsfToLsx' }
+                ]);
+            } else if (element.id === 'folderShortcuts') {
+                return Promise.resolve([
+                    { label: 'Mods Folder', command: 'bg3-mod-helper.openModsFolder' },
+                    { label: 'Workspace Folder', command: 'bg3-mod-helper.openWorkspaceFolder' },
+                    { label: 'Extension Logs Folder', command: 'bg3-mod-helper.openLogsFolder' },
+                    { label: 'Game Data Folder', command: 'bg3-mod-helper.openGameFolder' },
                 ]);
             } else {
                 return Promise.resolve([]);
