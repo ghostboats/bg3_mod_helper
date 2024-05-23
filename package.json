@@ -167,6 +167,26 @@
             {
                 "command": "bg3-mod-helper.unpackMod",
                 "title": "Unpack Mod"
+            },
+            {
+                "command": "bg3-mod-helper.openModsFolder",
+                "title": "Open Mods Folder",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openWorkspaceFolder",
+                "title": "Open Workspace Folder",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openLogsFolder",
+                "title": "Open Extension Logs Folder",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openGameFolder",
+                "title": "Open Game Data Folder",
+                "category": "BG3 Mod Helper"
             }
         ],
         "configuration": {

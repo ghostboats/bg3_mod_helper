@@ -1,70 +1,62 @@
-# BG3 Mod Helper Extension
+# BG3 Mod Helper - A VSCod(e/ium) Extension
 
-*Previous versions of this extension required divine.exe. This is no longer needed; instead, the path to LSLib is required.*
+Created by ghostboats and khbsd, this VSCod(e/ium) extension is designed to help mod authors speed up their mod creation workflows. The extension includes multiple useful utilities such as:
 
-This Visual Studio Code extension aids in modding Baldur's Gate 3 by speeding up various tasks. It offers a wide range of functionalities aimed at improving mod development efficiency.
+- **Mod Packing/Unpacking**
+- **UUID/Handle Generation**
+- **UUID Mapping**
+- **Handle Management**
+- **LSX/XML/LOCA/ETC File Conversions**
+- **Generate Mod Templates**
+- **Atlas Generation**
+- **And More!**
 
-Please visit the [BG3 Modding Community Wiki](https://wiki.bg3.community/Tools/bg3-mod-helper) for a detailed guide on how to use the extension as both a modder and a developer.
+This tool is very functional and follows the philosophy of “Few clicks, few tabs,” enabling modding without frequent tabbing out and minimizing the number of clicks needed. It’s available for both VSCode and VSCodium.
+
+## Getting Started
+
+### Install the extension:
+
+1. Open VSCode.
+2. Click on the View tab on the top ribbon.
+3. Click on Extensions.
+4. In the Search Extensions in Marketplace search box, enter `bg3_mod_helper`.
+5. Click Install on the correct extension.
+
+### Setup Extension Settings:
+
+1. Click on “File” in the top ribbon in VSCode.
+2. Click on “Preferences” and then “Settings”.
+3. Search for `bg3` in the settings search bar.
+
+### Adjust paths:
+
+1. Ensure LSLib.dll is in the folder specified in your settings.
+2. Set the Root Mod Path to your workspace folder.
+3. Configure other paths such as Mod Destination Path and Game Install Location.
+
+### Use the Data Provider:
+
+Access the data provider from the VSCode sidebar for a quick one-stop shop for the extension’s main functionalities.
+
+For detailed setup instructions, features, and usage, please refer to our [wiki page](https://wiki.bg3.community/Tools/bg3-mod-helper).
 
 ## Requirements
-- **LSLib**
 
-## General Features
+- Visual Studio Code
+- LSLib
 
-- **Generate UUIDs/Handles** via the right-click menu:
-  - Auto-create a handle in your localization file upon spawning a handle.
-  - Auto-highlight for quick copy on UUID/Handle generation.
-- **Hover over UUIDs/Handles** to find related UUIDs/Handles in your mod's root folder:
-  - Click the hover to move directly to that file/line.
-- **Right-click in the editor** to access tools like the stats/lsx validator and search tool via the export tools menu option (Internet connection required).
-- **Right-click in the file tree** to create a BG3 file from the menu (Ctrl+Shift+Q).
-- **Convert .DDS or .png files** to the opposite format by right-clicking on them.
-- **Resize .DDS/.png files** to a custom size or standard sizes for icons.
-- **Enhanced function definitions and parameters** for BG3, including stats functions and progressions. Future updates may include SE functions.
+## Limitations
 
-## Data Provider Features
+- Unable to work with multiple workspaces in one VSCode window.
+- Unable to edit PNGs/DDS files directly in VSCode.
+- May encounter bugs when using multiple VSCode windows or having other folders within your workspace.
+- Possible lag due to folder/file size.
+- No references to base game UUIDs/handles (coming soon).
 
-- **Pack Mod**: Automatically packs your mod and sends the new `.pak` to the Mods folder.
-  - Auto-creates `meta.lsx` if it's missing and prompts you for details.
-  - Automatically launches the game if selected in settings.
-  - Converts all `merged.lsx` to `merged.lsf` for packing.
-  - Converts all `.xml` localization folders in your Localization (supports multiple languages).
-- **Launch Game**: Launch the most recent save on game start.
-- **Xml to Loca**: Converts XML files to LOCA files, with options for mass or single file conversion.
-- **Generate Folder Structure**: Helps in creating a basic mod folder structure based on user selection.
+## Support and Community
 
-## Installation & Download Options
-
-To install the BG3 Mod Helper, follow these instructions:
-
-1. **Open Visual Studio Code**:
-   - Launch the Visual Studio Code application on your computer.
-
-2. **Access Extensions**:
-   - Click on `View` in the top menu.
-   - Select `Extensions` from the dropdown menu.
-
-3. **Install from VSIX**:
-   - In the Extensions view, click on the `...` button at the top-right corner.
-   - Choose `Install from VSIX` from the dropdown menu.
-
-4. **Select the VSIX File**:
-   - Navigate to the folder where you downloaded the `.vsix` file.
-   - Select the file and click `Open`.
-
-### Additional Download Options
-- [Nexus Mods](https://www.nexusmods.com/baldursgate3/mods/6574)
-- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=ghostboats.bg3-mod-helper)
-- Directly from inside VS Code (search for 'bg3_mod_helper').
-
-## Contribution & Feedback
-
-This extension was created by **ghostboats** and **khbsd**. For assistance, reach out via:
-- [ghostboats on Discord](https://discordapp.com/users/639109932263669781)
-- [khbsd on Discord](https://discord.com/users/231090009698992128)
-
-If you have any feature requests or encounter bugs, please feel free to reach out. Contributions and suggestions are highly appreciated to enhance this tool.
-
-A special thanks to the BG3 community, whose documentation provided significant assistance in the development of this extension.
-
-Direct messages on Discord are the best way to provide feedback, but other channels like GitHub are also checked.
+- For feature requests, bugs, or issues, join our WIP discussion on the [BG3 community Discord](https://discord.gg/bg3community).
+- Reach out directly on Discord:
+  - [ghostboats](https://discordapp.com/users/639109932263669781)
+  - [khbsd](https://discord.com/users/231090009698992128)
