@@ -27,12 +27,13 @@ function getConfig() {
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: path.normalize(config.get('rootModPath')),
-        modName: path.basename(config.get('rootModPath')),
         modDestPath: path.normalize(config.get('modDestPath')),
         lslibPath: path.normalize(config.get('lslibPath')),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
-        excludedFiles: normalizeExcludedFiles(config.get('excludedFiles'))
+        addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
+        excludedFiles: normalizeExcludedFiles(config.get('excludedFiles')),
+        gameInstallLocation: path.normalize(config.get('gameInstallLocation'))
     };
 }
 module.exports = { setConfig, getConfig };

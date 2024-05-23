@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.1.34",
+    "version": "2.2.1",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.86.0"
@@ -159,6 +159,14 @@
             {
                 "command": "bg3-mod-helper.debugCommand",
                 "title": "For dev use, dont press the button"
+            },
+            {
+                "command": "bg3-mod-helper.openPacker",
+                "title": "Open Packer"
+            },
+            {
+                "command": "bg3-mod-helper.unpackMod",
+                "title": "Unpack Mod"
             }
         ],
         "configuration": {
@@ -216,6 +224,16 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "bg3ModHelper.addHandlesToAllLocas": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When generating handles, add them to all loca files. If disabled, prompts for which files to add handles to."
+                },
+                "bg3ModHelper.gameInstallLocation": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to where your Baulders Gate 3 is installed, ie [W:\\SteamLibrary\\steamapps\\common\\Baldurs Gate 3, C:\\Program Files (x86)\\Steam\\steamapps\\common\\Baldurs Gate 3, etc]:"
                 }
             }
         },
@@ -252,7 +270,7 @@
             }
         ],
         "menus": {
-            "view/title" : [
+            "view/title": [
                 {
                     "when": "view == bg3ModHelperView",
                     "command": "bg3-mod-helper.packMod",
@@ -399,13 +417,11 @@
         "dependencies": "npm install"
     },
     "dependencies": {
-        "@img/sharp-win32-x64": "^0.33.3",
         "log4js": "^6.9.1",
         "magickwand.js": "^1.1.0",
         "node-api-dotnet": "^0.7.8",
         "node-fetch": "^3.3.2",
         "node-gyp": "^10.1.0",
-        "sharp": "^0.33.3",
         "uuid": "^9.0.1",
         "xmlbuilder": "^15.1.1"
     },

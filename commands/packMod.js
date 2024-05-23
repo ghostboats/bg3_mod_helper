@@ -4,18 +4,17 @@ const fs = require('fs');
 
 const { exec } = require('child_process');
 const { getConfig } = require('../support_files/config');
-const { modName, rootModPath } = getConfig();
+const { rootModPath } = getConfig();
 
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
 const bg3mh_logger = CREATE_LOGGER();
 
 const vscodeDirPath = path.join(rootModPath, '.vscode');
-const modsDirPath = path.normalize(rootModPath + "\\Mods");
-const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
 
 const { v4: uuidv4 } = require('uuid');
 
 const { convert } = require('../support_files/conversion_junction.js');
+const { getModName } = require('../support_files/helper_functions.js');
 const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
@@ -23,6 +22,10 @@ const { pak } = getFormats();
 // i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
     const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
+    const modName = await getModName()
+
+    const modsDirPath = path.normalize(rootModPath + "\\Mods");
+    const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
 
     // Check if BG3 is running
     const isRunning = await isGameRunning();
@@ -116,17 +119,23 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         if (fs.existsSync(settingsFilePath)) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
+        console.log('test1')
         fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
+        console.log('test2')
     }
     // send the directory to the convert() function, and let it know it's a pak
-    convert(rootModPath, pak);
+    convert(rootModPath, pak, modName);
 
     if (settingsContent) {
+        console.log('test3')
         if (!fs.existsSync(vscodeDirPath)) {
             fs.mkdirSync(vscodeDirPath, { recursive: true });
+            console.log('test4')
         }
         fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
+        console.log('test5')
     }
+    console.log('test6')
 });
 
 

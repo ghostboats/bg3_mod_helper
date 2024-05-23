@@ -11,7 +11,7 @@ const { convert } = require('../support_files/conversion_junction.js');
 const { getFormats } = require('../support_files/lslib_utils.js');
 const { loca, xml } = getFormats();
 const { getConfig } = require('../support_files/config');
-const { modName, rootModPath,  } = getConfig();
+const { rootModPath } = getConfig();
 
 
 const xmlToLocaCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlToLoca', async function () {

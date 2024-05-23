@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const { setConfig, getConfig } = require('./support_files/config');
 const packModImport = require('./commands/packMod');
+const unpackModCommand = require('./commands/unpackMod');
 const launchGameImport = require('./commands/launchGame');
 const createAtlasImport = require('./commands/createAtlas');
 const insertHandleUUIDImport = require('./commands/insertHandleUUID');
@@ -79,7 +80,7 @@ function activate(context) {
         const config = vscode.workspace.getConfiguration('bg3ModHelper');
         config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace
             ).then(() => {
-                vscode.window.showInformationMessage(`Workspace set to: 
+                vscode.window.showInformationMessage(`Workspace set to:
                 ${mainFolderPath}.`,
                 'Open Settings'
             ).then(selection => {
@@ -93,18 +94,19 @@ function activate(context) {
     }
 
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
-    
+
     setConfig({
         maxFilesToShow: config.get('hover.maxFiles'),
         hoverEnabled: config.get('hover.enabled'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: config.get('rootModPath'),
-        modName: path.basename(config.get('rootModPath')),
         modDestPath: config.get('modDestPath'),
         lslibPath: config.get('lslibPath'),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
-        excludedFiles: config.get('excludedFiles') || []
+        addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
+        excludedFiles: config.get('excludedFiles') || [],
+        gameInstallLocation: config.get('gameInstallLocation')
     });
     bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
@@ -118,7 +120,7 @@ function activate(context) {
     // Register the command to open file at a specific line
     context.subscriptions.push(vscode.commands.registerCommand('extension.openFileAtLine', ({ relativePath, lineNum }) => {
         const fullPath = getFullPath(relativePath)
-        
+
         const uri = vscode.Uri.file(fullPath);
         vscode.window.showTextDocument(uri, { preview: false }).then(editor => {
             const line = parseInt(lineNum, 10) - 1; // Convert line number to zero-based index
@@ -130,8 +132,8 @@ function activate(context) {
 
     // Register autocomplete provider for text files within 'Generated' folders
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
-        { scheme: 'file', pattern: '**/Generated/**/*.txt' }, 
-        new AutoCompleteProvider(), 
+        { scheme: 'file', pattern: '**/Generated/**/*.txt' },
+        new AutoCompleteProvider(),
         '"' // Trigger completion when `"` is typed
     ));
 
@@ -160,14 +162,11 @@ function activate(context) {
     context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand);
 }
 
-
 function aSimpleDataProvider() {
     return {
         getTreeItem: (element) => {
             const treeItem = new vscode.TreeItem(element.label);
-            if (element.id === 'conversion') {
-                treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
-            } else if (element.children) {
+            if (element.id) {
                 treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
             } else {
                 treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
@@ -178,15 +177,20 @@ function aSimpleDataProvider() {
         getChildren: (element) => {
             if (!element) {
                 return Promise.resolve([
-                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openPacker', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
-                    { label: 'Supply a folder of icons to make an atlas and its corresponding .dds with those icons', command: 'bg3-mod-helper.createAtlas' },
+                    { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
+                ]);
+            } else if (element.id === 'packer') {
+                return Promise.resolve([
+                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Unpack Mod (in development)', command: 'bg3-mod-helper.unpackMod' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([
@@ -201,7 +205,6 @@ function aSimpleDataProvider() {
         }
     };
 }
-
 
 function deactivate() {}
 

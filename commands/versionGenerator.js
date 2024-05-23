@@ -3,9 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const { getConfig } = require('../support_files/config');
 const { CREATE_LOGGER } = require('../support_files/log_utils.js');
-const { modName, rootModPath } = getConfig();
-const modsDirPath = path.normalize(rootModPath + "\\Mods");
-const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
+const { getModName } = require('../support_files/helper_functions.js');
+
+
 const bg3mh_logger = CREATE_LOGGER();
 
 let versionGeneratorCommand = vscode.commands.registerCommand('bg3-mod-helper.versionGenerator', function () {
@@ -34,6 +34,10 @@ let versionGeneratorCommand = vscode.commands.registerCommand('bg3-mod-helper.ve
 
 async function addToMeta(version) {
     bg3mh_logger.info('Updating Version64 in meta.lsx');
+    const { rootModPath } = getConfig();
+    const modName = await getModName();
+    const modsDirPath = path.normalize(rootModPath + "\\Mods");
+    const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
     if (!fs.existsSync(metaPath)) {
         vscode.window.showErrorMessage(`Meta file not found at ${metaPath}`);
         return;

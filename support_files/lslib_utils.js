@@ -33,7 +33,10 @@ const converterAppDll = ['ConverterApp.dll'];
 const illegalDlls = [].concat(elasticDlls, storyCompilerDlls, converterAppDll);
 
 // the list of directories that need lsx > lsf conversion
-const convertDirs = ["[PAK]", "RootTemplates", "MultiEffectInfos", "UI", "GUI", "Effects", "LevelMapValues", "Localization"];
+const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInfos", "Assets", "UI", "Effects", "LevelMapValues", "Localization"];
+
+// excluding this because it will match to "UI" in convertDirs
+const illegalFiles = ["Icons_Items.lsx"];
 
 var DLLS = [];
 var DLL_PATHS = [];
@@ -144,10 +147,14 @@ function LOAD_LSLIB() {
 function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     let filesToConvert = [];
 
+    console.log(filesPath);
+    console.log(targetExt);
+
     const filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
         recursive: isRecursive
     });
+    console.log(filesList);
 
     for (let i = 0; i < filesList.length; i++) {
         const temp = filesList[i].toString();
@@ -180,7 +187,16 @@ function FILTER_PATHS(filesPath) {
         let temp_ext = path.extname(filesPath);
 
         for (let i = 0; i < temp_path.length; i++) {
-            if ((!excludedFiles.includes(filesPath) && convertDirs.includes(temp_path[i])) || (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath)))) {
+            if (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath))) {
+                return filesPath;
+            }
+            else if (
+                (
+                    !excludedFiles.includes(filesPath) && 
+                    convertDirs.includes(temp_path[i]) && 
+                    !illegalFiles.includes(path.basename(filesPath))
+                )
+            ) {
                 return filesPath;
             }
         }
