@@ -9,9 +9,7 @@ const { lsx, xml, pak } = getFormats();
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
-const { getConfig } = require('./config.js');
-
-const { getModName } = require('./helper_functions.js');
+const { getConfig, getModName } = require('./config.js');
 
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
@@ -43,7 +41,7 @@ function getDynamicPath(filePath) {
 }
 
 
-async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName_ = '') {
+async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getModName()) {
     const { rootModPath } = getConfig();
 
     console.log('targetExt:' + targetExt);
@@ -61,10 +59,10 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
             await convert(rootModPath, lsx)
                 .then(() => raiseInfo(`lsx conversion done`, false));
 
-            processPak(rootModPath, modName_);
+            processPak(rootModPath, modName);
         }
         else if (fs.statSync(convertPath).isFile()) {
-            processPak(convertPath, modName_, 'n/a');
+            processPak(convertPath, modName, 'n/a');
         }
     } 
     else if (Array.isArray(convertPath)) {
