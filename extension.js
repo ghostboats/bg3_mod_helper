@@ -28,6 +28,8 @@ const DDSViewerCommand = require('./commands/DDSViewer');
 
 const { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand } = require('./commands/folderShortcuts');
 
+const addDependenciesCommand = require('./commands/addDependencies')
+
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
@@ -191,6 +193,7 @@ function aSimpleDataProvider() {
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
+                    { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
                     { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' },
                     { label: 'Folder Shortcuts', command: 'bg3-mod-helper.folderShortcuts', id: 'folderShortcuts' }
