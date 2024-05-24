@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { parseStringPromise, Builder } = require('xml2js');
 
-const { getConfig, getModName } = require('../support_files/config').getConfig;
+const { getConfig, getModName } = require('../support_files/config');
 
 // Helper function to recursively find modsettings.lsx files
 async function findFiles(dir, fileList = []) {
@@ -54,14 +54,25 @@ const addDependenciesCommand = vscode.commands.registerCommand('bg3-mod-helper.a
 
         for (const file of modSettingsFiles) {
             const content = await readXML(file);
-            const mods = content.save.region[0].node[0].children[0].node;
-            mods.forEach(mod => {
-                dependencies.push(mod.attribute[0]); // Assuming attribute structure matches your example
-            });
+            if (content && content.save && content.save.region && content.save.region[0] && 
+                content.save.region[0].node && content.save.region[0].node[0] &&
+                content.save.region[0].node[0].children && content.save.region[0].node[0].children[0] &&
+                content.save.region[0].node[0].children[0].node) {
+                const mods = content.save.region[0].node[0].children[0].node;
+                mods.forEach(mod => {
+                    if (mod.attribute && mod.attribute.length > 0) {
+                        dependencies.push(mod.attribute[0]);
+                    }
+                });
+            }
         }
 
-        await addDependenciesToMeta(metaPath, dependencies);
-        vscode.window.showInformationMessage('Dependencies added successfully!');
+        if (dependencies.length > 0) {
+            await addDependenciesToMeta(metaPath, dependencies);
+            vscode.window.showInformationMessage('Dependencies added successfully!');
+        } else {
+            vscode.window.showInformationMessage('No dependencies found to add.');
+        }
     } catch (error) {
         console.error(error);
         vscode.window.showErrorMessage('Failed to add dependencies: ' + error.message);
