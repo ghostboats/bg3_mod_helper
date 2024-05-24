@@ -185,7 +185,7 @@ function aSimpleDataProvider() {
         getChildren: (element) => {
             if (!element) {
                 return Promise.resolve([
-                    { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openPacker', id: 'packer' },
+                    { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool[tool is in development])', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
@@ -196,12 +196,12 @@ function aSimpleDataProvider() {
                     { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
                     { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' },
-                    { label: 'Folder Shortcuts', command: 'bg3-mod-helper.folderShortcuts', id: 'folderShortcuts' }
+                    { label: 'Folder Shortcuts', id: 'folderShortcuts' }
                 ]);
             } else if (element.id === 'packer') {
                 return Promise.resolve([
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
-                    { label: 'Unpack Mod (in development)', command: 'bg3-mod-helper.unpackMod' }
+                    { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([
