@@ -92,7 +92,7 @@ function processDllPaths() {
 
 
 // run through the created DLLS array and load each one
-function loadDlls() {
+async function loadDlls() {
     for (let i = 0; i < DLLS.length; i++) {
         try {
             dotnet.load(DLLS[i]);
@@ -119,13 +119,12 @@ async function LOAD_LSLIB() {
     }
 
     processDllPaths();    
-    loadDlls();
+    await loadDlls();
+    raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
     
-
-    raiseInfo(`${DLL_PATHS.length} .dlls loaded`, false);
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
-    return dotnet.LSLib.LS;
+    LSLIB = dotnet.LSLib.LS;
     
 }
 

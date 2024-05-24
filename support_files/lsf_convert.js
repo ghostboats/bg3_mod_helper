@@ -2,8 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
 
-console.log("in lsf_convert.js");
-const { getFormats, baseNamePath } = require('./lslib_utils');
+const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
 
 
 const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
@@ -13,6 +12,11 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 var to_lsf;
+var LSLIB;
+
+async function lslib_load() {
+    LSLIB = await LOAD_LSLIB();
+}
 
 
 function isLsf(ext) {
@@ -85,7 +89,6 @@ function getLsfOutputPath(filePath) {
 
 
 async function processLsf(file, targetExt) {
-    const LSLIB = await require('./lslib_utils').LOAD_LSLIB();
     const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
     const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
     const Game = LSLIB.Enums.Game;
@@ -110,5 +113,5 @@ async function processLsf(file, targetExt) {
     }
 }
  
-
+lslib_load();
 module.exports = { isLsf, processLsf, getLsfOutputPath, to_lsf };

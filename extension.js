@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
 const { setConfig, getConfig } = require('./support_files/config');
-console.log("in extension.js");
 
 const packModImport = require('./commands/packMod');
 const unpackModCommand = require('./commands/unpackMod');
@@ -193,7 +192,7 @@ function aSimpleDataProvider() {
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
-                    { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' }
+                    { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' },
                     { label: 'Folder Shortcuts', command: 'bg3-mod-helper.folderShortcuts', id: 'folderShortcuts' }
                 ]);
             } else if (element.id === 'packer') {
@@ -221,6 +220,7 @@ function aSimpleDataProvider() {
         }
     };
 }
+
 
 function deactivate() {}
 
