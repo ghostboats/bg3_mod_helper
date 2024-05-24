@@ -1,11 +1,9 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs').promises;
-const { parseStringPromise, Builder } = require('xml2js');
 
 const { getConfig, getModName } = require('../support_files/config');
 
-// Helper function to recursively find modsettings.lsx files
 async function findFiles(dir, fileList = []) {
     const files = await fs.readdir(dir, { withFileTypes: true });
     for (const file of files) {
@@ -19,26 +17,55 @@ async function findFiles(dir, fileList = []) {
     return fileList;
 }
 
-// Function to read XML and return an object
-async function readXML(filePath) {
-    const data = await fs.readFile(filePath);
-    return parseStringPromise(data);
+async function extractDependencies(filePath) {
+    const fileContent = await fs.readFile(filePath, 'utf8');
+    const profileName = path.basename(path.dirname(filePath));
+    const dependencies = [];
+    const regex = /<node id="ModuleShortDesc">([\s\S]*?)<\/node>/g;
+    let match;
+
+    while ((match = regex.exec(fileContent))) {
+        const attributes = {};
+        const attributeMatch = /<attribute id="([^"]+)" value="([^"]+)" type="([^"]+)" \/>/g;
+        let attr;
+
+        while ((attr = attributeMatch.exec(match[1]))) {
+            attributes[attr[1]] = {
+                '@id': attr[1],
+                '@value': attr[2],
+                '@type': attr[3]
+            };
+        }
+
+        if (Object.keys(attributes).length > 0) {
+            dependencies.push({
+                label: attributes['Name'] ? attributes['Name']['@value'] : 'No Name',
+                description: filePath,
+                detail: `Profile Name: ${profileName}`,
+                attributes: Object.values(attributes)
+            });
+        }
+    }
+
+    return dependencies;
 }
 
-// Function to add dependencies to meta.lsx
-async function addDependenciesToMeta(metaPath, dependencies) {
-    const data = await fs.readFile(metaPath);
-    const result = await parseStringPromise(data);
-    if (!result.save.region[0].node[0].children[0].node) {
-        result.save.region[0].node[0].children[0].node = [];
+async function addDependenciesToMeta(metaPath, selectedDependencies) {
+    let data = await fs.readFile(metaPath, 'utf8');
+    let depString = selectedDependencies.map(dep => {
+        let attrString = dep.attributes.map(attr => `\n\t\t\t\t\t<attribute id="${attr['@id']}" value="${attr['@value']}" type="${attr['@type']}" />`).join('');
+        return `\n\t\t\t\t<node id="ModuleShortDesc">${attrString}\n\t\t\t\t</node>`;
+    }).join('');
+
+    if (data.includes('<node id="Dependencies"><children>')) {
+        data = data.replace(/(<node id="Dependencies"><children>)([\s\S]*?)(<\/children><\/node>)/, `$1$2${depString}\n\t\t\t$3`);
+    } else if (data.includes('<node id="Dependencies" />')) {
+        data = data.replace('<node id="Dependencies" />', `<node id="Dependencies">\n\t\t<children>${depString}\n\t\t</children>\n\t</node>`);
+    } else {
+        data = data.replace('</children>', `\n\t<node id="Dependencies">\n\t\t<children>${depString}\n\t\t</children>\n\t</node>\n</children>`);
     }
-    const depsNode = result.save.region[0].node[0].children[0].node;
-    dependencies.forEach(dep => {
-        depsNode.push({ attribute: dep });
-    });
-    const builder = new Builder();
-    const xml = builder.buildObject(result);
-    await fs.writeFile(metaPath, xml);
+
+    await fs.writeFile(metaPath, data, 'utf8');
 }
 
 const addDependenciesCommand = vscode.commands.registerCommand('bg3-mod-helper.addDependencies', async () => {
@@ -49,29 +76,24 @@ const addDependenciesCommand = vscode.commands.registerCommand('bg3-mod-helper.a
 
     try {
         const playerProfilesPath = path.join(process.env.LOCALAPPDATA, 'Larian Studios', 'Baldur\'s Gate 3', 'PlayerProfiles');
+        let allDependencies = [];
         const modSettingsFiles = await findFiles(playerProfilesPath);
-        const dependencies = [];
 
-        for (const file of modSettingsFiles) {
-            const content = await readXML(file);
-            if (content && content.save && content.save.region && content.save.region[0] && 
-                content.save.region[0].node && content.save.region[0].node[0] &&
-                content.save.region[0].node[0].children && content.save.region[0].node[0].children[0] &&
-                content.save.region[0].node[0].children[0].node) {
-                const mods = content.save.region[0].node[0].children[0].node;
-                mods.forEach(mod => {
-                    if (mod.attribute && mod.attribute.length > 0) {
-                        dependencies.push(mod.attribute[0]);
-                    }
-                });
-            }
+        for (const filePath of modSettingsFiles) {
+            const dependencies = await extractDependencies(filePath);
+            allDependencies.push(...dependencies);
         }
 
-        if (dependencies.length > 0) {
-            await addDependenciesToMeta(metaPath, dependencies);
+        const selected = await vscode.window.showQuickPick(allDependencies, {
+            canPickMany: true,
+            placeHolder: 'Select dependencies to add to the meta.lsx'
+        });
+
+        if (selected && selected.length > 0) {
+            await addDependenciesToMeta(metaPath, selected);
             vscode.window.showInformationMessage('Dependencies added successfully!');
         } else {
-            vscode.window.showInformationMessage('No dependencies found to add.');
+            vscode.window.showInformationMessage('No dependencies selected.');
         }
     } catch (error) {
         console.error(error);
