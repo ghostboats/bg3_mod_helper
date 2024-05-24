@@ -124,7 +124,7 @@ async function LOAD_LSLIB() {
     
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
-    LSLIB = dotnet.LSLib.LS;
+    return dotnet.LSLib.LS;
     
 }
 
