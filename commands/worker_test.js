@@ -1,3 +1,9 @@
-// const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils.js');
-// const bg3mh_logger = CREATE_LOGGER();
+const { parentPort, isMainThread, Worker } = require('node:worker_threads');
+const { processLoca } = require('../support_files/loca_convert');
+// const vscode = require('vscode');
+
+
+parentPort.once('message', (message) => {
+    parentPort.postMessage(message);
+});
 

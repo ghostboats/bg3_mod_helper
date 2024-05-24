@@ -5,9 +5,10 @@
 */
 const path = require('path');
 const fs = require('fs');
-const vscode = require('vscode');
-const findFiles = vscode.workspace.findFiles;
-const parse = vscode.Uri.parse;
+var vscode;
+var findFiles;
+
+const { isMainThread, parentPort } = require('node:worker_threads');
 
 
 // loads the api
@@ -20,8 +21,6 @@ const dotnet = require('node-api-dotnet/net8.0');
 
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js')
-const bg3mh_logger = CREATE_LOGGER();
 
 const { getConfig }  = require('./config.js');
 const { lslibPath } = getConfig();
@@ -85,7 +84,8 @@ function processDllPaths() {
             DLLS.push(temp_path);
         }
         catch (Error) {
-            raiseError(Error);
+            console.error(Error)
+            // raiseError(Error);
         }
     }
 }
@@ -98,7 +98,8 @@ async function loadDlls() {
             dotnet.load(DLLS[i]);
         }
         catch (Error) {
-            raiseError(Error);
+            console.error(Error)
+            // raiseError(Error);
         }
     }
 }
@@ -106,21 +107,44 @@ async function loadDlls() {
 
 // handles the finding of LSLib. logs will be created wherever this laods from.
 async function LOAD_LSLIB() {
-    if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
-        DLL_PATHS = await FIND_FILES(getFormats().dll, lslibPath);
+    if (isMainThread) {
+        const { raiseError } = require('./log_utils.js')
+        vscode = require('vscode');
+        findFiles = vscode.workspace.findFiles;
+
+        if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
+            DLL_PATHS = await FIND_FILES(getFormats().dll, lslibPath);
+        }
+        else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
+            DLL_PATHS = await FIND_FILES(getFormats().dll, lslibToolsPath);
+        } 
+        else {
+            raiseError("LSLib.dll not found at " + lslibPath + ".", false);
+            vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
+            return null;
+        }
     }
-    else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
-        DLL_PATHS = await FIND_FILES(getFormats().dll, lslibToolsPath);
-    } 
     else {
-        raiseError("LSLib.dll not found at " + lslibPath + ".", false);
-        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
-        return null;
+        findFiles = FIND_FILES_SYNC;
+
+        if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
+            DLL_PATHS = FIND_FILES_SYNC(lslibPath, getFormats().dll);
+        }
+        else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
+            DLL_PATHS = FIND_FILES_SYNC(lslibToolsPath, getFormats().dll);
+        } 
+        else {
+            // raiseError("LSLib.dll not found at " + lslibPath + ".", false);
+            console.log(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
+            return null;
+        }
+
     }
+    
 
     processDllPaths();    
     await loadDlls();
-    raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
+    // raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
     
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
@@ -131,7 +155,7 @@ async function LOAD_LSLIB() {
 
 // returns an array with the absolute paths to every file found with the target file extension.
 // maybe replace with findFiles()? 
-function FIND_FILES_v1(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
+function FIND_FILES_SYNC(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     let filesToConvert = [];
 
     // console.log(filesPath);
@@ -207,29 +231,29 @@ function FILTER_PATHS(filesPath) {
 
 
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
-function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
+function moveFileAcrossDevices(sourcePath, destPath, console) {
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
-            raiseError(readErr);
+            console.error(readErr);
             return;
         }
         fs.writeFile(destPath, data, (writeErr) => {
             if (writeErr) {
-                raiseError(writeErr);
+                console.error(writeErr);
                 return;
             }
             fs.unlink(sourcePath, unlinkErr => {
                 // added the check because it was raising an error every time the func was called
                 if (unlinkErr) {
-                    raiseError(unlinkErr);
+                    console.error(unlinkErr);
                     return;
                 }
             });
         });
     });
-    raiseInfo(path.basename(sourcePath) + " moved to " + destPath, false);
-    vscode.window.showInformationMessage(`${path.basename(sourcePath)} moved to ${destPath}.`);
+    // raiseInfo(path.basename(sourcePath) + " moved to " + destPath, false);
+    // vscode.window.showInformationMessage(`${path.basename(sourcePath)} moved to ${destPath}.`);
 }
 
 
-module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_v1, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
+module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_SYNC, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
