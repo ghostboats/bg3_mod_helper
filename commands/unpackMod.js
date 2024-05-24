@@ -2,21 +2,30 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
 const { getConfig } = require('../support_files/config');
-const { convert } = require('../support_files/conversion_junction.js');
-const { processPak } = require('../support_files/process_pak.js')
+const { processPak } = require('../support_files/process_pak.js');
 
-const unpackModCommand = vscode.commands.registerCommand('bg3-mod-helper.unpackMod', async function () {
-    const pakFileUri = await vscode.window.showOpenDialog({
-        canSelectFiles: true,
-        canSelectFolders: false,
-        canSelectMany: false,
-        filters: { 'PAK Files': ['pak'] },
-        title: 'Select a .pak file to unpack'
-    });
+const unpackModCommand = vscode.commands.registerCommand('bg3-mod-helper.unpackMod', async function (fileUri) {
+    let pakFilePath;
 
-    if (!pakFileUri) {
-        vscode.window.showInformationMessage('No file selected.');
-        return;
+    // If the command is triggered via the context menu, use the provided URI.
+    if (fileUri && fileUri.scheme === 'file') {
+        pakFilePath = fileUri.fsPath;
+    } else {
+        // Show open dialog if not triggered via context menu
+        const pakFileUri = await vscode.window.showOpenDialog({
+            canSelectFiles: true,
+            canSelectFolders: false,
+            canSelectMany: false,
+            filters: { 'PAK Files': ['pak'] },
+            title: 'Select a .pak file to unpack'
+        });
+
+        if (!pakFileUri || pakFileUri.length === 0) {
+            vscode.window.showInformationMessage('No file selected.');
+            return;
+        }
+
+        pakFilePath = pakFileUri[0].fsPath;
     }
 
     const outputFolderUri = await vscode.window.showOpenDialog({
@@ -31,11 +40,8 @@ const unpackModCommand = vscode.commands.registerCommand('bg3-mod-helper.unpackM
         return;
     }
 
-    const pakFilePath = pakFileUri[0].fsPath;
     const baseOutputFolderPath = outputFolderUri[0].fsPath;
     const pakFileName = path.basename(pakFilePath, path.extname(pakFilePath));
-
-    // Create a unique folder for the unpacked contents
     const outputFolderPath = path.join(baseOutputFolderPath, `${pakFileName}_unpacked`);
 
     try {

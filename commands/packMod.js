@@ -50,30 +50,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
 
     bg3mh_logger.info("Grabbed mod name %s from %s.", modName, rootModPath);
 
-/*
-    let modName = '';
-
-    // Check if Mods directory exists and get the first subfolder name
-    if (fs.existsSync(modsDirPath) && fs.lstatSync(modsDirPath).isDirectory()) {
-        const subfolders = fs.readdirSync(modsDirPath).filter(file => {
-            const filePath = path.join(modsDirPath, file);
-            return fs.lstatSync(filePath).isDirectory();
-        });
-
-        if (subfolders.length > 0) {
-            // Assuming we need the first subfolder. Modify as needed.
-            modName = subfolders[0];
-            console.log(`Mod name determined from subfolder: ${modName}`);
-        } else {
-            vscode.window.showErrorMessage('No subfolders found in Mods directory to get a modName variable or get correct meta location.');
-            return;
-        }
-    } else {
-        vscode.window.showErrorMessage('Mods directory not found.');
-        return;
-    }
-*/
-
     if (!fs.existsSync(metaPath)) {
         const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + metaPath + '. Do you want to create one?', 'Create Meta', 'Close');
         if (shouldCreateMeta === 'Create Meta') {
@@ -124,7 +100,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         // console.log('test2')
     }
     // send the directory to the convert() function, and let it know it's a pak
-    convert(rootModPath, pak, modName);
+    await convert(rootModPath, pak, modName);
 
     if (settingsContent) {
         // console.log('test3')
@@ -134,6 +110,9 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
         fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
         // console.log('test5')
+    }
+    if (autoLaunchOnPack) {
+        vscode.commands.executeCommand('bg3-mod-helper.launchGame');
     }
     // console.log('test6')
 });

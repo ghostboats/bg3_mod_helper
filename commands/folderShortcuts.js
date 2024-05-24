@@ -5,13 +5,14 @@ const fs = require('fs').promises;
 
 
 const openModsFolderCommand = vscode.commands.registerCommand('bg3-mod-helper.openModsFolder', () => {
-    const modsFolderPath = path.join(getConfig().rootModPath, 'Mods');
-    vscode.env.openExternal(vscode.Uri.file(modsFolderPath));
+    const { modDestPath } = getConfig();
+    vscode.env.openExternal(vscode.Uri.file(modDestPath));
 });
 
 const openGameFolderCommand = vscode.commands.registerCommand('bg3-mod-helper.openGameFolder', () => {
-    const gameFolderPath = getConfig().gameInstallLocation;
-    vscode.env.openExternal(vscode.Uri.file(gameFolderPath));
+    const { gameInstallLocation } = getConfig();
+    const dataFolderPath = path.join(gameInstallLocation, 'Data');
+    vscode.env.openExternal(vscode.Uri.file(dataFolderPath));
 });
 
 const openLogsFolderCommand = vscode.commands.registerCommand('bg3-mod-helper.openLogsFolder', async () => {
