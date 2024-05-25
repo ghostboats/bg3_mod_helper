@@ -41,7 +41,7 @@ const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', a
         console.log(unpackDest);
 
         raiseInfo(`${modName} unpacking started`);
-        processPak(pakPath, modName, unpackDest);
+        // processPak(pakPath, modName, unpackDest);
         raiseInfo(`${modName} unpacking ended`);
     }
 

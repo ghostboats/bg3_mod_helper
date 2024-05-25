@@ -229,7 +229,7 @@
                 "bg3ModHelper.modDestPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Path where your mod should end up, ie [C:/Users/<username>/AppData/Local/Larian Studios/Baldur's Gate 3/Mods]"
+                    "description": "Path where your mod should end up, ie [C:/Users/<username>/AppData/Local/Larian Studios/Baldurs Gate 3/Mods]"
                 },
                 "bg3ModHelper.lslibPath": {
                     "type": "string",
@@ -262,7 +262,7 @@
                 "bg3ModHelper.gameInstallLocation": {
                     "type": "string",
                     "default": "",
-                    "description": "Path to where your Baulders Gate 3 is installed, ie [W:\\SteamLibrary\\steamapps\\common\\Baldurs Gate 3, C:\\Program Files (x86)\\Steam\\steamapps\\common\\Baldurs Gate 3, etc]:"
+                    "description": "Path to where Baldur's Gate 3 is installed, ie [W:\\SteamLibrary\\steamapps\\common\\Baldurs Gate 3], [C:\\Program Files (x86)\\Steam\\steamapps\\common\\Baldurs Gate 3]:"
                 }
             }
         },
