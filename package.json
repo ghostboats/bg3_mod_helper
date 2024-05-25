@@ -445,7 +445,7 @@
         "url": "https://github.com/ghostboats/bg3_mod_helper"
     },
     "scripts": {
-        "lint": "eslint .",
+        "lint": "eslint . --fix",
         "pretest": "npm run lint",
         "test": "vscode-test",
         "dependencies": "npm install"
@@ -459,5 +459,10 @@
         "uuid": "^9.0.1",
         "xmlbuilder": "^15.1.1"
     },
-    "license": "LGPL-3.0-or-later"
+    "license": "LGPL-3.0-or-later",
+    "devDependencies": {
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.1.3"
+    }
 }
