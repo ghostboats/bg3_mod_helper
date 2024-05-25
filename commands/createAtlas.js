@@ -3,8 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { Magick, MagickCore } = require('magickwand.js');
 const xmlbuilder = require('xmlbuilder');
-const { getConfig, setConfig } = require('../support_files/config');
-const { getModName } = require('../support_files/helper_functions.js');
+const { getConfig, setConfig, getModName } = require('../support_files/config');
 const { v4: uuidv4 } = require('uuid');
 
 const truncate = (number, digits) => {

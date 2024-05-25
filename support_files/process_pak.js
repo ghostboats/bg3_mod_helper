@@ -48,7 +48,7 @@ function prepareTempDir(movedPak = false) {
 
 
 // btw, sometimes this will log things before others because it's async.
-async function processPak(modPath, modName_,  unpackLocation = '') {
+async function processPak(modPath, modName_, unpackLocation = '') {
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 

@@ -2,8 +2,8 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
 
-const { insertText, getModName } = require('../support_files/helper_functions');
-const { getConfig } = require('../support_files/config');
+const { insertText } = require('../support_files/helper_functions');
+const { getConfig, getModName } = require('../support_files/config');
 const templates = require('../support_files/templates/skeleton_files');
 
 const locales = [

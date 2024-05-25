@@ -161,12 +161,25 @@ async function FIND_FILES(targetExt = getFormats().lsf, filesPath = '**/*') {
 
     if (targetExt === getFormats().dll) {
         let dllDir = new vscode.RelativePattern(filesPath, '*' + targetExt);
+        console.log(dllDir);
         filesList = (await findFiles(dllDir)).map(file => file.path);
+    }
+    else if (targetExt === getFormats().pak) {
+        let dllDir = new vscode.RelativePattern(filesPath, '**/*' + targetExt);
+        console.log(dllDir);
+        filesList = (await findFiles(dllDir)).map(file => dirSeparator(file.path));
     }
     else {
         filesList = (await findFiles(filesPath + targetExt)).map(file => file.path);
     }
-    return FILTER_PATHS(filesList);
+
+    if (targetExt === getFormats().pak) {
+        // filesList.map(file => dirSeparator(file));
+        return filesList;
+    }
+    else {
+        return FILTER_PATHS(filesList);
+    }
 }
 
 
@@ -189,6 +202,7 @@ function FILTER_PATHS(filesPath) {
         let temp_ext = path.extname(filesPath);
 
         for (let i = 0; i < temp_path.length; i++) {
+            // these statements could technically be combined, but that doesn't make it very readable.
             if (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath))) {
                 return filesPath;
             }
