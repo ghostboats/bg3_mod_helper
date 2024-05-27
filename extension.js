@@ -33,7 +33,7 @@ const addDependenciesCommand = require('./commands/addDependencies')
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
-const { CREATE_LOGGER } = require('./support_files/log_utils');
+const { CREATE_LOGGER, raiseInfo } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const debugCommand = require('./commands/debug');
@@ -116,7 +116,8 @@ function activate(context) {
         excludedFiles: config.get('excludedFiles') || [],
         gameInstallLocation: config.get('gameInstallLocation')
     });
-    bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
+    raiseInfo('Initial configs set:' + JSON.stringify(config, null, 2), false);
+    
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
             'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'

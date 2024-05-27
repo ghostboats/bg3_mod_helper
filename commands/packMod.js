@@ -85,14 +85,15 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
 
+    // changed existsSync() to statSync().isFile(), since existsSync() is being deprecated. this section can be shortened with the saveConfigFile and loadConfigFile functions in helper_functions.js
     // Path to .vscode directory and settings file
     const vscodeDirPath = path.join(rootModPath, '.vscode');
     const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
     let settingsContent = '';
 
     // Check and save settings.json if .vscode exists
-    if (fs.existsSync(vscodeDirPath)) {
-        if (fs.existsSync(settingsFilePath)) {
+    if (fs.statSync(vscodeDirPath).isFile()) {
+        if (fs.statSync(settingsFilePath).isFile()) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
         // console.log('test1')
@@ -104,7 +105,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
 
     if (settingsContent) {
         // console.log('test3')
-        if (!fs.existsSync(vscodeDirPath)) {
+        if (!fs.statSync(vscodeDirPath).isFile()) {
             fs.mkdirSync(vscodeDirPath, { recursive: true });
             // console.log('test4')
         }

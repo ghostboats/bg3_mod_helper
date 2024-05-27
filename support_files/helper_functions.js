@@ -1,9 +1,13 @@
 const vscode = require('vscode');
 const path = require('path');
-const { getConfig } = require('./config');
+const { getConfig, setConfig } = require('./config');
 const fs = require('fs');
 
-const { CREATE_LOGGER } = require('./log_utils');
+const rootModPath = getConfig().rootModPath;
+const vscodeDirPath = path.join(rootModPath, '.vscode');
+const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
+
+const { CREATE_LOGGER, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 // Function to insert text, replacing the current selection
@@ -65,4 +69,50 @@ async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
     return instances;
 }
 
-module.exports = { insertText, findInstancesInWorkspace, getFullPath };
+
+async function saveConfigFile(settingToSave = "all") {
+    let config = vscode.workspace.getConfiguration('bg3ModHelper');
+    let settings = {};
+
+    console.log(`${settingsFilePath}\n${rootModPath}`)
+    
+    if (settingToSave === "all") {
+        settings = {
+            maxFilesToShow: config.get('hover.maxFiles'),
+            hoverEnabled: config.get('hover.enabled'),
+            maxCacheSize: config.get('maxCacheSize'),
+            rootModPath: config.get('rootModPath'),
+            modDestPath: config.get('modDestPath'),
+            lslibPath: config.get('lslibPath'),
+            autoLaunchOnPack: config.get('autoLaunchOnPack'),
+            launchContinueGame: config.get('launchContinueGame'),
+            addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
+            excludedFiles: config.get('excludedFiles') || [],
+            gameInstallLocation: config.get('gameInstallLocation')
+        };
+    }
+    
+    setConfig(settings);
+    let settingsJson = JSON.stringify(config, null, 4);
+
+    fs.writeFileSync(settingsFilePath, settingsJson, 'utf8');
+    raiseInfo('Initial configs set:' + JSON.stringify(config, null, 4), false);
+}
+
+
+async function loadConfigFile(get = false) {
+    let settingsContent;
+    
+    if (fs.statSync(settingsFilePath).isFile()) {
+        settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
+        raiseInfo(settingsContent, false);
+
+        if (get) {
+            return settingsContent;
+        } else {
+            return undefined;
+        }
+    }
+}
+
+module.exports = { insertText, findInstancesInWorkspace, getFullPath, loadConfigFile, saveConfigFile };
