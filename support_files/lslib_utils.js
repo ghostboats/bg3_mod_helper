@@ -32,6 +32,10 @@ const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInf
 // excluding this because it will match to "UI" in convertDirs
 const illegalFiles = ["Icons_Items.lsx"];
 
+// excluding these packs because lslib uses something else to unpack them
+const virtualTexturePaks = ["VirtualTextures_"];
+const hotfixPatchPaks = ["Patch", "Hotfix"]
+
 // tools to test where the process is
 const { isMainThread, workerData } = require('node:worker_threads');
 
@@ -49,7 +53,7 @@ if (isMainThread) {
     findFiles = vscode.workspace.findFiles;
     parse = vscode.Uri.parse;
 } else {
-    getConfig = workerData;
+    getConfig = workerData.workerConfig;
     lslibPath = getConfig.lslibPath;
     compatRootModPath = path.join(getConfig.rootModPath + "\\");
     lslibToolsPath = path.join(getConfig.lslibPath, TOOL_SUBDIR);
@@ -145,8 +149,11 @@ async function LOAD_LSLIB() {
 
     processDllPaths();    
     await loadDlls();
-    bg3mh_logger.info(`${DLL_PATHS} \n.dlls loaded`);
-    console.log(`${DLL_PATHS} \n.dlls loaded`);
+    if (isMainThread) {
+        raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
+    } else {
+        // raiseInfo(`.dlls loaded into worker ${workerData.workerId}`)
+    }
     
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
@@ -238,6 +245,9 @@ function FILTER_PATHS(filesPath) {
             if (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath))) {
                 return filesPath;
             }
+            else if (filesPath.includes(virtualTexturePaks) || hotfixPatchPaks.includes(temp) {
+
+            }
             else if (
                 (
                     !excludedFiles.includes(filesPath) && 
@@ -280,9 +290,53 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
         raiseInfo(infoMsg, false);
         vscode.window.showInformationMessage(infoMsg);
     } else {
-        raiseInfo(infoMsg);
+        raiseInfo(infoMsg, false);
+    }
+}
+
+// i don't like putting this here but i need a worker_thread friendly version
+function getModName() {
+    let rootModPath;
+
+    if (isMainThread) {
+        rootModPath = getConfig().rootModPath;
+    } else {
+        rootModPath = getConfig.rootModPath;
+    }
+
+    let modsDirPath = path.join(rootModPath, 'Mods');
+
+    try {
+        if (!fs.existsSync(modsDirPath)) {
+            if (isMainThread) {
+                vscode.window.showErrorMessage('Mods directory does not exist.');
+            } else {
+                raiseError('Mods directory does not exist.');
+            }
+            
+            return '';
+        }
+
+        const files = fs.readdirSync(modsDirPath);
+        const directories = files.filter(file => 
+            fs.statSync(path.join(modsDirPath, file)).isDirectory()
+        );
+
+        if (directories.length === 1) {
+            return directories[0];
+        } else {
+            return '';
+        }
+    } catch (error) {
+        if (isMainThread) {
+            vscode.window.showErrorMessage(`Error reading directories in ${modsDirPath}: ${error}`);
+        } else {
+            raiseError(`Error reading directories in ${modsDirPath}: ${error}`);
+        }
+        
+        return '';
     }
 }
 
 
-module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_SYNC, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
+module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_SYNC, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath, getModName };

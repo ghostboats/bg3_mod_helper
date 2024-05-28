@@ -3,16 +3,21 @@ const bg3mh_logger = CREATE_LOGGER();
 const { parentPort, workerData } = require('node:worker_threads');
 const path = require('node:path');
 const fs = require('node:fs');
-const { LOAD_LSLIB } = require('../support_files/lslib_utils.js')
 
 
-parentPort.once('message', async () => {
-    raiseInfo(`lookee lslib @ ${workerData.lslibPath}`)
-    parentPort.postMessage("i got the workerData bitchhhhhhh");
+const { convert } = require('../support_files/conversion_junction.js')
 
-    /*try {
-        let LSLIB = await LOAD_LSLIB();
-    } catch (Error) {
-        raiseError(Error);
-    }*/
-});
+function taskIntake() {
+    // console.log(workerData.task)
+    if (Array.isArray(workerData.task)) {
+        for (let i = 0; i < workerData.task.length; i++) {
+            console.log(`converting ${workerData.task[i]}`)
+            convert(workerData.task[i]);
+        }
+    } else if (typeof(workerData.task) == 'string') {
+        convert(workerData.task);
+    }
+    
+}
+
+taskIntake();

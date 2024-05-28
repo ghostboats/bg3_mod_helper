@@ -1,23 +1,73 @@
 // what's your function
 const path = require('path');
+const os = require('os');
 const fs = require('fs');
-const vscode = require('vscode');
 
-const { FIND_FILES, getFormats } = require('./lslib_utils');
+const { FIND_FILES, getFormats, compatRootModPath } = require('./lslib_utils');
 const { lsx, xml, pak } = getFormats();
 
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
-const { getConfig, getModName } = require('./config.js');
-
 const { isLoca, processLoca, getLocaOutputPath } = require('./loca_convert');
 const { isLsf, processLsf, getLsfOutputPath } = require('./lsf_convert');
 const { processPak, prepareTempDir } = require('./process_pak');
 
+const { isMainThread, workerData } = require('node:worker_threads');
+
+let getConfig, getModName;
+
+if (isMainThread) {
+    getConfig = require('./config.js').getConfig();
+    getModName = require('./config.js').getModName();
+} else {
+    getConfig = workerData.workerConfig;
+    getModName = require('./lslib_utils.js').getModName();
+}
+
 
 function getActiveTabPath() {
-    return vscode.window.activeTextEditor.document.fileName;
+    if (isMainThread) {
+        const vscode = require('vscode');
+        return vscode.window.activeTextEditor.document.fileName;
+    } else {
+        return undefined;
+    }
+    
+}
+
+function jobs(filesNum) {
+    let halfCoreCount = Math.floor(os.availableParallelism() / 2);
+
+    return Math.min(filesNum, halfCoreCount);
+}
+
+
+function buildPathArrays(filesToConvert) {
+    let filesNum = filesToConvert.length;
+    let jobsNum = jobs(filesNum);
+
+    let temp_array = [];
+    let fileArrays = [];
+
+    if (jobsNum >= filesNum) {
+        return filesToConvert;
+    } else if (jobsNum < filesNum) {
+        for (let i = 0; i < jobsNum; i++) {
+            temp_array = [];
+            for (let j = 0; j < filesNum; j += jobsNum) {
+                let temp_index = i + j;
+
+                if (filesToConvert[temp_index] !== undefined) {
+                    // console.log(filesToConvert[temp_index]);
+                    temp_array.push(filesToConvert[temp_index]);
+                    // console.log(temp_array);
+                }
+            }
+            fileArrays.push(temp_array);
+        }
+        return fileArrays;
+    }
 }
 
 
@@ -41,10 +91,10 @@ function getDynamicPath(filePath) {
 }
 
 
-async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getModName()) {
-    const { rootModPath } = getConfig();
+async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getModName) {
+    let rootModPath = getConfig.rootModPath;
 
-    console.log('targetExt:' + targetExt);
+    // console.log('targetExt:' + targetExt);
     if (targetExt === "empty") {
         return;
     }
@@ -62,7 +112,12 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
             processPak(rootModPath, modName);
         }
         else if (fs.statSync(convertPath).isFile()) {
-            processPak(convertPath, modName, 'n/a');
+            if (isMainThread) {
+                processPak(convertPath, modName);
+            } else {
+                processPak(convertPath, modName, workerData.jobDestPath);
+            }
+            
         }
     } 
     else if (Array.isArray(convertPath)) {
@@ -100,4 +155,4 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
 }
 
 
-module.exports = { convert };
+module.exports = { convert, jobs, buildPathArrays };

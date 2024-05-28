@@ -1,5 +1,4 @@
 const path = require('path');
-const vscode = require('vscode');
 
 const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');

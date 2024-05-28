@@ -23,29 +23,45 @@ const { processPak } = require('../support_files/process_pak.js');
 
 const { isMainThread, parentPort, Worker } = require('node:worker_threads')
 
+const { jobs, buildPathArrays } = require('../support_files/conversion_junction');
+
  
 const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', async function () {
     // raiseInfo("hi dipshit! 💩");
 
-    let halfCoreCount = os.availableParallelism() / 2;
+    let filesToConvert = await FIND_FILES(pak, path.join(gameInstallLocation, "Data"));
+
     let workerArray = [];
     let workerConfig = JSON.parse(loadConfigFile(true));
-    // let workerLSLIB = await LOAD_LSLIB();
+
+    let jobsTotal = jobs(filesToConvert.length);
+
+    let temp_dir = path.normalize("W:\\Libraries\\Documents\\Baldur's Gate 3 Mods\\unpacking_tests\\unpacked_game_data");
 
     if (isMainThread) {
-        for (let i = 0; i < halfCoreCount; i++) {
-            workerArray.push(new Worker(__dirname + "/worker_test.js", { workerData: workerConfig }));
+        // console.log(filesToConvert);
+        filesToConvert = buildPathArrays(filesToConvert);
+        raiseInfo(`unpacking ${filesToConvert} started.`)
 
-            workerArray[i].on('message', (message) => {
-                console.log(`${message} received from worker ${workerArray[i].threadId}!`)
-            });
-
-            workerArray[i].postMessage(workerConfig);
+        // will only unpack 
+        for (let i = 0; i < jobsTotal; i++) {
+            workerArray.push(new Worker(__dirname + "/worker_test.js", { 
+                workerData:  { 
+                    // passes the crystallized configuration settings to each of the workers
+                    workerConfig, 
+                    // adding 2 to the workerId because 0 is the extension host and 1 is the main window
+                    workerId: i + 2, 
+                    // passes the path of the file that needs to be converted
+                    jobsTotal, 
+                    task: filesToConvert[i],
+                    jobDestPath: temp_dir
+                }
+            }));
         }
-
     }
 
-
 });
+
+
 
 module.exports = { debug2 }

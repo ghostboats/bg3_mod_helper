@@ -87,8 +87,8 @@ if (isMainThread) {
         bg3mh_logger.info(info);
     }
 } else {
-    lslibPath = workerData.lslibPath;
-    logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
+    lslibPath = workerData.workerConfig.lslibPath;
+    logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + "_worker_thread.log");
 
     CREATE_LOGGER = () => {
         var log4js = require('log4js');
@@ -99,7 +99,7 @@ if (isMainThread) {
                     filename: logPath,
                     layout: {
                         type: "pattern",
-                        pattern: "[%d] %f{1}:%l in %M [%p]: %m"
+                        pattern: "[%d]" + "[from worker_thread_" + workerData.workerId + "] %f{1}:%l in %M [%p]: %m"
                     }
                 } 
             },
@@ -128,14 +128,15 @@ if (isMainThread) {
         return log4js.getLogger("bg3mh_logger");
     }
 
-    raiseError = (error) => {
+    // extra arg for compat between main and worker threads
+    raiseError = (error, popup = Boolean) => {
         var bg3mh_logger = CREATE_LOGGER();
 
         console.error(error);
         bg3mh_logger.error(error);
     }
     
-    raiseInfo = (info) => {
+    raiseInfo = (info, popup = Boolean) => {
         var bg3mh_logger = CREATE_LOGGER();
 
         console.info(info);

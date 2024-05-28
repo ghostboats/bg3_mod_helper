@@ -1,27 +1,46 @@
 const path = require('path');
-const vscode = require('vscode');
 const fs = require('fs');
 
 const { getFormats, moveFileAcrossDevices, compatRootModPath, LOAD_LSLIB } = require('./lslib_utils');
 const { pak } = getFormats();
 
+const { isMainThread, workerData } = require('node:worker_threads');
+
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
-const { getConfig } = require('./config.js');
-
 const temp_folder = "\\temp_folder";
 // const temp_path = path.join(rootParentPath, temp_folder);
-var LSLIB;
+var LSLIB, getConfig, vscode;
 
 async function lslib_load() {
-    LSLIB = await LOAD_LSLIB();
+    if (LSLIB === undefined) {
+        console.log("lslib not found. loading...");
+        LSLIB = await LOAD_LSLIB();
+        // console.log(typeof(LSLIB))
+    } else {
+        console.log("lslib is already loaded!");
+    }
+}
+
+
+if (isMainThread) {
+    vscode = require('vscode');
+    getConfig = require('./config.js').getConfig();
+} else {
+    getConfig = workerData.workerConfig;
 }
 
 
 // this function is getting redone for next release
 function prepareTempDir(movedPak = false) {
-    const { rootModPath } = getConfig();
+    let rootModPath;
+    if (isMainThread) {
+        rootModPath = getConfig().rootModPath;
+    } else {
+        rootModPath = getConfig.rootModPath;
+    }
+    
     const rootParentPath = path.dirname(rootModPath);
 
     const temp_path = path.join(rootParentPath, temp_folder);
@@ -48,18 +67,28 @@ function prepareTempDir(movedPak = false) {
 
 
 // btw, sometimes this will log things before others because it's async.
-async function processPak(modPath, modName_, unpackLocation = '') {
+async function processPak(modPath, modName, unpackLocation = path.join(path.dirname(modPath), path.basename(modPath, pak))) {
+    await lslib_load();
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 
-    const { rootModPath, modDestPath } = getConfig();
+    let rootModPath, modDestPath;
+
+    if (isMainThread) {
+        rootModPath = getConfig().rootModPath;
+        modDestPath = getConfig().modDestPath;
+
+    } else {
+        rootModPath = getConfig.rootModPath;
+        modDestPath = getConfig.modDestPath;
+    }
 
     const lastFolderName = path.basename(rootModPath);
     const rootParentPath = path.dirname(rootModPath);
     const temp_path = path.join(rootParentPath, temp_folder);
     const modFinalDestPath = path.join(modDestPath, lastFolderName + pak);
     const modTempDestPath = path.join(temp_path, lastFolderName + pak);
-    const metaPath = path.join(rootModPath, 'Mods', modName_, 'meta.lsx');
+    const metaPath = path.join(rootModPath, 'Mods', modName, 'meta.lsx');
     
 
     try {
@@ -84,10 +113,13 @@ async function processPak(modPath, modName_, unpackLocation = '') {
         // Write the updated XML back to the file
         fs.writeFileSync(metaPath, xmlContent, 'utf8');
         bg3mh_logger.info('meta.lsx updated successfully.');
+
         await Packager.CreatePackage(modTempDestPath, modPath, build);
 
         raiseInfo(lastFolderName + pak + " packed", false);
-        vscode.window.showInformationMessage(`${lastFolderName + pak} packed`);
+        if (isMainThread) {
+            vscode.window.showInformationMessage(`${lastFolderName + pak} packed`);
+        }
 
         // move files to chosen path and [in progress] clean up the empty directory
         moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
@@ -98,5 +130,4 @@ async function processPak(modPath, modName_, unpackLocation = '') {
     }
 }
 
-lslib_load();
 module.exports = { processPak, prepareTempDir };

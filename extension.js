@@ -101,6 +101,7 @@ function activate(context) {
             });
     }
 
+    console.log(loadConfigFile(true));
     if (loadConfigFile(true) === undefined) {
         saveConfigFile();
     }
