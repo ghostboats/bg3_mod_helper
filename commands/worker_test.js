@@ -12,10 +12,10 @@ function taskIntake() {
     if (Array.isArray(workerData.task)) {
         for (let i = 0; i < workerData.task.length; i++) {
             console.log(`converting ${workerData.task[i]}`)
-            convert(workerData.task[i]);
+            // convert(workerData.task[i]);
         }
     } else if (typeof(workerData.task) == 'string') {
-        convert(workerData.task);
+        // convert(workerData.task);
     }
     
 }

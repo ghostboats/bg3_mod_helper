@@ -33,8 +33,8 @@ const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInf
 const illegalFiles = ["Icons_Items.lsx"];
 
 // excluding these packs because lslib uses something else to unpack them
-const virtualTexturePaks = ["VirtualTextures_"];
-const hotfixPatchPaks = ["Patch", "Hotfix"]
+const virtualTextureRegex = /VirtualTextures_[\d]+/;
+const hotfixPatchRegex = /Patch[\d]+_Hotfix[\d]+/;
 
 // tools to test where the process is
 const { isMainThread, workerData } = require('node:worker_threads');
@@ -206,13 +206,7 @@ async function FIND_FILES(targetExt = getFormats().lsf, filesPath = '**/*') {
         filesList = (await findFiles(filesPath + targetExt)).map(file => file.path);
     }
 
-    if (targetExt === getFormats().pak) {
-        // filesList.map(file => dirSeparator(file));
-        return filesList;
-    }
-    else {
-        return FILTER_PATHS(filesList);
-    }
+    return FILTER_PATHS(filesList);
 }
 
 
@@ -241,11 +235,15 @@ function FILTER_PATHS(filesPath) {
         let temp_ext = path.extname(filesPath);
 
         for (let i = 0; i < temp_path.length; i++) {
+            let temp_name = path.basename(filesPath, getFormats().pak)
             // these statements could technically be combined, but that doesn't make it very readable.
             if (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath))) {
                 return filesPath;
             }
-            else if (filesPath.includes(virtualTexturePaks) || hotfixPatchPaks.includes(temp) {
+            else if (temp_ext === getFormats().pak && !(virtualTextureRegex.test(temp_name) || hotfixPatchRegex.test(temp_name))) {
+                console.log(temp_name);
+                console.log(!(virtualTextureRegex.test(temp_name) || hotfixPatchRegex.test(temp_name)));
+                return filesPath;
 
             }
             else if (
