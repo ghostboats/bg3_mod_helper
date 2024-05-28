@@ -3,7 +3,7 @@ const path = require('path');
 var lslibPath;
 var logPath;
 
-const { isMainThread } = require('worker_threads');
+const { isMainThread, workerData } = require('worker_threads');
 
 // TODO: clear logs function
 
@@ -87,7 +87,7 @@ if (isMainThread) {
         bg3mh_logger.info(info);
     }
 } else {
-    lslibPath = require('./config').getConfig().lslibPath;
+    lslibPath = workerData.lslibPath;
     logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
 
     CREATE_LOGGER = () => {
@@ -142,8 +142,6 @@ if (isMainThread) {
         bg3mh_logger.info(info);
     }
 }
-
-
 
 
 module.exports = { LOGDATE, logPath, CREATE_LOGGER, raiseError, raiseInfo };

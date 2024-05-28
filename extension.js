@@ -42,7 +42,7 @@ const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescript
 const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
 const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
 
-const { getFullPath } = require('./support_files/helper_functions');
+const { getFullPath, saveConfigFile, loadConfigFile } = require('./support_files/helper_functions');
 
 
 async function addToExcludeList(fileUri) {
@@ -101,23 +101,10 @@ function activate(context) {
             });
     }
 
-    let config = vscode.workspace.getConfiguration('bg3ModHelper');
+    if (loadConfigFile(true) === undefined) {
+        saveConfigFile();
+    }
 
-    setConfig({
-        maxFilesToShow: config.get('hover.maxFiles'),
-        hoverEnabled: config.get('hover.enabled'),
-        maxCacheSize: config.get('maxCacheSize'),
-        rootModPath: config.get('rootModPath'),
-        modDestPath: config.get('modDestPath'),
-        lslibPath: config.get('lslibPath'),
-        autoLaunchOnPack: config.get('autoLaunchOnPack'),
-        launchContinueGame: config.get('launchContinueGame'),
-        addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
-        excludedFiles: config.get('excludedFiles') || [],
-        gameInstallLocation: config.get('gameInstallLocation')
-    });
-    raiseInfo('Initial configs set:' + JSON.stringify(config, null, 2), false);
-    
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
             'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'

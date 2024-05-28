@@ -4,7 +4,7 @@ const { getConfig, setConfig } = require('./config');
 const fs = require('fs');
 
 const rootModPath = getConfig().rootModPath;
-const vscodeDirPath = path.join(rootModPath, '.vscode');
+const vscodeDirPath = path.join(rootModPath, '/.vscode');
 const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
 
 const { CREATE_LOGGER, raiseInfo } = require('./log_utils');
@@ -70,37 +70,47 @@ async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
 }
 
 
-async function saveConfigFile(settingToSave = "all") {
+function saveConfigFile(settingToSave = "all") {
     let config = vscode.workspace.getConfiguration('bg3ModHelper');
-    let settings = {};
+    let allSettings = {
+        maxFilesToShow: config.get('hover.maxFiles'),
+        hoverEnabled: config.get('hover.enabled'),
+        maxCacheSize: config.get('maxCacheSize'),
+        rootModPath: config.get('rootModPath'),
+        modDestPath: config.get('modDestPath'),
+        lslibPath: config.get('lslibPath'),
+        autoLaunchOnPack: config.get('autoLaunchOnPack'),
+        launchContinueGame: config.get('launchContinueGame'),
+        addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
+        excludedFiles: config.get('excludedFiles') || [],
+        gameInstallLocation: config.get('gameInstallLocation')
+    };
 
-    console.log(`${settingsFilePath}\n${rootModPath}`)
-    
-    if (settingToSave === "all") {
-        settings = {
-            maxFilesToShow: config.get('hover.maxFiles'),
-            hoverEnabled: config.get('hover.enabled'),
-            maxCacheSize: config.get('maxCacheSize'),
-            rootModPath: config.get('rootModPath'),
-            modDestPath: config.get('modDestPath'),
-            lslibPath: config.get('lslibPath'),
-            autoLaunchOnPack: config.get('autoLaunchOnPack'),
-            launchContinueGame: config.get('launchContinueGame'),
-            addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
-            excludedFiles: config.get('excludedFiles') || [],
-            gameInstallLocation: config.get('gameInstallLocation')
-        };
+    try {
+        console.log(fs.statSync(vscodeDirPath).isFile());
+    } catch (error) {
+        setConfig(allSettings);
+        console.log(`settings set to ${allSettings}`)
+    }
+
+    if (!fs.statSync(vscodeDirPath).isFile()) {
+        fs.mkdirSync(vscodeDirPath, { recursive: true });
     }
     
-    setConfig(settings);
+    if (settingToSave === "all") {
+        setConfig(allSettings);
+    } else { // it's gonna do something else eventually
+        setConfig(allSettings);
+    }
+    
     let settingsJson = JSON.stringify(config, null, 4);
 
     fs.writeFileSync(settingsFilePath, settingsJson, 'utf8');
-    raiseInfo('Initial configs set:' + JSON.stringify(config, null, 4), false);
+    raiseInfo('Initial configs set:\n' + JSON.stringify(config, null, 4), false);
 }
 
 
-async function loadConfigFile(get = false) {
+function loadConfigFile(get = false) {
     let settingsContent;
     
     if (fs.statSync(settingsFilePath).isFile()) {

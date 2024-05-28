@@ -17,7 +17,7 @@ const { saveConfigFile, loadConfigFile } = require('../support_files/helper_func
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
-const { FIND_FILES, getFormats, dirSeparator } = require('../support_files/lslib_utils.js');
+const { FIND_FILES, getFormats, dirSeparator, LOAD_LSLIB } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 const { processPak } = require('../support_files/process_pak.js');
 
@@ -29,23 +29,21 @@ const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', a
 
     let halfCoreCount = os.availableParallelism() / 2;
     let workerArray = [];
-    let workerInfo = await loadConfigFile(true);
+    let workerConfig = JSON.parse(loadConfigFile(true));
+    // let workerLSLIB = await LOAD_LSLIB();
 
     if (isMainThread) {
         for (let i = 0; i < halfCoreCount; i++) {
-            workerArray.push(new Worker(__dirname + "/worker_test.js"));
+            workerArray.push(new Worker(__dirname + "/worker_test.js", { workerData: workerConfig }));
 
             workerArray[i].on('message', (message) => {
                 console.log(`${message} received from worker ${workerArray[i].threadId}!`)
             });
 
-            workerArray[i].postMessage(workerInfo);
+            workerArray[i].postMessage(workerConfig);
         }
 
     }
-
-    saveConfigFile();
-    console.log(await loadConfigFile(true));
 
 
 });
