@@ -64,7 +64,7 @@ function buildPathArrays(filesToConvert) {
                     // console.log(temp_array);
                 }
             }
-            fileArrays.push(temp_array);
+            fileArrays.push(temp_array.sort((file1, file2) => fs.statSync(file1).size - fs.statSync(file2).size));
         }
         return fileArrays;
     }

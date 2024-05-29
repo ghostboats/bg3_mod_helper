@@ -41,10 +41,13 @@ const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', a
     if (isMainThread) {
         // console.log(filesToConvert);
         filesToConvert = buildPathArrays(filesToConvert);
-        raiseInfo(`unpacking ${filesToConvert} started.`)
+        raiseInfo(`unpacking started.`);
+
+        let convertFileNames = filesToConvert.map(fileArray => fileArray.map(file => path.basename(file)));
 
         // will only unpack 
         for (let i = 0; i < jobsTotal; i++) {
+            raiseInfo(`${convertFileNames[i]}\n`, false);
             workerArray.push(new Worker(__dirname + "/worker_test.js", { 
                 workerData:  { 
                     // passes the crystallized configuration settings to each of the workers
@@ -59,7 +62,6 @@ const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', a
             }));
         }
     }
-
 });
 
 

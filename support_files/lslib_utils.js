@@ -91,26 +91,11 @@ function baseNamePath(filePath, ext) {
 }
 
 
-// makes sure the path is normalized to the user's system, and then pushes that on to DLLS
-function processDllPaths() {
-    for (let i = 0; i < DLL_PATHS.length; i++) {
-        var temp_path = dirSeparator(path.normalize(DLL_PATHS[i]));
-
-        try {
-            DLLS.push(temp_path);
-        }
-        catch (Error) {
-            raiseError(Error);
-        }
-    }
-}
-
-
 // run through the created DLLS array and load each one
 async function loadDlls() {
-    for (let i = 0; i < DLLS.length; i++) {
+    for (let i = 0; i < DLL_PATHS.length; i++) {
         try {
-            dotnet.load(DLLS[i]);
+            dotnet.load(path.normalize(DLL_PATHS[i]));
         }
         catch (Error) {
             raiseError(Error);
@@ -119,8 +104,9 @@ async function loadDlls() {
 }
 
 
-// handles the finding of LSLib. logs will be created wherever this laods from.
+// handles the finding of LSLib. logs will be created wherever this loads from.
 async function LOAD_LSLIB() {
+    // first step is to find all the dlls in the folder the user has specified for lslibPath. note the differences between the main thread and the worker thread.
     if (isMainThread) {
         if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
             DLL_PATHS = await FIND_FILES(getFormats().dll, lslibPath);
@@ -133,7 +119,6 @@ async function LOAD_LSLIB() {
             vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
             return null;
         }
-
     } else {
         if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
             DLL_PATHS = FIND_FILES_SYNC(lslibPath, getFormats().dll);
@@ -147,23 +132,21 @@ async function LOAD_LSLIB() {
         }
     }
 
-    processDllPaths();    
+    // normalize the paths and load them into the dotnet api variable
     await loadDlls();
     if (isMainThread) {
         raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
     } else {
-        // raiseInfo(`.dlls loaded into worker ${workerData.workerId}`)
+        raiseInfo(`.dlls loaded into worker ${workerData.workerId}`)
     }
     
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
     return dotnet.LSLib.LS;
-    
 }
 
 
-// returns an array with the absolute paths to every file found with the target file extension.
-// maybe replace with findFiles()? 
+// synchronously returns an array with the absolute paths to every file found with the target file extension.
 function FIND_FILES_SYNC(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     let filesToConvert = [];
 
@@ -188,22 +171,24 @@ function FIND_FILES_SYNC(filesPath, targetExt = getFormats().lsf, isRecursive = 
 }
 
 
-// beautiful. still needs dll handling in lslib_utils though
+// beautiful. still needs dll handling in lslib_utils though, and some refactoring
 async function FIND_FILES(targetExt = getFormats().lsf, filesPath = '**/*') {
     let filesList;
+    let nonRecursiveGlob = '*';
+    let recursiveGlob = '**/*'
 
+    // finding dlls needs to not be recursive so we don't accidentally load things twice
     if (targetExt === getFormats().dll) {
         let dllDir = new vscode.RelativePattern(filesPath, '*' + targetExt);
-        // console.log(dllDir);
-        filesList = (await findFiles(dllDir)).map(file => file.path);
+        filesList = (await findFiles(dllDir)).map(file =>  dirSeparator(file.path));
     }
+    // paks can be recursive, but we need to account for them not being in the workspace, like dlls
     else if (targetExt === getFormats().pak) {
         let dllDir = new vscode.RelativePattern(filesPath, '**/*' + targetExt);
-        // console.log(dllDir);
         filesList = (await findFiles(dllDir)).map(file => dirSeparator(file.path));
     }
     else {
-        filesList = (await findFiles(filesPath + targetExt)).map(file => file.path);
+        filesList = (await findFiles(filesPath + targetExt)).map(file => dirSeparator(file.path));
     }
 
     return FILTER_PATHS(filesList);
@@ -218,6 +203,7 @@ function FILTER_PATHS(filesPath) {
         excludedFiles = getConfig.excludedFiles;
     }
     
+    // if filesPath is an array, break it up into single files and send it back through this function for the second step
     if (Array.isArray(filesPath)) {
         let filteredPaths = [];
 
@@ -230,22 +216,23 @@ function FILTER_PATHS(filesPath) {
         }
         return filteredPaths;
     }
+    // if file path is a string, indicating a single path, loop through each directory and name, checking for reasons to exclude it 
     else if (typeof(filesPath) == 'string') {
         let temp_path = filesPath.split(path.sep);
         let temp_ext = path.extname(filesPath);
 
         for (let i = 0; i < temp_path.length; i++) {
             let temp_name = path.basename(filesPath, getFormats().pak)
-            // these statements could technically be combined, but that doesn't make it very readable.
+            // these if statements could technically be combined, but that doesn't make it very readable.
             if (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath))) {
                 return filesPath;
             }
+            // if paks are being grabbed, it's for unpacking, so exclude the ones that throw errors
             else if (temp_ext === getFormats().pak && !(virtualTextureRegex.test(temp_name) || hotfixPatchRegex.test(temp_name))) {
-                console.log(temp_name);
-                console.log(!(virtualTextureRegex.test(temp_name) || hotfixPatchRegex.test(temp_name)));
                 return filesPath;
 
             }
+            // check if an item is excluded by user, in a path that should be converted, or can be ignored
             else if (
                 (
                     !excludedFiles.includes(filesPath) && 
