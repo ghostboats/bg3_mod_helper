@@ -11,13 +11,23 @@ function taskIntake() {
     // console.log(workerData.task)
     if (Array.isArray(workerData.task)) {
         for (let i = 0; i < workerData.task.length; i++) {
-            console.log(`converting ${workerData.task[i]}`)
-            // convert(workerData.task[i]);
+            
+            try {
+                raiseInfo(`converting ${workerData.task[i]}`);
+                convert(workerData.task[i]);
+            } catch (Error) {
+                raiseError(`converting ${workerData.task[i]}\n failed with error ${Error}`);
+            }
+            
         }
     } else if (typeof(workerData.task) == 'string') {
-        // convert(workerData.task);
+        try {
+            raiseInfo(`converting ${workerData.task}`);
+            convert(workerData.task);
+        } catch (Error) {
+            raiseError(`converting ${workerData.task}\n failed with error ${Error}`);
+        }
     }
-    
 }
 
 taskIntake();

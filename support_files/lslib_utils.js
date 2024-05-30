@@ -33,7 +33,7 @@ const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInf
 const illegalFiles = ["Icons_Items.lsx"];
 
 // excluding these packs because lslib uses something else to unpack them
-const virtualTextureRegex = /VirtualTextures_[\d]+/;
+const virtualTextureRegex = /Textures_[\d]+/;
 const hotfixPatchRegex = /Patch[\d]+_Hotfix[\d]+/;
 
 // tools to test where the process is
