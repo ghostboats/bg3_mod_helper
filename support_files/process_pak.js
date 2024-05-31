@@ -2,18 +2,21 @@ const path = require('path');
 const vscode = require('vscode');
 const fs = require('fs');
 
-const { LSLIB, getFormats, moveFileAcrossDevices, compatRootModPath } = require('./lslib_utils');
+const { getFormats, moveFileAcrossDevices, compatRootModPath, LOAD_LSLIB } = require('./lslib_utils');
 const { pak } = getFormats();
 
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
-
-
 const { getConfig } = require('./config.js');
 
 const temp_folder = "\\temp_folder";
 // const temp_path = path.join(rootParentPath, temp_folder);
+var LSLIB;
+
+async function lslib_load() {
+    LSLIB = await LOAD_LSLIB();
+}
 
 
 // this function is getting redone for next release
@@ -22,7 +25,7 @@ function prepareTempDir(movedPak = false) {
     const rootParentPath = path.dirname(rootModPath);
 
     const temp_path = path.join(rootParentPath, temp_folder);
-    console.log('test11')
+    // console.log('test11')
     console.log(rootParentPath)
     console.log(rootModPath)
     if (!(fs.existsSync(temp_path))) {
@@ -45,9 +48,7 @@ function prepareTempDir(movedPak = false) {
 
 
 // btw, sometimes this will log things before others because it's async.
-async function processPak(modPath, modName_, unpackLocation = '') {
-    console.log('check')
-    
+async function processPak(modPath, modName_,  unpackLocation = '') {
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 
@@ -97,5 +98,5 @@ async function processPak(modPath, modName_, unpackLocation = '') {
     }
 }
 
-
+lslib_load();
 module.exports = { processPak, prepareTempDir };

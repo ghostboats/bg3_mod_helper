@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.2.1",
+    "version": "2.2.3",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.86.0"
@@ -161,12 +161,41 @@
                 "title": "For dev use, dont press the button"
             },
             {
+                "command": "bg3-mod-helper.debug2Command",
+                "title": "For dev use, do press the button ;)"
+            },
+            {
                 "command": "bg3-mod-helper.openPacker",
                 "title": "Open Packer"
             },
             {
                 "command": "bg3-mod-helper.unpackMod",
                 "title": "Unpack Mod"
+            },
+            {
+                "command": "bg3-mod-helper.openModsFolder",
+                "title": "Open Mods Folder",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openWorkspaceFolder",
+                "title": "Open Workspace Folder",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openLogsFolder",
+                "title": "Open Extension Logs Folder",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.openGameFolder",
+                "title": "Open Game Data Folder",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.addDependencies",
+                "title": "Add Dependencies",
+                "category": "BG3 Mod Helper"
             }
         ],
         "configuration": {
@@ -315,6 +344,11 @@
                 {
                     "when": "resourceExtname == .lsx || resourceExtname == .loca || resourceExtname == .xml || resourceExtname == .lsf && isExcluded",
                     "command": "bg3-mod-helper.removeFromExcludeList",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceExtname == .pak",
+                    "command": "bg3-mod-helper.unpackMod",
                     "group": "navigation"
                 }
             ],

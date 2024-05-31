@@ -6,6 +6,8 @@
 const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
+const findFiles = vscode.workspace.findFiles;
+const parse = vscode.Uri.parse;
 
 
 // loads the api
@@ -39,7 +41,8 @@ const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInf
 const illegalFiles = ["Icons_Items.lsx"];
 
 var DLLS = [];
-var DLL_PATHS = [];
+var DLL_PATHS;
+var LSLIB;
 
 
 function getFormats() {
@@ -76,7 +79,7 @@ function baseNamePath(filePath, ext) {
 // makes sure the path is normalized to the user's system, and then pushes that on to DLLS
 function processDllPaths() {
     for (let i = 0; i < DLL_PATHS.length; i++) {
-        var temp_path = path.normalize(DLL_PATHS[i]);
+        var temp_path = dirSeparator(path.normalize(DLL_PATHS[i]));
 
         try {
             DLLS.push(temp_path);
@@ -89,28 +92,10 @@ function processDllPaths() {
 
 
 // run through the created DLLS array and load each one
-function loadDlls() {
+async function loadDlls() {
     for (let i = 0; i < DLLS.length; i++) {
         try {
-            let temp_name = path.basename(DLLS[i]);
-
-            /* leaving this here for now, in case i find a quick solution
-                if (elasticDlls.includes(temp_name)) {
-                    bg3mh_logger.info("%s going into dotnet_elastic", temp_name);
-                    // dotnet_elastic.load(DLLS[i]);
-                }
-                else if (storyCompilerDll.includes(temp_name)) {
-                    bg3mh_logger.info("%s going into story_compiler", temp_name);
-                    // story_compiler.load(DLLS[i]);
-                }
-                else if (converterAppDll.includes(temp_name)) {
-                    bg3mh_logger.info("%s going into converter_app", temp_name);
-                    // converter_app.load(DLLS[i]);
-                } 
-            */
-
-        dotnet.load(DLLS[i]);
-        bg3mh_logger.info("%s loaded.", DLLS[i]);
+            dotnet.load(DLLS[i]);
         }
         catch (Error) {
             raiseError(Error);
@@ -120,12 +105,12 @@ function loadDlls() {
 
 
 // handles the finding of LSLib. logs will be created wherever this laods from.
-function LOAD_LSLIB() {
+async function LOAD_LSLIB() {
     if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
-        DLL_PATHS = FIND_FILES(lslibPath, getFormats().dll, false);
+        DLL_PATHS = await FIND_FILES(getFormats().dll, lslibPath);
     }
     else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
-        DLL_PATHS = FIND_FILES(lslibToolsPath, getFormats().dll, false);
+        DLL_PATHS = await FIND_FILES(getFormats().dll, lslibToolsPath);
     } 
     else {
         raiseError("LSLib.dll not found at " + lslibPath + ".", false);
@@ -134,27 +119,29 @@ function LOAD_LSLIB() {
     }
 
     processDllPaths();    
-    loadDlls();
-
+    await loadDlls();
+    raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
+    
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
     return dotnet.LSLib.LS;
+    
 }
 
 
 // returns an array with the absolute paths to every file found with the target file extension.
 // maybe replace with findFiles()? 
-function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
+function FIND_FILES_v1(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     let filesToConvert = [];
 
-    console.log(filesPath);
-    console.log(targetExt);
+    // console.log(filesPath);
+    // console.log(targetExt);
 
     const filesList = fs.readdirSync(filesPath, {
         withFileTypes: false,
         recursive: isRecursive
     });
-    console.log(filesList);
+    // console.log(filesList);
 
     for (let i = 0; i < filesList.length; i++) {
         const temp = filesList[i].toString();
@@ -168,6 +155,21 @@ function FIND_FILES(filesPath, targetExt = getFormats().lsf, isRecursive = true)
 }
 
 
+// beautiful. still needs dll handling in lslib_utils though
+async function FIND_FILES(targetExt = getFormats().lsf, filesPath = '**/*') {
+    let filesList;
+
+    if (targetExt === getFormats().dll) {
+        let dllDir = new vscode.RelativePattern(filesPath, '*' + targetExt);
+        filesList = (await findFiles(dllDir)).map(file => file.path);
+    }
+    else {
+        filesList = (await findFiles(filesPath + targetExt)).map(file => file.path);
+    }
+    return FILTER_PATHS(filesList);
+}
+
+
 function FILTER_PATHS(filesPath) {
     let excludedFiles = getConfig().excludedFiles;
     if (Array.isArray(filesPath)) {
@@ -177,7 +179,7 @@ function FILTER_PATHS(filesPath) {
             let temp_path = FILTER_PATHS(path.normalize(filesPath[i]));
 
             if (temp_path) {
-                filteredPaths.push(temp_path);
+                filteredPaths.push(dirSeparator(path.normalize(temp_path)));
             }
         }
         return filteredPaths;
@@ -230,6 +232,4 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
 }
 
 
-const LSLIB = LOAD_LSLIB();
-
-module.exports = { LSLIB, FIND_FILES, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
+module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_v1, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };

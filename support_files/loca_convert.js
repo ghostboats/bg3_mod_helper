@@ -1,13 +1,18 @@
 const path = require('path');
 const vscode = require('vscode');
 
-const { LSLIB, getFormats, baseNamePath } = require('./lslib_utils');
+const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER(); 
 
 const { xml, loca } = getFormats();
 
 var to_loca;
+var LSLIB;
+
+async function lslib_load() {
+    LSLIB = await LOAD_LSLIB();
+}
 
 
 function isLoca(ext) {
@@ -32,7 +37,7 @@ function getLocaOutputPath(filePath) {
 }
 
 
-function processLoca(file, targetExt) {
+async function processLoca(file, targetExt) {
     var LocaUtils = LSLIB.LocaUtils;
     var file_output;
     var temp_loca;
@@ -51,6 +56,6 @@ function processLoca(file, targetExt) {
     }
 }
 
-
+lslib_load();
 module.exports = { isLoca, processLoca, getLocaOutputPath, to_loca };
 

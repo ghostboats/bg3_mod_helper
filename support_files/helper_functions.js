@@ -65,32 +65,4 @@ async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
     return instances;
 }
 
-async function getModName() {
-    const { rootModPath } = getConfig();
-    const modsDirPath = path.join(rootModPath, 'Mods');
-
-    try {
-        if (!fs.existsSync(modsDirPath)) {
-            vscode.window.showErrorMessage('Mods directory does not exist.');
-            return '';
-        }
-
-        const files = fs.readdirSync(modsDirPath);
-        const directories = files.filter(file => 
-            fs.statSync(path.join(modsDirPath, file)).isDirectory()
-        );
-
-        if (directories.length === 0) {
-            return '';
-        } else if (directories.length === 1) {
-            return directories[0];
-        } else {
-            return '';
-        }
-    } catch (error) {
-        vscode.window.showErrorMessage(`Error reading directories in ${modsDirPath}: ${error}`);
-        return '';
-    }
-}
-
-module.exports = { insertText, findInstancesInWorkspace, getFullPath, getModName };
+module.exports = { insertText, findInstancesInWorkspace, getFullPath };

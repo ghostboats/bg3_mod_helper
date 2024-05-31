@@ -2,10 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const vscode = require('vscode');
 
-const { LSLIB, getFormats, baseNamePath } = require('./lslib_utils');
-const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
-const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
-const Game = LSLIB.Enums.Game;
+const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
+
 
 const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
 const lsfFormats = [lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx];
@@ -14,6 +12,11 @@ const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 var to_lsf;
+var LSLIB;
+
+async function lslib_load() {
+    LSLIB = await LOAD_LSLIB();
+}
 
 
 function isLsf(ext) {
@@ -85,7 +88,11 @@ function getLsfOutputPath(filePath) {
 }
 
 
-function processLsf(file, targetExt) {
+async function processLsf(file, targetExt) {
+    const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
+    const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
+    const Game = LSLIB.Enums.Game;
+
     var load_params = ResourceLoadParameters.FromGameVersion(Game.BaldursGate3);
     var conversion_params = ResourceConversionParameters.FromGameVersion(Game.BaldursGate3);
     var ResourceUtils = LSLIB.ResourceUtils;
@@ -106,5 +113,5 @@ function processLsf(file, targetExt) {
     }
 }
  
-
+lslib_load();
 module.exports = { isLsf, processLsf, getLsfOutputPath, to_lsf };

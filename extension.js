@@ -2,7 +2,9 @@ const vscode = require('vscode');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+
 const { setConfig, getConfig } = require('./support_files/config');
+
 const packModImport = require('./commands/packMod');
 const unpackModCommand = require('./commands/unpackMod');
 const launchGameImport = require('./commands/launchGame');
@@ -24,12 +26,18 @@ const versionGeneratorCommand = require('./commands/versionGenerator');
 const rotationToolCommand = require('./commands/rotationTool');
 const DDSViewerCommand = require('./commands/DDSViewer');
 
+const { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand } = require('./commands/folderShortcuts');
+
+const addDependenciesCommand = require('./commands/addDependencies')
+
+
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
 const { CREATE_LOGGER } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const debugCommand = require('./commands/debug');
+const debug2Command = require('./commands/debug2');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
 const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
 const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
@@ -159,7 +167,7 @@ function activate(context) {
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.removeFromExcludeList', removeFromExcludeList));
-    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand);
+    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand);
 }
 
 function aSimpleDataProvider() {
@@ -177,7 +185,7 @@ function aSimpleDataProvider() {
         getChildren: (element) => {
             if (!element) {
                 return Promise.resolve([
-                    { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openPacker', id: 'packer' },
+                    { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool[tool is in development])', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
@@ -185,12 +193,15 @@ function aSimpleDataProvider() {
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
-                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' }
+                    { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
+                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
+                    { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' },
+                    { label: 'Folder Shortcuts', id: 'folderShortcuts' }
                 ]);
             } else if (element.id === 'packer') {
                 return Promise.resolve([
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
-                    { label: 'Unpack Mod (in development)', command: 'bg3-mod-helper.unpackMod' }
+                    { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([
@@ -199,12 +210,20 @@ function aSimpleDataProvider() {
                     { label: 'Convert all LSX to LSF', command: 'bg3-mod-helper.lsxToLsf' },
                     { label: 'Convert all LSF to LSX', command: 'bg3-mod-helper.lsfToLsx' }
                 ]);
+            } else if (element.id === 'folderShortcuts') {
+                return Promise.resolve([
+                    { label: 'Mods Folder', command: 'bg3-mod-helper.openModsFolder' },
+                    { label: 'Workspace Folder', command: 'bg3-mod-helper.openWorkspaceFolder' },
+                    { label: 'Extension Logs Folder', command: 'bg3-mod-helper.openLogsFolder' },
+                    { label: 'Game Data Folder', command: 'bg3-mod-helper.openGameFolder' },
+                ]);
             } else {
                 return Promise.resolve([]);
             }
         }
     };
 }
+
 
 function deactivate() {}
 
