@@ -39,7 +39,7 @@ const debugCommand = require('./commands/debug');
 const unpackGameDataCommand = require('./commands/unpackGameData');
 
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
-const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
+const { setupUuidsHandlesHoverProvider, registerTextEditCommand }= require('./hovers/uuidsHandlesCollector');
 const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
 
 const { getFullPath, saveConfigFile, loadConfigFile } = require('./support_files/helper_functions');
@@ -135,6 +135,7 @@ function activate(context) {
     ));
 
     let uuidsHandlesHoverProvider = setupUuidsHandlesHoverProvider();
+    let uuidsHandlesHoverProviderr = registerTextEditCommand();
 
     let functionsHoverProvider = setupFunctionDescriptionHoverProvider();
 

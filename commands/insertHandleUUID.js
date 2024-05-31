@@ -15,34 +15,38 @@ let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHan
         return;
     }
 
-    const { customWorkspacePath } = getConfig();
+    const workspaceEdit = new vscode.WorkspaceEdit();
 
-    // Generate all handles first
-    const handleData = await Promise.all(editor.selections.map(selection => {
+    for (const selection of editor.selections) {
         const selectedText = editor.document.getText(selection);
-        const handle = generateHandle();
-        return { selection, handle, selectedText };
-    }));
+        const initialHandleValue = selectedText || 'Enter initial handle content here'; // Provide a default or use selected text
 
-    // Collect all the necessary changes for XML files
-    let changes = [];
-    for (const data of handleData) {
-        changes.push({
-            handle: data.handle,
-            text: data.selectedText
+        const userText = await vscode.window.showInputBox({
+            value: initialHandleValue,
+            prompt: "Enter initial value for the handle"
         });
+
+        if (userText !== undefined) {
+            const handle = generateHandle();
+            workspaceEdit.replace(editor.document.uri, selection, handle);
+
+            // Prepare changes for localization files
+            let changes = [{
+                handle: handle,
+                text: userText // Using the user-entered text as the handle content
+            }];
+
+            // Update localization files with the handle
+            await updateLocaXmlFiles(changes);
+            console.log(`Handle ${handle} created with initial value: ${userText}`);
+        }
     }
 
-    // Apply edits to the editor first
-    await editor.edit(editBuilder => {
-        for (const data of handleData) {
-            editBuilder.replace(data.selection, data.handle);
-        }
-    });
-
-    // Update XML files with all changes (avoid I/O conflicts)
-    if (changes.length > 0) {
-        await updateLocaXmlFiles(changes);
+    if (await vscode.workspace.applyEdit(workspaceEdit)) {
+        await editor.document.save(); // Save the document after making edits
+        vscode.window.showInformationMessage('Handles inserted and localization files updated successfully.');
+    } else {
+        vscode.window.showErrorMessage('Failed to insert handles.');
     }
 });
 
