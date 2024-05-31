@@ -11,7 +11,7 @@ function taskIntake() {
             
             try {
                 raiseInfo(`converting ${workerData.task[i]}`);
-                convert(workerData.task[i]);
+                // convert(workerData.task[i]);
             } catch (Error) {
                 raiseError(`converting ${workerData.task[i]}\n failed with error ${Error}`);
             }  
@@ -19,7 +19,7 @@ function taskIntake() {
     } else if (typeof(workerData.task) == 'string') {
         try {
             raiseInfo(`converting ${workerData.task}`);
-            convert(workerData.task);
+            // convert(workerData.task);
         } catch (Error) {
             raiseError(`converting ${workerData.task}\n failed with error ${Error}`);
         }

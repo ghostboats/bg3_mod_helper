@@ -3,46 +3,67 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
-const { setConfig, getConfig } = require('./support_files/config');
-
-const packModImport = require('./commands/packMod');
-const unpackModCommand = require('./commands/unpackMod');
-const launchGameImport = require('./commands/launchGame');
-const createAtlasImport = require('./commands/createAtlas');
-const insertHandleUUIDImport = require('./commands/insertHandleUUID');
-const openWebPageImport = require('./commands/openWebPage');
-const createFileFromTemplateImport = require('./commands/createFileFromTemplate');
-const goToHandleUUIDCommand = require('./commands/goToHandleUUID');
-const DDSToPNGCommand = require('./commands/DDSToPNG');
-const PNGToDDSCommand = require('./commands/PNGToDDS');
-const addIconBackground  = require('./commands/addIconBackground');
-const createModTemplateImport = require('./commands/createModTemplate/createModTemplate');
-const getAttributesCommand = require('./commands/getAttributes');
-const smartConvertCommand = require('./commands/smartConvert');
-const { xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand } = require('./commands/commands')
-
-const openConverterCommand = require('./commands/openConverter');
-const versionGeneratorCommand = require('./commands/versionGenerator');
-const rotationToolCommand = require('./commands/rotationTool');
-const DDSViewerCommand = require('./commands/DDSViewer');
-
-const { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand } = require('./commands/folderShortcuts');
-
-const addDependenciesCommand = require('./commands/addDependencies')
-
-const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
+const { setConfig, getConfig, checkConfigFile, setModName, checkModDir, saveConfigFile, startUpConfig } = require('./support_files/config');
 
 const { CREATE_LOGGER, raiseInfo } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
-const debugCommand = require('./commands/debug');
-const unpackGameDataCommand = require('./commands/unpackGameData');
+let packModImport, unpackModCommand, launchGameImport, createAtlasImport, insertHandleUUIDImport, 
+    openWebPageImport, createFileFromTemplateImport, goToHandleUUIDCommand, DDSToPNGCommand, PNGToDDSCommand,   addIconBackground, createModTemplateImport, getAttributesCommand, smartConvertCommand, addDependenciesCommand, xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, DDSViewerCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand, debugCommand, unpackGameDataCommand, resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom;
 
+const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
 const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
-const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
 
-const { getFullPath, saveConfigFile, loadConfigFile } = require('./support_files/helper_functions');
+const { getFullPath } = require('./support_files/helper_functions');
+
+
+function setCommands() {
+    // general commands
+    insertHandleUUIDImport = require('./commands/insertHandleUUID');
+    goToHandleUUIDCommand = require('./commands/goToHandleUUID');
+    addDependenciesCommand = require('./commands/addDependencies');
+    createAtlasImport = require('./commands/createAtlas');
+    openWebPageImport = require('./commands/openWebPage');
+    createFileFromTemplateImport = require('./commands/createFileFromTemplate');
+    createModTemplateImport = require('./commands/createModTemplate/createModTemplate');
+    getAttributesCommand = require('./commands/getAttributes');
+    smartConvertCommand = require('./commands/smartConvert');
+    openConverterCommand = require('./commands/openConverter');
+    versionGeneratorCommand = require('./commands/versionGenerator');
+
+    // lslib commands
+    xmlToLocaCommand= require('./commands/commands').xmlToLocaCommand;
+    locaToXmlCommand= require('./commands/commands').locaToXmlCommand;
+    lsxToLsfCommand= require('./commands/commands').lsxToLsfCommand;
+    lsfToLsxCommand = require('./commands/commands').lsfToLsxCommand;
+    unpackGameDataCommand = require('./commands/unpackGameData');
+    packModImport = require('./commands/packMod');
+    unpackModCommand = require('./commands/unpackMod');
+
+    // folder shortcut commands
+    openModsFolderCommand = require('./commands/folderShortcuts').openModsFolderCommand;
+    openGameFolderCommand = require('./commands/folderShortcuts').openGameFolderCommand;
+    openLogsFolderCommand = require('./commands/folderShortcuts').openLogsFolderCommand;
+    openWorkspaceFolderCommand = require('./commands/folderShortcuts').openWorkspaceFolderCommand;
+
+    // image commands
+    resizeImageTooltip = require('./commands/resizeImage').resizeImageTooltip;
+    resizeImageController = require('./commands/resizeImage').resizeImageController;
+    resizeImageHotbar = require('./commands/resizeImage').resizeImageHotbar;
+    resizeImageCustom = require('./commands/resizeImage').resizeImageCustom;
+    DDSToPNGCommand = require('./commands/DDSToPNG');
+    PNGToDDSCommand = require('./commands/PNGToDDS');
+    addIconBackground  = require('./commands/addIconBackground');
+    rotationToolCommand = require('./commands/rotationTool');
+    DDSViewerCommand = require('./commands/DDSViewer');
+
+    // launch the game
+    launchGameImport = require('./commands/launchGame');
+
+    // debug commands
+    debugCommand = require('./commands/debug');
+}
 
 
 async function addToExcludeList(fileUri) {
@@ -60,6 +81,7 @@ async function addToExcludeList(fileUri) {
     }
 }
 
+
 async function removeFromExcludeList(fileUri) {
     const config = vscode.workspace.getConfiguration('bg3ModHelper');
     let excludedFiles = config.get('excludedFiles') || [];
@@ -74,43 +96,16 @@ async function removeFromExcludeList(fileUri) {
     }
 }
 
+
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
     bg3mh_logger.info('Displaying extension activation message');
 
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders && workspaceFolders.length > 0) {
-        const mainFolderPath = workspaceFolders[0].uri.fsPath;
+    startUpConfig();
 
-        // Update the extension configuration
-        const config = vscode.workspace.getConfiguration('bg3ModHelper');
-        config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace
-            ).then(() => {
-                vscode.window.showInformationMessage(`Workspace set to:
-                ${mainFolderPath}.`,
-                'Open Settings'
-            ).then(selection => {
-                if (selection === 'Open Settings') {
-                vscode.commands.executeCommand('workbench.action.openSettings', 'bg3ModHelper');
-                }
-            });
-            }, (error) => {
-                vscode.window.showErrorMessage(`Error setting workspace: ${error}`);
-            });
-    }
-
-    console.log(loadConfigFile(true));
-    if (loadConfigFile(true) === undefined) {
-        saveConfigFile();
-    }
-
-    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-        vscode.window.showWarningMessage(
-            'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'
-        )
-    }
+    setCommands();
 
     vscode.window.createTreeView('bg3ModHelperView', { treeDataProvider: aSimpleDataProvider() });
 
@@ -158,6 +153,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.removeFromExcludeList', removeFromExcludeList));
     context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand);
 }
+
 
 function aSimpleDataProvider() {
     return {

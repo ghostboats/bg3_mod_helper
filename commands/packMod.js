@@ -22,7 +22,7 @@ const { pak } = getFormats();
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
     raiseInfo("pack button clicked", false);
     const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
-    const modName = getModName();
+    const modName = await getModName();
 
     const modsDirPath = path.normalize(rootModPath + "\\Mods");
     const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");

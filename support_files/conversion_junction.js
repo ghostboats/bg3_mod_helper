@@ -14,16 +14,14 @@ const { processPak, prepareTempDir } = require('./process_pak');
 
 const { isMainThread, workerData, Worker } = require('node:worker_threads');
 
-let getConfig, getModName;
+let getConfig;
 
 
 // need this outside a function so it's run on load. 
 if (isMainThread) {
     getConfig = require('./config.js').getConfig();
-    getModName = require('./config.js').getModName();
 } else {
     getConfig = workerData.workerConfig;
-    getModName = require('./lslib_utils.js').getModName();
 }
 
 
@@ -145,7 +143,7 @@ function getDynamicPath(filePath) {
 
 
 // at the moment this has all the functionality i planned for it, ie lsf, loca, and paks. for any other conversions we can make separate functions
-async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getModName) {
+async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getConfig.getModName) {
     let rootModPath = getConfig.rootModPath;
 
     // checks if the convertPath was undefined and halts the function before it goes any further

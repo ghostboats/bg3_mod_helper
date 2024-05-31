@@ -280,7 +280,7 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
 }
 
 // i don't like putting this here but i need a worker_thread friendly version
-function getModName() {
+function getModNameSync() {
     let rootModPath;
 
     if (isMainThread) {
@@ -324,4 +324,4 @@ function getModName() {
 }
 
 
-module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_SYNC, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath, getModName };
+module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_SYNC, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath, getModNameSync };

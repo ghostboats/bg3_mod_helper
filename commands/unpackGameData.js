@@ -2,11 +2,8 @@ const vscode = require('vscode');
 
 const path = require('path');
 
-const { getConfig } = require('../support_files/config');
+const { getConfig, loadConfigFile } = require('../support_files/config');
 const { gameInstallLocation } = getConfig();
-
-
-const { loadConfigFile } = require('../support_files/helper_functions')
 
 const { raiseInfo } = require('../support_files/log_utils');
 

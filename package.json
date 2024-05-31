@@ -263,6 +263,11 @@
                     "type": "string",
                     "default": "",
                     "description": "Path to where Baldur's Gate 3 is installed, ie [W:\\SteamLibrary\\steamapps\\common\\Baldurs Gate 3], [C:\\Program Files (x86)\\Steam\\steamapps\\common\\Baldurs Gate 3]:"
+                },
+                "bg3ModHelper.modName": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Name of your mod. If left empty, will default to the workspace folder."
                 }
             }
         },

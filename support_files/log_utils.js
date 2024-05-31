@@ -26,7 +26,8 @@ var raiseError, raiseInfo, CREATE_LOGGER;
 
 if (isMainThread) {
     const vscode = require('vscode');
-    lslibPath = require('./config').getConfig().lslibPath;
+    const config = vscode.workspace.getConfiguration('bg3ModHelper');
+    lslibPath = config.get('lslibPath');
     logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
 
     CREATE_LOGGER = () => {

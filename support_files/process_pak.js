@@ -24,14 +24,6 @@ async function lslib_load() {
 }
 
 
-if (isMainThread) {
-    vscode = require('vscode');
-    getConfig = require('./config.js').getConfig();
-} else {
-    getConfig = workerData.workerConfig;
-}
-
-
 // this function is getting redone for next release
 function prepareTempDir(movedPak = false) {
     let rootModPath;
@@ -73,10 +65,13 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
     let rootModPath, modDestPath;
 
     if (isMainThread) {
+        vscode = require('vscode');
+        getConfig = require('./config.js').getConfig();
         rootModPath = getConfig.rootModPath;
         modDestPath = getConfig.modDestPath;
 
     } else {
+        getConfig = workerData.workerConfig;
         rootModPath = getConfig.rootModPath;
         modDestPath = getConfig.modDestPath;
     }
@@ -92,6 +87,7 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
     try {
         if (path.extname(modPath) === pak && fs.statSync(modPath).isFile()) {
             try {
+                console.log(unpackLocation);
                 await Packager.UncompressPackage(modPath, unpackLocation);
             }
             catch (Error) {
