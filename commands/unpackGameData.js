@@ -1,28 +1,19 @@
 const vscode = require('vscode');
-const fs = require('fs');
-const os = require('os');
 
 const path = require('path');
 
-const LSLIB_DLL = 'LSLib.dll';
-const TOOL_SUBDIR = 'Tools\\';
-
 const { getConfig } = require('../support_files/config');
-const { lslibPath, rootModPath,  gameInstallLocation } = getConfig();
-const compatRootModPath = path.join(rootModPath + "\\");
-const lslibToolsPath = path.join(lslibPath, TOOL_SUBDIR);
+const { gameInstallLocation } = getConfig();
 
-const { saveConfigFile, loadConfigFile } = require('../support_files/helper_functions')
 
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
-var bg3mh_logger = CREATE_LOGGER();
+const { loadConfigFile } = require('../support_files/helper_functions')
 
-const { FIND_FILES, getFormats, dirSeparator, LOAD_LSLIB } = require('../support_files/lslib_utils.js');
+const { raiseInfo } = require('../support_files/log_utils');
+
+const { FIND_FILES, getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
-const { processPak } = require('../support_files/process_pak.js');
 
-const { isMainThread, MessageChannel, Worker } = require('node:worker_threads');
-const comsPorts = new MessageChannel();
+const { isMainThread } = require('node:worker_threads');
 
 const { createConversionWorkers } = require('../support_files/conversion_junction');
 
