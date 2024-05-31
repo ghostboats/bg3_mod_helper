@@ -1,8 +1,5 @@
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js');
-const bg3mh_logger = CREATE_LOGGER();
+const { raiseError, raiseInfo } = require('./log_utils.js');
 const { parentPort, workerData } = require('node:worker_threads');
-const path = require('node:path');
-const fs = require('node:fs');
 
 
 const { convert } = require('./conversion_junction.js')
