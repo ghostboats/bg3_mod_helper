@@ -161,7 +161,7 @@
                 "title": "For dev use, dont press the button"
             },
             {
-                "command": "bg3-mod-helper.debug2Command",
+                "command": "bg3-mod-helper.unpackGameDataCommand",
                 "title": "For dev use, do press the button ;)"
             },
             {

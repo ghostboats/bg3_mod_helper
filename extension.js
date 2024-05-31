@@ -30,14 +30,14 @@ const { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, ope
 
 const addDependenciesCommand = require('./commands/addDependencies')
 
-
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
 const { CREATE_LOGGER, raiseInfo } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const debugCommand = require('./commands/debug');
-const debug2Command = require('./commands/debug2');
+const unpackGameDataCommand = require('./commands/unpackGameData');
+
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
 const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
 const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
@@ -184,13 +184,13 @@ function aSimpleDataProvider() {
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
-                    { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' },
                     { label: 'Folder Shortcuts', id: 'folderShortcuts' }
                 ]);
             } else if (element.id === 'packer') {
                 return Promise.resolve([
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
-                    { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' }
+                    { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' },
+                    { label: 'Unpack Game Data', command: 'bg3-mod-helper.unpackGameDataCommand' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([

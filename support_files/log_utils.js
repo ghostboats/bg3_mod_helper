@@ -83,7 +83,7 @@ if (isMainThread) {
         if (popup) {
             vscode.window.showInformationMessage(`${info}`);
         }
-        console.info(info);
+        console.log(info);
         bg3mh_logger.info(info);
     }
 } else {
