@@ -26,6 +26,7 @@ if (isMainThread) {
     getModName = require('./lslib_utils.js').getModName();
 }
 
+
 // this functionality can't work on a worker thread, so i don't think it's possible for it to return undefined. i still need it to not attempt to load the vscode module while in a worker thread, though.
 function getActiveTabPath() {
     if (isMainThread) {
@@ -74,6 +75,7 @@ function buildPathArrays(filesToConvert) {
 }
 
 
+// prepare workerData and spin up workers with what they need to unpack stuff
 async function createConversionWorkers(filesToConvert, workerConfig, unpackedGameDataDirectory) {
     // an array of workers
     const workerArray = [];
