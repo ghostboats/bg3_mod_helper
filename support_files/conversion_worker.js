@@ -1,20 +1,20 @@
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils.js');
+const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js');
 const bg3mh_logger = CREATE_LOGGER();
 const { parentPort, workerData } = require('node:worker_threads');
 const path = require('node:path');
 const fs = require('node:fs');
 
 
-const { convert } = require('../support_files/conversion_junction.js')
+const { convert } = require('./conversion_junction.js')
 
 function taskIntake() {
-    // console.log(workerData.task)
+    // basic array or file handling stuff
     if (Array.isArray(workerData.task)) {
         for (let i = 0; i < workerData.task.length; i++) {
             
             try {
                 raiseInfo(`converting ${workerData.task[i]}`);
-                // convert(workerData.task[i]);
+                convert(workerData.task[i]);
             } catch (Error) {
                 raiseError(`converting ${workerData.task[i]}\n failed with error ${Error}`);
             }  
@@ -22,13 +22,15 @@ function taskIntake() {
     } else if (typeof(workerData.task) == 'string') {
         try {
             raiseInfo(`converting ${workerData.task}`);
-            // convert(workerData.task);
+            convert(workerData.task);
         } catch (Error) {
             raiseError(`converting ${workerData.task}\n failed with error ${Error}`);
         }
     }
 
+    // let the main thread know you're done
     parentPort.postMessage(`worker ${workerData.workerId} done.`);
 }
 
+// start it up babyyyyy
 taskIntake();
