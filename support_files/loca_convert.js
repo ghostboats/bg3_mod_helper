@@ -10,7 +10,13 @@ var to_loca;
 var LSLIB;
 
 async function lslib_load() {
-    LSLIB = await LOAD_LSLIB();
+    if (LSLIB === undefined) {
+        raiseInfo("lslib not found. loading...", false);
+        LSLIB = await LOAD_LSLIB();
+        // console.log(typeof(LSLIB))
+    } else {
+        raiseInfo("lslib is already loaded!", false);
+    }
 }
 
 

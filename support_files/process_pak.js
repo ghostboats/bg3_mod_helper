@@ -36,7 +36,7 @@ if (isMainThread) {
 function prepareTempDir(movedPak = false) {
     let rootModPath;
     if (isMainThread) {
-        rootModPath = getConfig().rootModPath;
+        rootModPath = getConfig.rootModPath;
     } else {
         rootModPath = getConfig.rootModPath;
     }
@@ -45,8 +45,6 @@ function prepareTempDir(movedPak = false) {
 
     const temp_path = path.join(rootParentPath, temp_folder);
     // console.log('test11')
-    console.log(rootParentPath)
-    console.log(rootModPath)
     if (!(fs.existsSync(temp_path))) {
         console.log("making temp_path");
         fs.mkdirSync(temp_path, { recursive: true});
@@ -75,8 +73,8 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
     let rootModPath, modDestPath;
 
     if (isMainThread) {
-        rootModPath = getConfig().rootModPath;
-        modDestPath = getConfig().modDestPath;
+        rootModPath = getConfig.rootModPath;
+        modDestPath = getConfig.modDestPath;
 
     } else {
         rootModPath = getConfig.rootModPath;
@@ -130,4 +128,5 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
     }
 }
 
+lslib_load();
 module.exports = { processPak, prepareTempDir };
