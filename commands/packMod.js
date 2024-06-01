@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { exec } = require('child_process');
-const { getConfig, getModName } = require('../support_files/config');
+const { getConfig, getModName, saveConfigFile, loadConfigFile } = require('../support_files/config');
 const { rootModPath } = getConfig();
 
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
@@ -90,27 +90,15 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     // Path to .vscode directory and settings file
     const vscodeDirPath = path.join(rootModPath, '.vscode');
     const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
-    let settingsContent = '';
+    let settingsContent = loadConfigFile(true);
 
-    // Check and save settings.json if .vscode exists
-    if (fs.statSync(vscodeDirPath).isFile()) {
-        if (fs.statSync(settingsFilePath).isFile()) {
-            settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
-        }
-        // console.log('test1')
-        fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
-        // console.log('test2')
-    }
+
     // send the directory to the convert() function, and let it know it's a pak
     await convert(rootModPath, pak, modName);
 
     if (settingsContent) {
         // console.log('test3')
-        if (!fs.statSync(vscodeDirPath).isFile()) {
-            fs.mkdirSync(vscodeDirPath, { recursive: true });
-            // console.log('test4')
-        }
-        fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
+        saveConfigFile(settingsContent)
         // console.log('test5')
     }
     if (autoLaunchOnPack) {

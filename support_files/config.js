@@ -33,10 +33,10 @@ function startUpConfig() {
         config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace
             ).then(() => {
                 initVariables();
-                console.log(`root mod path set too: \n${getConfig().rootModPath}`);
+                console.log(`root mod path set to: \n${getConfig().rootModPath}`);
                 setModName(mainFolderPath);
-                console.log(`modName set to ${getModName()}`);
-                // checkConfigFile();
+                console.log(`mod name set to: \n${getConfig().modName}`);
+                checkConfigFile();
                 checkModDir();
                 saveConfigFile(config);
                 vscode.window.showInformationMessage(`Workspace set to:
@@ -100,6 +100,9 @@ function normalizeExcludedFiles(excludedFiles) {
 
 function setModName(rootPath = getConfig().rootModPath) {
     config = vscode.workspace.getConfiguration('bg3ModHelper');
+
+    // calling this to make sure we can save it later.
+    saveConfigFile();
     
     let temp_name = config.get('modName');
     const modsDirPath = path.join(rootPath, 'Mods');
@@ -110,9 +113,9 @@ function setModName(rootPath = getConfig().rootModPath) {
     console.log(directories);
 
     if (directories.length === 1 && temp_name == "") {
-        console.log(`modName set to ${directories[0]}`)
+        // console.log(`modName set to ${directories[0]}`)
         config.update('modName', directories[0], vscode.ConfigurationTarget.Workspace);
-        console.log(getModName());
+        console.log(config.get('modName'));
         saveConfigFile();
     } else {
         console.log(`modName kept as ${temp_name}`)
@@ -147,9 +150,8 @@ function checkConfigFile() {
     vscodeDirPath = path.join(rootModPath, '.vscode');
     settingsFilePath = path.join(vscodeDirPath, 'settings.json');
 
-    if (loadConfigFile(true) === undefined) {
+    if (loadConfigFile() === undefined) {
         saveConfigFile();
-        config.update('settingsFilePath', settingsFilePath, vscode.ConfigurationTarget.Workspace);
     } else {
         saveConfigFile(getConfig());
     }
@@ -160,6 +162,8 @@ function saveConfigFile(settingsToSave = "all" || {}) {
     try {
         if (!fs.statSync(settingsFilePath).isFile()) {
             fs.mkdirSync(vscodeDirPath, { recursive: true });
+        } else {
+            fs.rmSync(vscodeDirPath, { recursive: true, force: true });
         }
     } catch (error) {
         console.error(error);
@@ -178,13 +182,16 @@ function saveConfigFile(settingsToSave = "all" || {}) {
 }
 
 
-function loadConfigFile(get = false) {
+function loadConfigFile(reset = false, get = true) {
     let settingsContent;
     
     if (fs.statSync(settingsFilePath).isFile()) {
         settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         raiseInfo(settingsContent, false);
 
+        if (reset) {
+            fs.rmdirSync(vscodeDirPath, { recursive: true });
+        }
         if (get) {
             return settingsContent;
         }
