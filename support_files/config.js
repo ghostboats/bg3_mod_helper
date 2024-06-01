@@ -17,7 +17,7 @@ function stringify(jsonObj) {
     return JSON.stringify(jsonObj, null, 4)
 }
 
-
+// this is probably causing issues. gonna need to come up with a better solution.
 function setConfig(newConfig) {
     config = newConfig;
 }
@@ -35,6 +35,7 @@ function startUpConfig() {
                 initVariables();
                 console.log(`root mod path set too: \n${getConfig().rootModPath}`);
                 setModName(mainFolderPath);
+                console.log(`modName set to ${getModName()}`);
                 // checkConfigFile();
                 checkModDir();
                 saveConfigFile(config);
@@ -111,7 +112,7 @@ function setModName(rootPath = getConfig().rootModPath) {
     if (directories.length === 1 && temp_name == "") {
         console.log(`modName set to ${directories[0]}`)
         config.update('modName', directories[0], vscode.ConfigurationTarget.Workspace);
-        console.log(getConfig().modName);
+        console.log(getModName());
         saveConfigFile();
     } else {
         console.log(`modName kept as ${temp_name}`)
@@ -119,19 +120,21 @@ function setModName(rootPath = getConfig().rootModPath) {
 }
 
 
-function getModName(rootModPath = getConfig().rootModPath) {
-    // setModName(rootModPath);
-    return getConfig().modName;
+function getModName() {
+    config = vscode.workspace.getConfiguration('bg3ModHelper');
+    return config.get('modName');
 }
 
 
 function checkModDir() {
     const modsDirPath = path.join(getConfig().rootModPath, 'Mods');
+
+    bg3mh_logger.info(modsDirPath);
+    console.log(modsDirPath);
+
     try {
         if (!fs.existsSync(modsDirPath)) {
             vscode.window.showErrorMessage('Mods directory does not exist.');
-            bg3mh_logger.info(modsDirPath);
-            console.log(modsDirPath);
         }
     } catch (error) {
         raiseError(`Error reading directories in ${modsDirPath}: ${error}`);
@@ -160,18 +163,17 @@ function saveConfigFile(settingsToSave = "all" || {}) {
         }
     } catch (error) {
         console.error(error);
-        setConfig(getConfig());
+        // setConfig(getConfig());
     }
     
     if (settingsToSave === "all") {
-        setConfig(getConfig());
+        // setConfig(getConfig());
     } else {
-        setConfig(settingsToSave);
+        // setConfig(settingsToSave);
     }
     
     let settingsJson = stringify(config);
 
-    console.log(getConfig().modName);
     fs.writeFileSync(settingsFilePath, settingsJson);
 }
 

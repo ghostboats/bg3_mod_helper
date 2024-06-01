@@ -28,8 +28,10 @@ async function lslib_load() {
 function prepareTempDir(movedPak = false) {
     let rootModPath;
     if (isMainThread) {
+        getConfig = require('./config.js').getConfig();
         rootModPath = getConfig.rootModPath;
     } else {
+        getConfig = workerData.workerConfig;
         rootModPath = getConfig.rootModPath;
     }
     

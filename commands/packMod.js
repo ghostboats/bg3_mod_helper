@@ -24,8 +24,8 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
     const modName = await getModName();
 
-    const modsDirPath = path.normalize(rootModPath + "\\Mods");
-    const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
+    const modsDirPath = path.join(rootModPath, "Mods");
+    const metaPath = path.join(modsDirPath, modName, "meta.lsx");
 
     // Check if BG3 is running
     const isRunning = await isGameRunning();
@@ -50,6 +50,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
 
     bg3mh_logger.info("Grabbed mod name %s from %s.", modName, rootModPath);
 
+    console.log(metaPath);
     if (!fs.existsSync(metaPath)) {
         const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + metaPath + '. Do you want to create one?', 'Create Meta', 'Close');
         if (shouldCreateMeta === 'Create Meta') {

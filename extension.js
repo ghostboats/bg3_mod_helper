@@ -210,7 +210,9 @@ function aSimpleDataProvider() {
 }
 
 
-function deactivate() {}
+function deactivate() {
+    saveConfigFile();
+}
 
 
 module.exports = {
