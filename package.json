@@ -161,6 +161,10 @@
                 "title": "For dev use, dont press the button"
             },
             {
+                "command": "bg3-mod-helper.debug2Command",
+                "title": "For dev use, the button presses you."
+            },
+            {
                 "command": "bg3-mod-helper.unpackGameDataCommand",
                 "title": "For dev use, do press the button ;)"
             },
@@ -206,17 +210,17 @@
                     "default": 100,
                     "description": "Maximum number of items to store in the cache."
                 },
-                "bg3ModHelper.hover.maxFiles": {
+                "bg3ModHelper.hoverMaxFiles": {
                     "type": "number",
                     "default": 10,
                     "description": "Maximum number of file instances to show on hover."
                 },
-                "bg3ModHelper.hover.enabled": {
+                "bg3ModHelper.hoverEnabled": {
                     "type": "boolean",
                     "default": true,
                     "description": "Enable or disable hover feature."
                 },
-                "bg3ModHelper.hover.showPath": {
+                "bg3ModHelper.hoverShowPath": {
                     "type": "boolean",
                     "default": true,
                     "description": "Toggle file path in hover message (not working in current update)."

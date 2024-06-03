@@ -27,6 +27,9 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     const modsDirPath = path.join(rootModPath, "Mods");
     const metaPath = path.join(modsDirPath, modName, "meta.lsx");
 
+    console.log(modsDirPath);
+    console.log(metaPath);
+
     // Check if BG3 is running
     const isRunning = await isGameRunning();
 
@@ -86,21 +89,16 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
 
-    // changed existsSync() to statSync().isFile(), since existsSync() is being deprecated. this section can be shortened with the saveConfigFile and loadConfigFile functions in helper_functions.js
-    // Path to .vscode directory and settings file
-    const vscodeDirPath = path.join(rootModPath, '.vscode');
-    const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
-    let settingsContent = loadConfigFile(true);
-
+    // let settingsContent = loadConfigFile(true);
 
     // send the directory to the convert() function, and let it know it's a pak
     await convert(rootModPath, pak, modName);
 
-    if (settingsContent) {
+    /* if (settingsContent) {
         // console.log('test3')
         saveConfigFile(settingsContent)
         // console.log('test5')
-    }
+    } */
     if (autoLaunchOnPack) {
         vscode.commands.executeCommand('bg3-mod-helper.launchGame');
     }

@@ -69,14 +69,16 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
     if (isMainThread) {
         vscode = require('vscode');
         getConfig = require('./config.js').getConfig();
-        rootModPath = getConfig.rootModPath;
-        modDestPath = getConfig.modDestPath;
 
     } else {
         getConfig = workerData.workerConfig;
-        rootModPath = getConfig.rootModPath;
-        modDestPath = getConfig.modDestPath;
     }
+
+    rootModPath = getConfig.rootModPath;
+    modDestPath = getConfig.modDestPath;
+
+    console.log(rootModPath);
+    console.log(modDestPath);
 
     const lastFolderName = path.basename(rootModPath);
     const rootParentPath = path.dirname(rootModPath);
@@ -110,7 +112,7 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
         fs.writeFileSync(metaPath, xmlContent, 'utf8');
         bg3mh_logger.info('meta.lsx updated successfully.');
 
-        await Packager.CreatePackage(modTempDestPath, modPath, build);
+        await Packager.CreatePackage(modTempDestPath, modPath, build, true);
 
         raiseInfo(lastFolderName + pak + " packed", false);
         if (isMainThread) {

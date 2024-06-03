@@ -3,13 +3,45 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
-const { setConfig, getConfig, checkConfigFile, setModName, checkModDir, saveConfigFile, startUpConfig } = require('./support_files/config');
+const { setConfig, getConfig, setModName, checkModDir, saveConfigFile, startUpConfig } = require('./support_files/config');
 
 const { CREATE_LOGGER, raiseInfo } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
-let packModImport, unpackModCommand, launchGameImport, createAtlasImport, insertHandleUUIDImport, 
-    openWebPageImport, createFileFromTemplateImport, goToHandleUUIDCommand, DDSToPNGCommand, PNGToDDSCommand,   addIconBackground, createModTemplateImport, getAttributesCommand, smartConvertCommand, addDependenciesCommand, xmlToLocaCommand, locaToXmlCommand, lsxToLsfCommand, lsfToLsxCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, DDSViewerCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand, debugCommand, unpackGameDataCommand, resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom;
+let packModImport,
+    unpackModCommand,
+    launchGameImport,
+    createAtlasImport,
+    insertHandleUUIDImport, 
+    openWebPageImport,
+    createFileFromTemplateImport,
+    goToHandleUUIDCommand,
+    DDSToPNGCommand,
+    PNGToDDSCommand,
+    addIconBackground,
+    createModTemplateImport,
+    getAttributesCommand,
+    smartConvertCommand,
+    addDependenciesCommand,
+    xmlToLocaCommand,
+    locaToXmlCommand,
+    lsxToLsfCommand,
+    lsfToLsxCommand,
+    openConverterCommand,
+    versionGeneratorCommand,
+    rotationToolCommand,
+    DDSViewerCommand,
+    openModsFolderCommand,
+    openGameFolderCommand,
+    openLogsFolderCommand,
+    openWorkspaceFolderCommand,
+    debugCommand,
+    debug2Command,
+    unpackGameDataCommand,
+    resizeImageTooltip,
+    resizeImageController,
+    resizeImageHotbar,
+    resizeImageCustom;
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
@@ -63,6 +95,7 @@ function setCommands() {
 
     // debug commands
     debugCommand = require('./commands/debug');
+    debug2Command = require('./commands/debug2');
 }
 
 
@@ -164,7 +197,7 @@ function aSimpleDataProvider() {
             } else {
                 treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
             }
-            treeItem.command = element.command ? { command: element.command, title: "", arguments: [element.label] } : undefined;
+            treeItem.command = element.command ? { command: element.command, title: "", arguments: [element.arguments] } : undefined;
             return treeItem;
         },
         getChildren: (element) => {
@@ -172,6 +205,7 @@ function aSimpleDataProvider() {
                 return Promise.resolve([
                     { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool[tool is in development])', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
+                    { label: 'Configuration Options',  id: 'config' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
@@ -180,6 +214,7 @@ function aSimpleDataProvider() {
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
                     { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
+                    { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' },
                     { label: 'Folder Shortcuts', id: 'folderShortcuts' }
                 ]);
             } else if (element.id === 'packer') {
@@ -187,6 +222,12 @@ function aSimpleDataProvider() {
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
                     { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' },
                     { label: 'Unpack Game Data', command: 'bg3-mod-helper.unpackGameDataCommand' }
+                ]);
+            } else if (element.id === 'config') {
+                return Promise.resolve([
+                    { label: 'Reload Window', command: 'workbench.action.reloadWindow' },
+                    { label: 'Extension Settings', command: 'workbench.action.openSettings', arguments: 'bg3ModHelper' }
+                    // { label: 'Unpack Game Data', command: 'bg3-mod-helper.unpackGameDataCommand' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([
@@ -211,7 +252,6 @@ function aSimpleDataProvider() {
 
 
 function deactivate() {
-    saveConfigFile();
 }
 
 
