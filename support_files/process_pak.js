@@ -1,5 +1,9 @@
 const path = require('path');
 const fs = require('fs');
+const { createGzip } = require('zlib');
+const { pipeline } = require('stream');
+const { promisify } = require('util');
+const streamPipeline = promisify(pipeline);
 
 const { getFormats, moveFileAcrossDevices, compatRootModPath, LOAD_LSLIB } = require('./lslib_utils');
 const { pak } = getFormats();
@@ -65,7 +69,7 @@ function prepareTempDir(movedPak = false) {
 
 
 // btw, sometimes this will log things before others because it's async.
-async function processPak(modPath, modName, unpackLocation = path.join(path.dirname(modPath), path.basename(modPath, pak))) {
+async function processPak(modPath, modName, unpackLocation = path.join(path.dirname(modPath), path.basename(modPath, pak)), zipCheck = false) {
     await lslib_load();
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
@@ -118,10 +122,23 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
         if (isMainThread) {
             vscode.window.showInformationMessage(`${lastFolderName + pak} packed`);
         }
+        if (zipCheck == true) {
+            console.log('zipping');
+            const zipPath = path.join(rootModPath, `${lastFolderName}.pak.gz`);
+            const gzip = createGzip();
+            const source = fs.createReadStream(modTempDestPath);
+            const destination = fs.createWriteStream(zipPath);
 
-        // move files to chosen path and [in progress] clean up the empty directory
-        moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
-        prepareTempDir(true);
+            await streamPipeline(source, gzip, destination);
+            raiseInfo(`Gzip file has been created at ${zipPath}`, false);
+            if (isMainThread) {
+                vscode.window.showInformationMessage(`${lastFolderName}.pak.gz created`);
+            }
+        } else {
+            console.log('not zipping');
+            moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
+            prepareTempDir(true);
+        }
     }
     catch (Error) {
         raiseError(Error);

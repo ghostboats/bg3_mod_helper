@@ -2,7 +2,6 @@ const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
 const { getConfig } = require('../support_files/config');
-const xmlbuilder = require('xmlbuilder');
 
 const xmlMergerCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlMerger', async function () {
     const config = getConfig();
@@ -44,7 +43,6 @@ const xmlMergerCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlMerg
             for (const match of contentMatches) {
                 const [ , contentuid, version, text ] = match;
                 if (contentsMap[contentuid]) {
-                    // Prompt user to resolve duplicates
                     const selectedText = await vscode.window.showQuickPick([contentsMap[contentuid].text, text], {
                         placeHolder: `Duplicate found for contentuid: ${contentuid}. Select which one to keep.`,
                     });
@@ -55,13 +53,13 @@ const xmlMergerCommand = vscode.commands.registerCommand('bg3-mod-helper.xmlMerg
             }
         }
 
-        let root = xmlbuilder.create('contentList');
+        let mergedXmlContent = `<contentList>\n`;
         Object.entries(contentsMap).forEach(([contentuid, { version, text }]) => {
-            root.ele('content', { contentuid, version }, text);
+            mergedXmlContent += `  <content contentuid="${contentuid}" version="${version}">${text}</content>\n`;
         });
+        mergedXmlContent += `</contentList>`;
 
-        const mergedXml = root.end({ pretty: true });
-        fs.writeFileSync(uri.fsPath, mergedXml, 'utf8');
+        fs.writeFileSync(uri.fsPath, mergedXmlContent, 'utf8');
         vscode.window.showInformationMessage('XML files merged and saved successfully!');
     } catch (error) {
         vscode.window.showErrorMessage('Error merging XML files: ' + error.message);
