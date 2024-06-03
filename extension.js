@@ -30,19 +30,20 @@ const { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, ope
 
 const addDependenciesCommand = require('./commands/addDependencies')
 
-
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 
-const { CREATE_LOGGER } = require('./support_files/log_utils');
+const { CREATE_LOGGER, raiseInfo } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
-const debugCommand = require('./commands/debug');
-const debug2Command = require('./commands/debug2');
+const xmlMergerCommand = require('./commands/xmlMerger');
+const symlinkCommand = require('./commands/symlinker');
+const unpackGameDataCommand = require('./commands/unpackGameData');
+
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
-const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
+const { setupUuidsHandlesHoverProvider, registerTextEditCommand }= require('./hovers/uuidsHandlesCollector');
 const { resizeImageTooltip, resizeImageController, resizeImageHotbar, resizeImageCustom } = require('./commands/resizeImage');
 
-const { getFullPath } = require('./support_files/helper_functions');
+const { getFullPath, saveConfigFile, loadConfigFile } = require('./support_files/helper_functions');
 
 
 async function addToExcludeList(fileUri) {
@@ -101,22 +102,11 @@ function activate(context) {
             });
     }
 
-    let config = vscode.workspace.getConfiguration('bg3ModHelper');
+    console.log(loadConfigFile(true));
+    if (loadConfigFile(true) === undefined) {
+        saveConfigFile();
+    }
 
-    setConfig({
-        maxFilesToShow: config.get('hover.maxFiles'),
-        hoverEnabled: config.get('hover.enabled'),
-        maxCacheSize: config.get('maxCacheSize'),
-        rootModPath: config.get('rootModPath'),
-        modDestPath: config.get('modDestPath'),
-        lslibPath: config.get('lslibPath'),
-        autoLaunchOnPack: config.get('autoLaunchOnPack'),
-        launchContinueGame: config.get('launchContinueGame'),
-        addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
-        excludedFiles: config.get('excludedFiles') || [],
-        gameInstallLocation: config.get('gameInstallLocation')
-    });
-    bg3mh_logger.info('Initial configs set:' + JSON.stringify(config, null, 2))
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
             'bg3-mod-helper extension requires a workspace to be set for optimal functionality, one not found.'
@@ -146,6 +136,7 @@ function activate(context) {
     ));
 
     let uuidsHandlesHoverProvider = setupUuidsHandlesHoverProvider();
+    let uuidsHandlesHoverProviderr = registerTextEditCommand();
 
     let functionsHoverProvider = setupFunctionDescriptionHoverProvider();
 
@@ -188,20 +179,22 @@ function aSimpleDataProvider() {
                     { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool[tool is in development])', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
+                    { label: 'Add/Remove Symlink (linux testing required)', command: 'bg3-mod-helper.symlinker' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
+                    { label: 'Merge Xmls', command: 'bg3-mod-helper.xmlMerger' },
+                    { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
-                    { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
-                    { label: 'Debug Command', command: 'bg3-mod-helper.debugCommand' },
-                    { label: 'Debug2 Command', command: 'bg3-mod-helper.debug2Command' },
                     { label: 'Folder Shortcuts', id: 'folderShortcuts' }
                 ]);
             } else if (element.id === 'packer') {
                 return Promise.resolve([
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
-                    { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' }
+                    { label: 'Pack Mod and ZIP(gz)', command: 'bg3-mod-helper.packModZip' },
+                    { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' },
+                    { label: 'Unpack Game Data (in development)', command: 'bg3-mod-helper.unpackGameDataCommand' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([

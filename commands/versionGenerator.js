@@ -1,9 +1,8 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
-const { getConfig } = require('../support_files/config');
+const { getConfig, getModName } = require('../support_files/config');
 const { CREATE_LOGGER } = require('../support_files/log_utils.js');
-const { getModName } = require('../support_files/helper_functions.js');
 
 
 const bg3mh_logger = CREATE_LOGGER();

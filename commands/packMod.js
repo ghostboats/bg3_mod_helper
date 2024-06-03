@@ -18,8 +18,13 @@ const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
 
+const packModZipCommand = vscode.commands.registerCommand('bg3-mod-helper.packModZip', async function () {
+    // You can call the existing packMod function with additional parameters
+    await vscode.commands.executeCommand('bg3-mod-helper.packMod', { packAsZip: true });
+});
+
 // i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
-const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
+const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function (options = {}) {
     raiseInfo("pack button clicked", false);
     const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
     const modName = getModName();
@@ -85,33 +90,45 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         }
     }
 
+    // changed existsSync() to statSync().isFile(), since existsSync() is being deprecated. this section can be shortened with the saveConfigFile and loadConfigFile functions in helper_functions.js
     // Path to .vscode directory and settings file
     const vscodeDirPath = path.join(rootModPath, '.vscode');
     const settingsFilePath = path.join(vscodeDirPath, 'settings.json');
     let settingsContent = '';
 
     // Check and save settings.json if .vscode exists
-    if (fs.existsSync(vscodeDirPath)) {
-        if (fs.existsSync(settingsFilePath)) {
+    if (fs.statSync(vscodeDirPath).isFile()) {
+        if (fs.statSync(settingsFilePath).isFile()) {
             settingsContent = fs.readFileSync(settingsFilePath, 'utf8');
         }
         // console.log('test1')
         fs.rmSync(vscodeDirPath, { recursive: true }); // Delete .vscode directory
         // console.log('test2')
     }
+
+    let zipCheck = false
+    if (options.packAsZip) {
+        // Add logic to pack as ZIP
+        console.log("Packing as ZIP...");
+        zipCheck = true
+    } else {
+        // Existing logic for normal packing
+        console.log("Packing normally...");
+    }
+
     // send the directory to the convert() function, and let it know it's a pak
-    await convert(rootModPath, pak, modName);
+    await convert(rootModPath, pak, modName, zipCheck);
 
     if (settingsContent) {
         // console.log('test3')
-        if (!fs.existsSync(vscodeDirPath)) {
+        if (!fs.statSync(vscodeDirPath).isFile()) {
             fs.mkdirSync(vscodeDirPath, { recursive: true });
             // console.log('test4')
         }
         fs.writeFileSync(settingsFilePath, settingsContent, 'utf8');
         // console.log('test5')
     }
-    if (autoLaunchOnPack) {
+    if (autoLaunchOnPack && !zipCheck) {
         vscode.commands.executeCommand('bg3-mod-helper.launchGame');
     }
     // console.log('test6')
@@ -161,4 +178,4 @@ function isGameRunning() {
     });
 }
 
-module.exports = packModCommand;
+module.exports = { packModZipCommand, packModCommand };

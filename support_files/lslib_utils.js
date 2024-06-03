@@ -5,9 +5,6 @@
 */
 const path = require('path');
 const fs = require('fs');
-const vscode = require('vscode');
-const findFiles = vscode.workspace.findFiles;
-const parse = vscode.Uri.parse;
 
 
 // loads the api
@@ -23,11 +20,6 @@ const TOOL_SUBDIR = 'Tools\\';
 const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
-const { getConfig }  = require('./config.js');
-const { lslibPath } = getConfig();
-const compatRootModPath = path.join(getConfig().rootModPath + "\\");
-const lslibToolsPath = path.join(getConfig().lslibPath, TOOL_SUBDIR);
-
 // separated for future use
 const elasticDlls = ['Elastic.Transport.dll', 'Elastic.Clients.Elasticsearch.dll'];
 const storyCompilerDlls = ['StoryCompiler.dll', 'StoryDecompiler.dll'];
@@ -40,9 +32,32 @@ const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInf
 // excluding this because it will match to "UI" in convertDirs
 const illegalFiles = ["Icons_Items.lsx"];
 
+// excluding these packs because lslib uses something else to unpack them
+const virtualTextureRegex = /Textures_[\d]+/;
+const hotfixPatchRegex = /Patch[\d]+_Hotfix[\d]+/;
+
+// tools to test where the process is
+const { isMainThread, workerData } = require('node:worker_threads');
+
 var DLLS = [];
-var DLL_PATHS;
-var LSLIB;
+var DLL_PATHS, LSLIB, lslibPath, compatRootModPath, lslibToolsPath, vscode, findFiles, parse;
+var getConfig;
+
+
+if (isMainThread) {
+    getConfig = require('./config.js').getConfig;
+    lslibPath = getConfig().lslibPath;
+    compatRootModPath = path.join(getConfig().rootModPath + "\\");
+    lslibToolsPath = path.join(getConfig().lslibPath, TOOL_SUBDIR);
+    vscode = require('vscode');
+    findFiles = vscode.workspace.findFiles;
+    parse = vscode.Uri.parse;
+} else {
+    getConfig = workerData.workerConfig;
+    lslibPath = getConfig.lslibPath;
+    compatRootModPath = path.join(getConfig.rootModPath + "\\");
+    lslibToolsPath = path.join(getConfig.lslibPath, TOOL_SUBDIR);
+}
 
 
 function getFormats() {
@@ -76,26 +91,11 @@ function baseNamePath(filePath, ext) {
 }
 
 
-// makes sure the path is normalized to the user's system, and then pushes that on to DLLS
-function processDllPaths() {
-    for (let i = 0; i < DLL_PATHS.length; i++) {
-        var temp_path = dirSeparator(path.normalize(DLL_PATHS[i]));
-
-        try {
-            DLLS.push(temp_path);
-        }
-        catch (Error) {
-            raiseError(Error);
-        }
-    }
-}
-
-
 // run through the created DLLS array and load each one
 async function loadDlls() {
-    for (let i = 0; i < DLLS.length; i++) {
+    for (let i = 0; i < DLL_PATHS.length; i++) {
         try {
-            dotnet.load(DLLS[i]);
+            dotnet.load(path.normalize(DLL_PATHS[i]));
         }
         catch (Error) {
             raiseError(Error);
@@ -104,34 +104,50 @@ async function loadDlls() {
 }
 
 
-// handles the finding of LSLib. logs will be created wherever this laods from.
+// handles the finding of LSLib. logs will be created wherever this loads from.
 async function LOAD_LSLIB() {
-    if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
-        DLL_PATHS = await FIND_FILES(getFormats().dll, lslibPath);
-    }
-    else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
-        DLL_PATHS = await FIND_FILES(getFormats().dll, lslibToolsPath);
-    } 
-    else {
-        raiseError("LSLib.dll not found at " + lslibPath + ".", false);
-        vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
-        return null;
+    // first step is to find all the dlls in the folder the user has specified for lslibPath. note the differences between the main thread and the worker thread.
+    if (isMainThread) {
+        if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
+            DLL_PATHS = await FIND_FILES(getFormats().dll, lslibPath);
+        }
+        else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
+            DLL_PATHS = await FIND_FILES(getFormats().dll, lslibToolsPath);
+        } 
+        else {
+            raiseError("LSLib.dll not found at " + lslibPath + ".", false);
+            vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
+            return null;
+        }
+    } else {
+        if (fs.existsSync(path.join(lslibPath, LSLIB_DLL))) {
+            DLL_PATHS = FIND_FILES_SYNC(lslibPath, getFormats().dll);
+        }
+        else if (fs.existsSync(path.join(lslibToolsPath, LSLIB_DLL))) {
+            DLL_PATHS = FIND_FILES_SYNC(lslibToolsPath, getFormats().dll);
+        } 
+        else {
+            raiseError("LSLib.dll not found at " + lslibPath + ".");
+            return null;
+        }
     }
 
-    processDllPaths();    
+    // normalize the paths and load them into the dotnet api variable
     await loadDlls();
-    raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
+    if (isMainThread) {
+        raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
+    } else {
+        raiseInfo(`.dlls loaded into worker ${workerData.workerId}`)
+    }
     
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
     // @ts-ignore 
     return dotnet.LSLib.LS;
-    
 }
 
 
-// returns an array with the absolute paths to every file found with the target file extension.
-// maybe replace with findFiles()? 
-function FIND_FILES_v1(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
+// synchronously returns an array with the absolute paths to every file found with the target file extension.
+function FIND_FILES_SYNC(filesPath, targetExt = getFormats().lsf, isRecursive = true) {
     let filesToConvert = [];
 
     // console.log(filesPath);
@@ -155,23 +171,39 @@ function FIND_FILES_v1(filesPath, targetExt = getFormats().lsf, isRecursive = tr
 }
 
 
-// beautiful. still needs dll handling in lslib_utils though
+// beautiful. still needs dll handling in lslib_utils though, and some refactoring
 async function FIND_FILES(targetExt = getFormats().lsf, filesPath = '**/*') {
     let filesList;
+    let nonRecursiveGlob = '*';
+    let recursiveGlob = '**/*'
 
+    // finding dlls needs to not be recursive so we don't accidentally load things twice
     if (targetExt === getFormats().dll) {
         let dllDir = new vscode.RelativePattern(filesPath, '*' + targetExt);
-        filesList = (await findFiles(dllDir)).map(file => file.path);
+        filesList = (await findFiles(dllDir)).map(file =>  dirSeparator(file.path));
+    }
+    // paks can be recursive, but we need to account for them not being in the workspace, like dlls
+    else if (targetExt === getFormats().pak) {
+        let dllDir = new vscode.RelativePattern(filesPath, '**/*' + targetExt);
+        filesList = (await findFiles(dllDir)).map(file => dirSeparator(file.path));
     }
     else {
-        filesList = (await findFiles(filesPath + targetExt)).map(file => file.path);
+        filesList = (await findFiles(filesPath + targetExt)).map(file => dirSeparator(file.path));
     }
+
     return FILTER_PATHS(filesList);
 }
 
 
 function FILTER_PATHS(filesPath) {
-    let excludedFiles = getConfig().excludedFiles;
+    let excludedFiles = [];
+    if (isMainThread) {
+        excludedFiles = getConfig().excludedFiles;
+    } else {
+        excludedFiles = getConfig.excludedFiles;
+    }
+    
+    // if filesPath is an array, break it up into single files and send it back through this function for the second step
     if (Array.isArray(filesPath)) {
         let filteredPaths = [];
 
@@ -184,14 +216,23 @@ function FILTER_PATHS(filesPath) {
         }
         return filteredPaths;
     }
+    // if file path is a string, indicating a single path, loop through each directory and name, checking for reasons to exclude it 
     else if (typeof(filesPath) == 'string') {
         let temp_path = filesPath.split(path.sep);
         let temp_ext = path.extname(filesPath);
 
         for (let i = 0; i < temp_path.length; i++) {
+            let temp_name = path.basename(filesPath, getFormats().pak)
+            // these if statements could technically be combined, but that doesn't make it very readable.
             if (temp_ext === getFormats().dll && !illegalDlls.includes(path.basename(filesPath))) {
                 return filesPath;
             }
+            // if paks are being grabbed, it's for unpacking, so exclude the ones that throw errors
+            else if (temp_ext === getFormats().pak && !(virtualTextureRegex.test(temp_name) || hotfixPatchRegex.test(temp_name))) {
+                return filesPath;
+
+            }
+            // check if an item is excluded by user, in a path that should be converted, or can be ignored
             else if (
                 (
                     !excludedFiles.includes(filesPath) && 
@@ -208,6 +249,8 @@ function FILTER_PATHS(filesPath) {
 
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
 function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
+    let infoMsg = `${path.basename(sourcePath)} moved to ${destPath}.`;
+
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
             raiseError(readErr);
@@ -227,9 +270,58 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
             });
         });
     });
-    raiseInfo(path.basename(sourcePath) + " moved to " + destPath, false);
-    vscode.window.showInformationMessage(`${path.basename(sourcePath)} moved to ${destPath}.`);
+    
+    if (isMainThread) {
+        raiseInfo(infoMsg, false);
+        vscode.window.showInformationMessage(infoMsg);
+    } else {
+        raiseInfo(infoMsg, false);
+    }
+}
+
+// i don't like putting this here but i need a worker_thread friendly version
+function getModName() {
+    let rootModPath;
+
+    if (isMainThread) {
+        rootModPath = getConfig().rootModPath;
+    } else {
+        rootModPath = getConfig.rootModPath;
+    }
+
+    let modsDirPath = path.join(rootModPath, 'Mods');
+
+    try {
+        if (!fs.existsSync(modsDirPath)) {
+            if (isMainThread) {
+                vscode.window.showErrorMessage('Mods directory does not exist.');
+            } else {
+                raiseError('Mods directory does not exist.');
+            }
+            
+            return '';
+        }
+
+        const files = fs.readdirSync(modsDirPath);
+        const directories = files.filter(file => 
+            fs.statSync(path.join(modsDirPath, file)).isDirectory()
+        );
+
+        if (directories.length === 1) {
+            return directories[0];
+        } else {
+            return '';
+        }
+    } catch (error) {
+        if (isMainThread) {
+            vscode.window.showErrorMessage(`Error reading directories in ${modsDirPath}: ${error}`);
+        } else {
+            raiseError(`Error reading directories in ${modsDirPath}: ${error}`);
+        }
+        
+        return '';
+    }
 }
 
 
-module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_v1, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath };
+module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_SYNC, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath, getModName };

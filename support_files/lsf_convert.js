@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const vscode = require('vscode');
 
 const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
 
@@ -15,7 +14,13 @@ var to_lsf;
 var LSLIB;
 
 async function lslib_load() {
-    LSLIB = await LOAD_LSLIB();
+    if (LSLIB === undefined) {
+        console.log("lslib not found. loading...");
+        LSLIB = await LOAD_LSLIB();
+        // console.log(typeof(LSLIB))
+    } else {
+        console.log("lslib is already loaded!");
+    }
 }
 
 
