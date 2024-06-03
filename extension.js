@@ -192,7 +192,7 @@ function aSimpleDataProvider() {
             } else if (element.id === 'packer') {
                 return Promise.resolve([
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
-                    { label: 'Pack Mod as ZIP', command: 'bg3-mod-helper.packModZip' },
+                    { label: 'Pack Mod and ZIP(gz)', command: 'bg3-mod-helper.packModZip' },
                     { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' },
                     { label: 'Unpack Game Data (in development)', command: 'bg3-mod-helper.unpackGameDataCommand' }
                 ]);
