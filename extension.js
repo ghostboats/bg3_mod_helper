@@ -1,7 +1,4 @@
 const vscode = require('vscode');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-const fs = require('fs');
 
 const { startUpConfig } = require('./support_files/config');
 
