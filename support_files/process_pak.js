@@ -6,7 +6,7 @@ const { pak } = getFormats();
 
 const { isMainThread, workerData } = require('node:worker_threads');
 
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
+const { CREATE_LOGGER } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 const temp_folder = "\\temp_folder";
@@ -79,6 +79,9 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
 
     console.log(rootModPath);
     console.log(modDestPath);
+    
+    build.ExcludeHidden = getConfig.excludeHidden;
+    console.log(build.ExcludeHidden);
 
     const lastFolderName = path.basename(rootModPath);
     const rootParentPath = path.dirname(rootModPath);
@@ -95,9 +98,9 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
                 await Packager.UncompressPackage(modPath, unpackLocation);
             }
             catch (Error) {
-                raiseError(Error);
+                bg3mh_logger.error(Error);
             }
-            raiseInfo(`Mod ${path.basename(modPath)} unpacked to ${unpackLocation}`)
+            bg3mh_logger.info(`Mod ${path.basename(modPath)} unpacked to ${unpackLocation}`)
             return;
         }
         // i'd like to refactor xml code into its own file for next release
@@ -112,9 +115,9 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
         fs.writeFileSync(metaPath, xmlContent, 'utf8');
         bg3mh_logger.info('meta.lsx updated successfully.');
 
-        await Packager.CreatePackage(modTempDestPath, modPath, build, true);
+        await Packager.CreatePackage(modTempDestPath, modPath, build);
 
-        raiseInfo(lastFolderName + pak + " packed", false);
+        bg3mh_logger.info(lastFolderName + pak + " packed", false);
         if (isMainThread) {
             vscode.window.showInformationMessage(`${lastFolderName + pak} packed`);
         }
@@ -124,7 +127,7 @@ async function processPak(modPath, modName, unpackLocation = path.join(path.dirn
         prepareTempDir(true);
     }
     catch (Error) {
-        raiseError(Error);
+        bg3mh_logger.error(Error);
     }
 }
 

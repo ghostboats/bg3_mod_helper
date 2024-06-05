@@ -2,31 +2,50 @@ const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
 
-let config = {};
+let config;
 
 let rootModPath;
 let vscodeDirPath;
 let settingsFilePath;
+let workerSettingsFile;
+
 
 // putting this here so getConfig() loads before the log_utils.js file needs it
-const { raiseInfo, raiseError, CREATE_LOGGER } = require('./log_utils');
+const { CREATE_LOGGER } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER();
 
 
-function stringify(jsonObj) {
-    return JSON.stringify(jsonObj, null, 4)
+function stringify(file) {
+    return JSON.stringify(file, null, 4);
 }
 
 
-function setConfig(newConfig = loadConfigFile()) {
+function setConfig(newConfig = {} || vscode.workspace.getConfiguration("bg3ModHelper")) {
     let extensionName = "bg3ModHelper";
     let working_config = vscode.workspace.getConfiguration(extensionName);
 
     for (let config in newConfig) {
-        console.log(`config name: ${config}\nconfig value: ${newConfig[config]}`);
         working_config.update(config, newConfig[config], vscode.ConfigurationTarget.Workspace);
-        
     }
+
+    fs.writeFileSync(workerSettingsFile, stringify(working_config));
+}
+
+
+function clampPackPriority() {
+    let packingPriority = "packingPriority";
+
+    let priority = config.get(packingPriority);
+
+    if (priority > 255) {
+        priority = 255;
+    }
+    else if (priority < 0) {
+        priority = 0;
+    }
+
+    config.update(packingPriority, priority, vscode.ConfigurationTarget.Workspace);
+    bg3mh_logger.info(`packing priority set to ${priority}`);
 }
 
 
@@ -42,9 +61,10 @@ function startUpConfig() {
         config = vscode.workspace.getConfiguration('bg3ModHelper');
         config.update('rootModPath', mainFolderPath, vscode.ConfigurationTarget.Workspace
             ).then(() => {
-                console.log(`root mod path set to: \n${getConfig().rootModPath}`);
+                clampPackPriority();
+                bg3mh_logger.info(`root mod path set to: \n${getConfig().rootModPath}`);
                 setModName(mainFolderPath);
-                console.log(`mod name set to: \n${getConfig().modName}`);
+
                 vscode.window.showInformationMessage(`Workspace set to:
                 ${mainFolderPath}.`,
                 'Open Settings'
@@ -66,21 +86,25 @@ function startUpConfig() {
 }
 
 
-function getConfig(config = vscode.workspace.getConfiguration('bg3ModHelper')) {
+function getConfig() {
+    config = vscode.workspace.getConfiguration('bg3ModHelper');
     return {
         hoverMaxFiles: config.get('hoverMaxFiles'),
         hoverEnabled: config.get('hoverEnabled'),
         hoverShowPath: config.get('hoverShowPath'),
-        maxCacheSize: config.get('maxCacheSize'),
+        maxCacheSize: config.get('general.maxCacheSize'),
         rootModPath: path.normalize(config.get('rootModPath')),
         modDestPath: path.normalize(config.get('modDestPath')),
         lslibPath: path.normalize(config.get('lslibPath')),
         autoLaunchOnPack: config.get('autoLaunchOnPack'),
+        zipOnPack: config.get('zipOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
         excludedFiles: normalizeExcludedFiles(config.get('excludedFiles')),
         gameInstallLocation: path.normalize(config.get('gameInstallLocation')),
-        modName: config.get('modName')
+        modName: config.get('modName'),
+        excludeHidden: config.get('excludeHidden'),
+        packingPriority: config.get('packingPriority')
     };
 }
 
@@ -88,7 +112,8 @@ function getConfig(config = vscode.workspace.getConfiguration('bg3ModHelper')) {
 function initVariables() {
     rootModPath = getConfig().rootModPath;
     vscodeDirPath = path.join(rootModPath, '.vscode');
-    settingsFilePath = path.join(vscodeDirPath, 'settings_unparsed.json');
+    settingsFilePath = path.join(vscodeDirPath, 'settings.json');
+    workerSettingsFile = path.join(vscodeDirPath, 'workerSettings.json')
 }
 
 
@@ -96,8 +121,7 @@ function normalizeExcludedFiles(excludedFiles) {
     if (Array.isArray(excludedFiles)) {
         let normalizeExcludedFiles = excludedFiles.map((temp_file) => path.normalize(temp_file));
         return normalizeExcludedFiles;
-    }
-    else {
+    } else {
         return path.normalize(excludedFiles);
     }
 }
@@ -111,11 +135,10 @@ function setModName(rootPath = getConfig().rootModPath) {
     const directories = files.filter(file => fs.statSync(path.join(modsDirPath, file)).isDirectory());
 
     if (directories.length === 1 && temp_name == "") {
-        // console.log(`modName set to ${directories[0]}`);
         config.update('modName', directories[0], vscode.ConfigurationTarget.Workspace);
-        console.log(config.get('modName'));
+        return directories[0];
     } else {
-        console.log(`modName kept as ${temp_name}`)
+        bg3mh_logger.info(`modName kept as ${temp_name}`)
     }
 }
 
@@ -125,55 +148,18 @@ function getModName() {
 }
 
 
-function checkModDir() {
-    const modsDirPath = path.join(getConfig().rootModPath, 'Mods');
-
-    bg3mh_logger.info(modsDirPath);
-    console.log(modsDirPath);
-
-    try {
-        if (!fs.existsSync(modsDirPath)) {
-            vscode.window.showErrorMessage('Mods directory does not exist.');
-        }
-    } catch (error) {
-        raiseError(`Error reading directories in ${modsDirPath}: ${error}`);
-    }
-}
-
-
-function saveConfigFile() {
-    initVariables();
-
-    vscodeDirPath = path.join(getConfig().rootModPath, '.vscode');
-    console.log(`vscode path at ${vscodeDirPath}`);
-    // console.log(`vscode settings file at${settingsFilePath}`);
-
-    console.log("hi from saveConfigFile");
-    console.log(`settings folder and file do not exist: ${(!fs.existsSync(settingsFilePath) && !fs.existsSync(vscodeDirPath))}`);
-    console.log(`settings folder and file do exist: ${fs.existsSync(settingsFilePath)}`);
-
-    if (fs.existsSync(settingsFilePath)) {
-        console.log(`${settingsFilePath} exists, deleting for new save.`);
-        fs.rmSync(settingsFilePath, { force: true });
-        console.log(`${(!fs.existsSync(settingsFilePath) && !fs.existsSync(vscodeDirPath))}`);
-    } else if (!fs.existsSync(settingsFilePath) && !fs.existsSync(vscodeDirPath)) { 
-        fs.mkdirSync(vscodeDirPath);
-    }
-
-    fs.writeFileSync(settingsFilePath, stringify(config));
-
-    // setConfig();
-}
-
-
-function loadConfigFile(reset = false, get = true) {
+function loadConfigFile(reset = false, get = true, worker = true) {
     let settingsContent;
     
+    if (worker) {
+        if (!fs.existsSync(workerSettingsFile)) {
+            setConfig();
+        }
+        return JSON.parse(fs.readFileSync(workerSettingsFile, 'utf8'));
+    }
+
     if (fs.existsSync(settingsFilePath)) {
         settingsContent = JSON.parse(fs.readFileSync(settingsFilePath, 'utf8'));
-        // raiseInfo(settingsContent, false);
-
-        setConfig(settingsContent);
 
         if (reset) {
             fs.rmSync(vscodeDirPath, { recursive: true });
@@ -182,11 +168,11 @@ function loadConfigFile(reset = false, get = true) {
             return settingsContent;
         }
     } else if (!(fs.existsSync(settingsFilePath)) || !fs.existsSync(vscodeDirPath)) {
-        saveConfigFile();
+        setConfig();
     } else {
         return undefined;
     }
 }
 
 
-module.exports = { setConfig, getConfig, getModName, loadConfigFile, saveConfigFile, setModName, checkModDir, startUpConfig };
+module.exports = { setConfig, getConfig, getModName, loadConfigFile, setModName, startUpConfig };

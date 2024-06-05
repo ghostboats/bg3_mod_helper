@@ -6,7 +6,8 @@ const fs = require('fs');
 const { FIND_FILES, getFormats } = require('./lslib_utils');
 const { lsx, xml, pak } = getFormats();
 
-const { raiseError, raiseInfo } = require('./log_utils');
+const { CREATE_LOGGER } = require('./log_utils');
+const bg3mh_logger = CREATE_LOGGER();
 
 const { isLoca, processLoca } = require('./loca_convert');
 const { isLsf, processLsf } = require('./lsf_convert');
@@ -91,7 +92,7 @@ async function createConversionWorkers(filesToConvert, workerConfig, unpackedGam
 
     // for each job, which is either a single file or an array of files sorted from smallest to largest file size, create a worker and give it the data it needs to unpack those files via workerData.
     for (let i = 0; i < jobsTotal; i++) {
-        raiseInfo(`${convertFileNames[i]}\n`, false);
+        bg3mh_logger.info(`${convertFileNames[i]}\n`, false);
         workerArray.push(new Worker(__dirname + "/conversion_worker.js", { 
             workerData:  { 
                 // passes the crystallized configuration settings to each of the workers
@@ -107,13 +108,13 @@ async function createConversionWorkers(filesToConvert, workerConfig, unpackedGam
         // creates a listener for the newly pushed worker. if the worker sends back a message containing "done.", adds 1 to the jobsFinished tracker variable.
         workerArray[i].on('message', (message) => {
             if (message.includes("done.")) {
-                raiseInfo(message);
+                bg3mh_logger.info(message);
                 jobsFinished++;
             }
 
             // once the jobsFinished variable is equal to the amount of jobs we started with, we know all jobs are done and can tell the user that.
             if (jobsFinished === jobsTotal) {
-                raiseInfo("All game data unpacked!");
+                bg3mh_logger.info("All game data unpacked!");
             }
         })
     }
@@ -157,10 +158,10 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
             prepareTempDir();
 
             await convert(rootModPath, xml)
-                .then(() => raiseInfo(`xml conversion done`, false));
+                .then(() => bg3mh_logger.info(`xml conversion done`, false));
 
             await convert(rootModPath, lsx)
-                .then(() => raiseInfo(`lsx conversion done`, false));
+                .then(() => bg3mh_logger.info(`lsx conversion done`, false));
 
             processPak(rootModPath, modName);
         }
@@ -195,7 +196,7 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
                 processLoca(convertPath, targetExt);
             } 
             catch (Error) {
-                raiseError(Error);
+                bg3mh_logger.error(Error);
                 return;
             }
         } 
@@ -204,7 +205,7 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
                 processLsf(convertPath, targetExt);
             } 
             catch (Error) {
-                raiseError(Error);
+                bg3mh_logger.error(Error);
                 return;
             }
         }

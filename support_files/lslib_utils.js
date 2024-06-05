@@ -17,7 +17,7 @@ const dotnet = require('node-api-dotnet/net8.0');
 
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils.js')
+const { CREATE_LOGGER } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
 // separated for future use
@@ -98,7 +98,7 @@ async function loadDlls() {
             dotnet.load(path.normalize(DLL_PATHS[i]));
         }
         catch (Error) {
-            raiseError(Error);
+            bg3mh_logger.error(Error);
         }
     }
 }
@@ -115,7 +115,7 @@ async function LOAD_LSLIB() {
             DLL_PATHS = await FIND_FILES(getFormats().dll, lslibToolsPath);
         } 
         else {
-            raiseError("LSLib.dll not found at " + lslibPath + ".", false);
+            bg3mh_logger.error("LSLib.dll not found at " + lslibPath + ".");
             vscode.window.showErrorMessage(`LSLib.dll not found at ${lslibPath}. Are you sure you aren't using the legacy option using divine.exe?`);
             return null;
         }
@@ -127,7 +127,7 @@ async function LOAD_LSLIB() {
             DLL_PATHS = FIND_FILES_SYNC(lslibToolsPath, getFormats().dll);
         } 
         else {
-            raiseError("LSLib.dll not found at " + lslibPath + ".");
+            bg3mh_logger.error("LSLib.dll not found at " + lslibPath + ".");
             return null;
         }
     }
@@ -135,9 +135,9 @@ async function LOAD_LSLIB() {
     // normalize the paths and load them into the dotnet api variable
     await loadDlls();
     if (isMainThread) {
-        raiseInfo(`${DLL_PATHS} \n.dlls loaded`, false);
+        bg3mh_logger.info(`${DLL_PATHS} \n.dlls loaded`);
     } else {
-        raiseInfo(`.dlls loaded into worker ${workerData.workerId}`)
+        bg3mh_logger.info(`.dlls loaded into worker ${workerData.workerId}`)
     }
     
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:
@@ -248,23 +248,23 @@ function FILTER_PATHS(filesPath) {
 
 
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
-function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
+function moveFileAcrossDevices(sourcePath, destPath, bg3mh_logger) {
     let infoMsg = `${path.basename(sourcePath)} moved to ${destPath}.`;
 
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
-            raiseError(readErr);
+            bg3mh_logger.error(readErr);
             return;
         }
         fs.writeFile(destPath, data, (writeErr) => {
             if (writeErr) {
-                raiseError(writeErr);
+                bg3mh_logger.error(writeErr);
                 return;
             }
             fs.unlink(sourcePath, unlinkErr => {
                 // added the check because it was raising an error every time the func was called
                 if (unlinkErr) {
-                    raiseError(unlinkErr);
+                    bg3mh_logger.error(unlinkErr);
                     return;
                 }
             });
@@ -272,10 +272,10 @@ function moveFileAcrossDevices(sourcePath, destPath, raiseError) {
     });
     
     if (isMainThread) {
-        raiseInfo(infoMsg, false);
+        bg3mh_logger.info(infoMsg, false);
         vscode.window.showInformationMessage(infoMsg);
     } else {
-        raiseInfo(infoMsg, false);
+        bg3mh_logger.info(infoMsg, false);
     }
 }
 
@@ -296,7 +296,7 @@ function getModNameSync() {
             if (isMainThread) {
                 vscode.window.showErrorMessage('Mods directory does not exist.');
             } else {
-                raiseError('Mods directory does not exist.');
+                bg3mh_logger.error('Mods directory does not exist.');
             }
             
             return '';
@@ -316,7 +316,7 @@ function getModNameSync() {
         if (isMainThread) {
             vscode.window.showErrorMessage(`Error reading directories in ${modsDirPath}: ${error}`);
         } else {
-            raiseError(`Error reading directories in ${modsDirPath}: ${error}`);
+            bg3mh_logger.error(`Error reading directories in ${modsDirPath}: ${error}`);
         }
         
         return '';

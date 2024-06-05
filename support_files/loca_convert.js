@@ -1,8 +1,8 @@
 const path = require('path');
 
 const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
-const bg3mh_logger = CREATE_LOGGER(); 
+const { CREATE_LOGGER } = require('./log_utils');
+const bg3mh_logger = CREATE_LOGGER();
 
 const { xml, loca } = getFormats();
 
@@ -11,11 +11,11 @@ var LSLIB;
 
 async function lslib_load() {
     if (LSLIB === undefined) {
-        raiseInfo("lslib not found. loading...", false);
+        bg3mh_logger.info("lslib not found. loading...", false);
         LSLIB = await LOAD_LSLIB();
         // console.log(typeof(LSLIB))
     } else {
-        raiseInfo("lslib is already loaded!", false);
+        bg3mh_logger.info("lslib is already loaded!", false);
     }
 }
 
@@ -54,10 +54,10 @@ async function processLoca(file, targetExt) {
         temp_loca = LocaUtils.Load(file);
 
         LocaUtils.Save(temp_loca, file_output);
-        raiseInfo(`Exported ${to_loca} file: ${file_output}`)
+        bg3mh_logger.info(`Exported ${to_loca} file: ${file_output}`)
     }
     catch (Error) { 
-        raiseError(Error);
+        bg3mh_logger.error(Error);
     }
 }
 

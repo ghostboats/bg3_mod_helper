@@ -3,13 +3,10 @@ const path = require('path');
 const fs = require('fs');
 
 const { exec } = require('child_process');
-const { getConfig, getModName, saveConfigFile, loadConfigFile } = require('../support_files/config');
-const { rootModPath } = getConfig();
+const { getConfig, getModName } = require('../support_files/config');
 
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
+const { CREATE_LOGGER } = require('../support_files/log_utils');
 const bg3mh_logger = CREATE_LOGGER();
-
-const vscodeDirPath = path.join(rootModPath, '.vscode');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -20,15 +17,12 @@ const { pak } = getFormats();
 
 // i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function () {
-    raiseInfo("pack button clicked", false);
+    bg3mh_logger.info("pack button clicked", false);
     const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
     const modName = await getModName();
 
     const modsDirPath = path.join(rootModPath, "Mods");
     const metaPath = path.join(modsDirPath, modName, "meta.lsx");
-
-    console.log(modsDirPath);
-    console.log(metaPath);
 
     // Check if BG3 is running
     const isRunning = await isGameRunning();
@@ -52,8 +46,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     }
 
     bg3mh_logger.info("Grabbed mod name %s from %s.", modName, rootModPath);
-
-    console.log(metaPath);
+    
     if (!fs.existsSync(metaPath)) {
         const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + metaPath + '. Do you want to create one?', 'Create Meta', 'Close');
         if (shouldCreateMeta === 'Create Meta') {
@@ -84,25 +77,16 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
         } 
         else {
             bg3mh_logger.info(metaPath);
-            
             return;
         }
     }
 
-    // let settingsContent = loadConfigFile(true);
-
     // send the directory to the convert() function, and let it know it's a pak
     await convert(rootModPath, pak, modName);
 
-    /* if (settingsContent) {
-        // console.log('test3')
-        saveConfigFile(settingsContent)
-        // console.log('test5')
-    } */
     if (autoLaunchOnPack) {
         vscode.commands.executeCommand('bg3-mod-helper.launchGame');
     }
-    // console.log('test6')
 });
 
 
@@ -138,7 +122,7 @@ function isGameRunning() {
     return new Promise((resolve, reject) => {
         exec('tasklist', (error, stdout, stderr) => {
             if (error || stderr) {
-                raiseError("Error checking running processes" + error || stderr);
+                bg3mh_logger.error("Error checking running processes" + error || stderr);
                 resolve(false); // Assuming game is not running in case of error
                 return;
             }

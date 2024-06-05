@@ -2,7 +2,7 @@ const vscode = require('vscode');
 
 const path = require('path');
 
-const { getConfig, loadConfigFile, saveConfigFile } = require('../support_files/config');
+const { getConfig, loadConfigFile, setConfig } = require('../support_files/config');
 const { gameInstallLocation } = getConfig();
 
 const { raiseInfo } = require('../support_files/log_utils');
@@ -37,7 +37,7 @@ async function getTempDir() {
 // eventually we can add specific game data files for unpacking, but atm it'll just grab everything.
 const unpackGameData = vscode.commands.registerCommand('bg3-mod-helper.unpackGameDataCommand', async function () {
     let filesToConvert = await FIND_FILES(pak, path.join(gameInstallLocation, "Data"));
-    saveConfigFile();
+    setConfig();
     let workerConfig = loadConfigFile();
 
     // made this a boolean so things don't get converted unless an unpack location is selected

@@ -3,9 +3,9 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
-const { setConfig, getConfig, setModName, checkModDir, saveConfigFile, startUpConfig } = require('./support_files/config');
+const { startUpConfig } = require('./support_files/config');
 
-const { CREATE_LOGGER, raiseInfo } = require('./support_files/log_utils');
+const { CREATE_LOGGER } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 let packModImport,
@@ -41,7 +41,8 @@ let packModImport,
     resizeImageTooltip,
     resizeImageController,
     resizeImageHotbar,
-    resizeImageCustom;
+    resizeImageCustom,
+    saveConfigToFile;
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
@@ -63,6 +64,9 @@ function setCommands() {
     smartConvertCommand = require('./commands/smartConvert');
     openConverterCommand = require('./commands/openConverter');
     versionGeneratorCommand = require('./commands/versionGenerator');
+
+    // config commands
+    saveConfigToFile = require('./commands/saveConfigToFile')
 
     // lslib commands
     xmlToLocaCommand= require('./commands/commands').xmlToLocaCommand;
@@ -166,10 +170,6 @@ function activate(context) {
 
     let functionsHoverProvider = setupFunctionDescriptionHoverProvider();
 
-    let DDSToPNG = DDSToPNGCommand;
-
-    let PNGToDDS = PNGToDDSCommand;
-
     // Register resize image commands
     let resizeTooltipCommand = vscode.commands.registerCommand('bg3-mod-helper.resizeImageTooltip', resizeImageTooltip);
     let resizeControllerCommand = vscode.commands.registerCommand('bg3-mod-helper.resizeImageController', resizeImageController);
@@ -184,7 +184,7 @@ function activate(context) {
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.removeFromExcludeList', removeFromExcludeList));
-    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNG, PNGToDDS, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand);
+    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNGCommand, PNGToDDSCommand, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand);
 }
 
 
@@ -203,6 +203,7 @@ function aSimpleDataProvider() {
         getChildren: (element) => {
             if (!element) {
                 return Promise.resolve([
+                    // ideas for more dropdown menus: image utilities, generators, debug
                     { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool[tool is in development])', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Configuration Options',  id: 'config' },
@@ -226,8 +227,8 @@ function aSimpleDataProvider() {
             } else if (element.id === 'config') {
                 return Promise.resolve([
                     { label: 'Reload Window', command: 'workbench.action.reloadWindow' },
-                    { label: 'Extension Settings', command: 'workbench.action.openSettings', arguments: 'bg3ModHelper' }
-                    // { label: 'Unpack Game Data', command: 'bg3-mod-helper.unpackGameDataCommand' }
+                    { label: 'Extension Settings', command: 'workbench.action.openSettings', arguments: 'bg3ModHelper' },
+                    { label: 'Upate Settings File', command: 'bg3-mod-helper.saveConfigToFile' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([

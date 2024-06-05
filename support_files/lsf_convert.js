@@ -7,7 +7,7 @@ const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
 const { lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx } = getFormats();
 const lsfFormats = [lsb, lsf, lsj, lsfx, lsbc, lsbs, lsx];
 
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('./log_utils');
+const { CREATE_LOGGER } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
 var to_lsf;
@@ -111,10 +111,10 @@ async function processLsf(file, targetExt) {
         temp_lsf = ResourceUtils.LoadResource(file, load_params);
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
         
-        raiseInfo(`Exported ${to_lsf} file: ${file_output}`)
+        bg3mh_logger.info(`Exported ${to_lsf} file: ${file_output}`)
     }
     catch (Error) { 
-        raiseError(Error);
+        bg3mh_logger.error(Error);
     }
 }
  

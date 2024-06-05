@@ -1,6 +1,7 @@
-const { raiseError, raiseInfo } = require('./log_utils.js');
+const { CREATE_LOGGER } = require('./log_utils.js');
 const { parentPort, workerData } = require('node:worker_threads');
 
+const bg3mh_logger = CREATE_LOGGER();
 
 const { convert } = require('./conversion_junction.js')
 
@@ -10,18 +11,20 @@ function taskIntake() {
         for (let i = 0; i < workerData.task.length; i++) {
             
             try {
-                raiseInfo(`converting ${workerData.task[i]}`);
+                let info = `converting ${workerData.task[i]}`;
+                bg3mh_logger.info(info)
                 // convert(workerData.task[i]);
             } catch (Error) {
-                raiseError(`converting ${workerData.task[i]}\n failed with error ${Error}`);
+                bg3mh_logger.error(`converting ${workerData.task[i]}\n failed with error ${Error}`)
             }  
         }
     } else if (typeof(workerData.task) == 'string') {
         try {
-            raiseInfo(`converting ${workerData.task}`);
-            // convert(workerData.task);
+            let info = `converting ${workerData.task}`;
+            bg3mh_logger.info(info)
+            // convert(workerData.task[i]);
         } catch (Error) {
-            raiseError(`converting ${workerData.task}\n failed with error ${Error}`);
+            bg3mh_logger.error(`converting ${workerData.task}\n failed with error ${Error}`)
         }
     }
 

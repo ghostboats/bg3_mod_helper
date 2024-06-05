@@ -26,8 +26,12 @@
             {
                 "command": "bg3-mod-helper.smartConvert",
                 "title": "Convert this file",
-                "category": "BG3 Mod Helper",
-                "iconPath": "$(zap)"
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.saveConfigToFile",
+                "title": "Update Settings File",
+                "category": "BG3 Mod Helper"
             },
             {
                 "command": "bg3-mod-helper.goToHandleUUID",
@@ -215,6 +219,11 @@
                     "default": 10,
                     "description": "Maximum number of file instances to show on hover."
                 },
+                "bg3ModHelper.packingPriority": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Maximum number of file instances to show on hover."
+                },
                 "bg3ModHelper.hoverEnabled": {
                     "type": "boolean",
                     "default": true,
@@ -245,6 +254,11 @@
                     "default": false,
                     "description": "Automatically launch the game after you pack your mod"
                 },
+                "bg3ModHelper.zipOnPack": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Zip up your mod in a .gz (.gzip) format, for distribution on other platforms."
+                },
                 "bg3ModHelper.launchContinueGame": {
                     "type": "boolean",
                     "default": false,
@@ -272,6 +286,11 @@
                     "type": "string",
                     "default": "",
                     "description": "Name of your mod. If left empty, will default to the workspace folder."
+                },
+                "bg3ModHelper.excludeHidden": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "If, when packing mods, files and folders starting with a '.' should be excluded, ie the '.vscode' folder or a .gitignore file."
                 }
             }
         },
