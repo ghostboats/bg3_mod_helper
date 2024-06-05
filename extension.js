@@ -25,6 +25,7 @@ const openConverterCommand = require('./commands/openConverter');
 const versionGeneratorCommand = require('./commands/versionGenerator');
 const rotationToolCommand = require('./commands/rotationTool');
 const DDSViewerCommand = require('./commands/DDSViewer');
+const textEditorCommand = require('./commands/textEditor');
 
 const { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand } = require('./commands/folderShortcuts');
 
@@ -185,6 +186,7 @@ function aSimpleDataProvider() {
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Merge Xmls', command: 'bg3-mod-helper.xmlMerger' },
                     { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
+                    { label: 'Open BBCode/Markdown Editor ', command: 'bg3-mod-helper.textEditorTool'},
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Folder Shortcuts', id: 'folderShortcuts' }
