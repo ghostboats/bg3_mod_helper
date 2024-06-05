@@ -512,8 +512,5 @@
         "uuid": "^9.0.1",
         "xmlbuilder": "^15.1.1"
     },
-    "optionalDependencies": {
-        "magickwand.js": "^1.1.0"
-    },
     "license": "LGPL-3.0-or-later"
 }
