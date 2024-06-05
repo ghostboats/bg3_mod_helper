@@ -46,7 +46,7 @@ const unpackModCommand = vscode.commands.registerCommand('bg3-mod-helper.unpackM
 
     try {
         await fs.promises.mkdir(outputFolderPath, { recursive: true });
-        await processPak(pakFilePath, 'n/a', outputFolderPath);
+        await processPak(pakFilePath, outputFolderPath);
         vscode.window.showInformationMessage(`Successfully unpacked ${path.basename(pakFilePath)} to ${outputFolderPath}`);
     } catch (error) {
         vscode.window.showErrorMessage(`Failed to unpack .pak file: ${error.message}`);

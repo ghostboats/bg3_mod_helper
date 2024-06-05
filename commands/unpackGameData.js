@@ -18,17 +18,18 @@ let unpackedGameDataDirectory;
 
 
 async function getTempDir() {
-    unpackedGameDataDirectory = await vscode.window.showOpenDialog({
+    let unpackedGameDataSelectDir = await vscode.window.showOpenDialog({
         canSelectFiles: false,
         canSelectFolders: true,
         canSelectMany: false,
         title: 'Unpacked game data folder. Needs at least 160GB free space.'
     })
 
-    if (!unpackedGameDataDirectory || unpackedGameDataDirectory.length === 0) {
+    if (!unpackedGameDataSelectDir || unpackedGameDataSelectDir.length === 0) {
         vscode.window.showErrorMessage('No folder selected.');
         return false;
     } else {
+        unpackedGameDataDirectory = unpackedGameDataSelectDir[0].fsPath;
         return true;
     }
 }
@@ -42,7 +43,7 @@ const unpackGameData = vscode.commands.registerCommand('bg3-mod-helper.unpackGam
 
     // made this a boolean so things don't get converted unless an unpack location is selected
     if (isMainThread && await getTempDir()) {
-        // console.log(filesToConvert);
+        //  console.log(unpackedGameDataDirectory);
         createConversionWorkers(filesToConvert, workerConfig, unpackedGameDataDirectory);
         raiseInfo(`Game data unpacking started. Please allow a few hours for this to complete, it's a big game.`);
     }

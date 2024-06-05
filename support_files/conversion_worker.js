@@ -12,8 +12,8 @@ function taskIntake() {
             
             try {
                 let info = `converting ${workerData.task[i]}`;
-                bg3mh_logger.info(info)
-                // convert(workerData.task[i]);
+                bg3mh_logger.info(info);
+                convert(workerData.task[i]);
             } catch (Error) {
                 bg3mh_logger.error(`converting ${workerData.task[i]}\n failed with error ${Error}`)
             }  
@@ -21,8 +21,8 @@ function taskIntake() {
     } else if (typeof(workerData.task) == 'string') {
         try {
             let info = `converting ${workerData.task}`;
-            bg3mh_logger.info(info)
-            // convert(workerData.task[i]);
+            bg3mh_logger.info(info);
+            convert(workerData.task);
         } catch (Error) {
             bg3mh_logger.error(`converting ${workerData.task}\n failed with error ${Error}`)
         }

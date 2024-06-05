@@ -58,9 +58,13 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 
+    console.log(modPath);
+    console.log(unpackLocation);
+
     let rootModPath, 
         modDestPath,
-        zipOnPack;
+        zipOnPack,
+        excludeHidden;
 
     if (isMainThread) {
         vscode = require('vscode');
@@ -73,6 +77,10 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
     rootModPath = getConfig.rootModPath;
     modDestPath = getConfig.modDestPath;
     zipOnPack = getConfig.zipOnPack;
+    
+    build.ExcludeHidden = getConfig.excludeHidden;
+
+    console.log(build.ExcludeHidden);
 
     const lastFolderName = path.basename(rootModPath);
     const rootParentPath = path.dirname(rootModPath);

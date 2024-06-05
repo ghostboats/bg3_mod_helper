@@ -206,7 +206,7 @@ function aSimpleDataProvider() {
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Configuration Options',  id: 'config' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
-                    { label: 'Add/Remove Symlink (linux testing required)', command: 'bg3-mod-helper.symlinker' },
+                    { label: 'Add/Remove Symlink (In Development)', command: 'bg3-mod-helper.symlinker' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
