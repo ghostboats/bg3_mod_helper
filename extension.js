@@ -28,6 +28,7 @@ let packModImport,
     versionGeneratorCommand,
     rotationToolCommand,
     DDSViewerCommand,
+    textEditorCommand,
     openModsFolderCommand,
     openGameFolderCommand,
     openLogsFolderCommand,
@@ -61,6 +62,7 @@ function setCommands() {
     smartConvertCommand = require('./commands/smartConvert');
     openConverterCommand = require('./commands/openConverter');
     versionGeneratorCommand = require('./commands/versionGenerator');
+    textEditorCommand = require('./commands/textEditor');
 
     // config commands
     saveConfigToFile = require('./commands/saveConfigToFile')
@@ -206,12 +208,13 @@ function aSimpleDataProvider() {
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Configuration Options',  id: 'config' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
-                    { label: 'Add/Remove Symlink (in development)', command: 'bg3-mod-helper.symlinker' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
+                    { label: 'BBCode/Markdown Editor ', command: 'bg3-mod-helper.textEditorTool'},
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Merge Xmls', command: 'bg3-mod-helper.xmlMerger' },
                     { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
+                    { label: 'Add/Remove Symlink (in development)', command: 'bg3-mod-helper.symlinker' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
