@@ -233,7 +233,7 @@ function aSimpleDataProvider() {
                 return Promise.resolve([
                     { label: 'Reload Window', command: 'workbench.action.reloadWindow' },
                     { label: 'Extension Settings', command: 'workbench.action.openSettings', arguments: 'bg3ModHelper' },
-                    { label: 'Upate Settings File', command: 'bg3-mod-helper.saveConfigToFile' }
+                    { label: 'Update Settings File', command: 'bg3-mod-helper.saveConfigToFile' }
                 ]);
             } else if (element.id === 'conversion') {
                 return Promise.resolve([

@@ -144,7 +144,7 @@ function getDynamicPath(filePath) {
 
 
 // at the moment this has all the functionality i planned for it, ie lsf, loca, and paks. for any other conversions we can make separate functions
-async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getConfig.getModName, zipCheck = getConfig.zipOnPack) {
+async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getConfig.getModName) {
     let rootModPath = getConfig.rootModPath;
 
     // checks if the convertPath was undefined and halts the function before it goes any further
@@ -163,34 +163,31 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
             await convert(rootModPath, lsx)
                 .then(() => bg3mh_logger.info(`lsx conversion done`, false));
 
-            processPak(rootModPath, modName, '', zipCheck);
+            processPak(rootModPath);
         }
         // has a check for main thread here because when a worker thread calls this function, it's batch unpacking and has a specific place it needs the files inside to go, but can't rely on vscode module functions to get them
         else if (fs.statSync(convertPath).isFile()) {
             if (isMainThread) {
-                processPak(convertPath, modName);
+                processPak(convertPath);
             } else {
-                processPak(convertPath, modName, workerData.jobDestPath);
+                processPak(convertPath, workerData.jobDestPath);
             }
             
         }
     } 
     // this function works best on single files, so we need to process that array and re-run this function with each of its elements
     else if (Array.isArray(convertPath)) {
-        // console.log('array1')
         for (let i = 0; i < convertPath.length; i++) {
             convert(convertPath[i], path.extname(convertPath[i]));
         }
     } 
     // if this function is passsed a directory, parse it into an array of files of the specified type in targetExt, then send that back through
     else if (fs.statSync(convertPath).isDirectory()) {
-        // console.log('plz1')
         const filesToConvert = await FIND_FILES(targetExt);
         convert(filesToConvert);
     } 
     // finally, if this function is handed a file, convert that bitch :catyes:
     else if (fs.statSync(convertPath).isFile()) {
-        // console.log('plz2')
         if (isLoca(targetExt)) {
             try {
                 processLoca(convertPath, targetExt);

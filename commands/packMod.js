@@ -87,7 +87,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     }
 
     // send the directory to the convert() function, and let it know it's a pak
-    await convert(rootModPath, pak, modName, getConfig().zipOnPack);
+    await convert(rootModPath, pak, modName);
 
     if (autoLaunchOnPack) {
         vscode.commands.executeCommand('bg3-mod-helper.launchGame');

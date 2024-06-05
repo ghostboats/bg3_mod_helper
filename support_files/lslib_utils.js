@@ -39,7 +39,6 @@ const hotfixPatchRegex = /Patch[\d]+_Hotfix[\d]+/;
 // tools to test where the process is
 const { isMainThread, workerData } = require('node:worker_threads');
 
-var DLLS = [];
 var DLL_PATHS, LSLIB, lslibPath, compatRootModPath, lslibToolsPath, vscode, findFiles, parse;
 var getConfig;
 
@@ -174,20 +173,25 @@ function FIND_FILES_SYNC(filesPath, targetExt = getFormats().lsf, isRecursive = 
 // beautiful. still needs dll handling in lslib_utils though, and some refactoring
 async function FIND_FILES(targetExt = getFormats().lsf, filesPath = '**/*') {
     let filesList;
+    // these don't do anything... yet
+    let globToSearch;
     let nonRecursiveGlob = '*';
     let recursiveGlob = '**/*'
+    
+    // pak logic may not be needed here, will check at some point
+    if (targetExt === getFormats().dll || targetExt === getFormats().pak) {
+        // finding dlls needs to not be recursive so we don't accidentally load things twice
+        if (targetExt === getFormats().dll) {
+            globToSearch = nonRecursiveGlob;
+        }
+        // paks can be recursive, but we need to account for them not being in the workspace, like dlls
+        else if (targetExt === getFormats().pak) {
+            globToSearch = recursiveGlob;
+        }
 
-    // finding dlls needs to not be recursive so we don't accidentally load things twice
-    if (targetExt === getFormats().dll) {
-        let dllDir = new vscode.RelativePattern(filesPath, '*' + targetExt);
-        filesList = (await findFiles(dllDir)).map(file =>  dirSeparator(file.path));
-    }
-    // paks can be recursive, but we need to account for them not being in the workspace, like dlls
-    else if (targetExt === getFormats().pak) {
-        let dllDir = new vscode.RelativePattern(filesPath, '**/*' + targetExt);
-        filesList = (await findFiles(dllDir)).map(file => dirSeparator(file.path));
-    }
-    else {
+        let fileDir = new vscode.RelativePattern(filesPath, globToSearch + targetExt);
+        filesList = (await findFiles(fileDir)).map(file =>  dirSeparator(file.path));
+    } else {
         filesList = (await findFiles(filesPath + targetExt)).map(file => dirSeparator(file.path));
     }
 
@@ -228,9 +232,12 @@ function FILTER_PATHS(filesPath) {
                 return filesPath;
             }
             // if paks are being grabbed, it's for unpacking, so exclude the ones that throw errors
-            else if (temp_ext === getFormats().pak && !(virtualTextureRegex.test(temp_name) || hotfixPatchRegex.test(temp_name))) {
+            else if (
+                temp_ext === getFormats().pak && 
+                !(virtualTextureRegex.test(temp_name) || 
+                hotfixPatchRegex.test(temp_name))
+            ) {
                 return filesPath;
-
             }
             // check if an item is excluded by user, in a path that should be converted, or can be ignored
             else if (
@@ -248,23 +255,23 @@ function FILTER_PATHS(filesPath) {
 
 
 // here in case people (i'm people) have their working directory and their AppData on different hard drives.
-function moveFileAcrossDevices(sourcePath, destPath, bg3mh_logger) {
+function moveFileAcrossDevices(sourcePath, destPath, logger = bg3mh_logger) {
     let infoMsg = `${path.basename(sourcePath)} moved to ${destPath}.`;
 
     fs.readFile(sourcePath, (readErr, data) => {
         if (readErr) {
-            bg3mh_logger.error(readErr);
+            logger.error(readErr);
             return;
         }
         fs.writeFile(destPath, data, (writeErr) => {
             if (writeErr) {
-                bg3mh_logger.error(writeErr);
+                logger.error(writeErr);
                 return;
             }
             fs.unlink(sourcePath, unlinkErr => {
                 // added the check because it was raising an error every time the func was called
                 if (unlinkErr) {
-                    bg3mh_logger.error(unlinkErr);
+                    logger.error(unlinkErr);
                     return;
                 }
             });
@@ -272,13 +279,14 @@ function moveFileAcrossDevices(sourcePath, destPath, bg3mh_logger) {
     });
     
     if (isMainThread) {
-        bg3mh_logger.info(infoMsg, false);
+        logger.info(infoMsg, false);
         vscode.window.showInformationMessage(infoMsg);
     } else {
-        bg3mh_logger.info(infoMsg, false);
+        logger.info(infoMsg, false);
     }
 }
 
+// probably not needed but i'll investigate later
 // i don't like putting this here but i need a worker_thread friendly version
 function getModNameSync() {
     let rootModPath;

@@ -1,7 +1,9 @@
 const path = require('path');
 
+const { isMainThread } = require('worker_threads');
+
 const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
-const { CREATE_LOGGER } = require('./log_utils');
+const { CREATE_LOGGER, raiseInfo } = require('./log_utils');
 const bg3mh_logger = CREATE_LOGGER();
 
 const { xml, loca } = getFormats();
@@ -54,7 +56,15 @@ async function processLoca(file, targetExt) {
         temp_loca = LocaUtils.Load(file);
 
         LocaUtils.Save(temp_loca, file_output);
-        bg3mh_logger.info(`Exported ${to_loca} file: ${file_output}`)
+
+        if (isMainThread) {
+            const vscode = require('vscode');
+            vscode.window.showInformationMessage(`Exported ${to_loca} file: ${file_output}`);
+        } else {
+            bg3mh_logger.info(`Exported ${to_loca} file: ${file_output}`);
+        }
+        
+        
     }
     catch (Error) { 
         bg3mh_logger.error(Error);
