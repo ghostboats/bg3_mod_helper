@@ -25,6 +25,7 @@ function normalizeExcludedFiles(excludedFiles) {
 function getModName() {
     const { rootModPath } = getConfig();
     const modsDirPath = path.join(rootModPath, 'Mods');
+    const excludeDirs = ['Gustav', 'GustavDev']; // Directories to exclude
 
     try {
         if (!fs.existsSync(modsDirPath)) {
@@ -33,8 +34,8 @@ function getModName() {
         }
 
         const files = fs.readdirSync(modsDirPath);
-        const directories = files.filter(file => 
-            fs.statSync(path.join(modsDirPath, file)).isDirectory()
+        const directories = files.filter(file =>
+            fs.statSync(path.join(modsDirPath, file)).isDirectory() && !excludeDirs.includes(file)
         );
 
         if (directories.length === 1) {
@@ -47,6 +48,7 @@ function getModName() {
         return '';
     }
 }
+
 
 
 function getConfig() {
