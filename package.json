@@ -253,7 +253,7 @@
                 "bg3ModHelper.rootModPath": {
                     "type": "string",
                     "default": "",
-                    "description": "DO NOT ALTER THIS GLOBAL SETTING, RATHER CHANGE IN WORKSPACE SETTING IF YOU NEED TO, PROBABLY DONT NEED TO SINCE ITS AUTOSET (WORKSPACE SETTING FOUND ABOVE, NEXT TO USER). Root mod folder path. The folder that will get packed when you run the Pack Current Mod command."
+                    "description": "(Requires reload- Configuration Options > Reload Window) DO NOT ALTER THIS GLOBAL SETTING, RATHER CHANGE IN WORKSPACE SETTING IF YOU NEED TO, PROBABLY DONT NEED TO SINCE ITS AUTOSET (WORKSPACE SETTING FOUND ABOVE, NEXT TO USER). Root mod folder path. The folder that will get packed when you run the Pack Current Mod command."
                 },
                 "bg3ModHelper.modDestPath": {
                     "type": "string",
@@ -263,12 +263,12 @@
                 "bg3ModHelper.lslibPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5\\Packed]:"
+                    "description": "(Requires reload- Configuration Options > Reload Window) Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5\\Packed]:"
                 },
                 "bg3ModHelper.autoLaunchOnPack": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Automatically launch the game after you pack your mod"
+                    "description": "(Requires reload- Configuration Options > Reload Window) Automatically launch the game after you pack your mod"
                 },
                 "bg3ModHelper.zipOnPack": {
                     "type": "boolean",
@@ -301,7 +301,7 @@
                 "bg3ModHelper.modName": {
                     "type": "string",
                     "default": "",
-                    "description": "Name of your mod. If left empty, will default to the workspace folder."
+                    "description": "(Requires reload- Configuration Options > Reload Window) Name of your mod. If left empty, will default to the workspace folder."
                 },
                 "bg3ModHelper.excludeHidden": {
                     "type": "boolean",

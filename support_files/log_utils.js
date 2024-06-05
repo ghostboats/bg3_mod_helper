@@ -146,4 +146,10 @@ if (isMainThread) {
 }
 
 
-module.exports = { LOGDATE, logPath, CREATE_LOGGER, raiseError, raiseInfo };
+module.exports = { 
+    LOGDATE, 
+    logPath, 
+    CREATE_LOGGER, 
+    raiseError, 
+    raiseInfo 
+};

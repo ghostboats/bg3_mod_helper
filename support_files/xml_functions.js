@@ -26,7 +26,6 @@ function xmlUpdate(){
     const metaPath = path.join(rootModPath, 'Mods', getConfig.modName, 'meta.lsx');
     let xmlContent = fs.readFileSync(metaPath, 'utf8');
     
-
     // Modify the Name attribute in the XML
     xmlContent = xmlContent.replace(/(<attribute id="Name" type="FixedString" value=")(.*?)("\/>)/, `$1${lastFolderName}$3`);
 

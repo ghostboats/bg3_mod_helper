@@ -15,11 +15,10 @@ var LSLIB;
 
 async function lslib_load() {
     if (LSLIB === undefined) {
-        console.log("lslib not found. loading...");
+        bg3mh_logger.info("lslib not found. loading...");
         LSLIB = await LOAD_LSLIB();
-        // console.log(typeof(LSLIB))
     } else {
-        console.log("lslib is already loaded!");
+        bg3mh_logger.info("lslib is already loaded!");
     }
 }
 
@@ -128,4 +127,9 @@ async function processLsf(file, targetExt) {
 }
  
 lslib_load();
-module.exports = { isLsf, processLsf, getLsfOutputPath, to_lsf };
+module.exports = { 
+    isLsf, 
+    processLsf, 
+    getLsfOutputPath, 
+    to_lsf 
+};

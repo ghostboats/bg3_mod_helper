@@ -66,4 +66,8 @@ async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
 }
 
 
-module.exports = { insertText, findInstancesInWorkspace, getFullPath };
+module.exports = { 
+    insertText, 
+    findInstancesInWorkspace, 
+    getFullPath 
+};

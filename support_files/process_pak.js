@@ -21,11 +21,10 @@ let LSLIB,
 
 async function lslib_load() {
     if (LSLIB === undefined) {
-        console.log("lslib not found. loading...");
+        bg3mh_logger.info("lslib not found. loading...");
         LSLIB = await LOAD_LSLIB();
-        // console.log(typeof(LSLIB))
     } else {
-        console.log("lslib is already loaded!");
+        bg3mh_logger.info("lslib is already loaded!");
     }
 }
 
@@ -58,18 +57,14 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 
-    console.log(modPath);
-    console.log(unpackLocation);
-
     let rootModPath, 
         modDestPath,
         zipOnPack,
-        excludeHidden;
+        packingPriority;
 
     if (isMainThread) {
         vscode = require('vscode');
         getConfig = require('./config.js').getConfig();
-
     } else {
         getConfig = workerData.workerConfig;
     }
@@ -77,8 +72,10 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
     rootModPath = getConfig.rootModPath;
     modDestPath = getConfig.modDestPath;
     zipOnPack = getConfig.zipOnPack;
+    packingPriority = getConfig.packingPriority
     
     build.ExcludeHidden = getConfig.excludeHidden;
+    build.Priority = packingPriority
 
     console.log(build.ExcludeHidden);
 
@@ -88,13 +85,11 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
     const modFinalDestPath = path.join(modDestPath, lastFolderName + pak);
     const modTempDestPath = path.join(temp_path, lastFolderName + pak);
     
-
     try {
         if (path.extname(modPath) === pak && fs.statSync(modPath).isFile()) {
             try {
                 await Packager.UncompressPackage(modPath, unpackLocation);
-            }
-            catch (Error) {
+            } catch (Error) {
                 bg3mh_logger.error(Error);
             }
             bg3mh_logger.info(`Mod ${path.basename(modPath)} unpacked to ${unpackLocation}`);
@@ -121,4 +116,7 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
 }
 
 lslib_load();
-module.exports = { processPak, prepareTempDir };
+module.exports = { 
+    processPak, 
+    prepareTempDir 
+};

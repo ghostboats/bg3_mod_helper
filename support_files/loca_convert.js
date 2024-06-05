@@ -13,11 +13,10 @@ var LSLIB;
 
 async function lslib_load() {
     if (LSLIB === undefined) {
-        bg3mh_logger.info("lslib not found. loading...", false);
+        bg3mh_logger.info("lslib not found. loading...");
         LSLIB = await LOAD_LSLIB();
-        // console.log(typeof(LSLIB))
     } else {
-        bg3mh_logger.info("lslib is already loaded!", false);
+        bg3mh_logger.info("lslib is already loaded!");
     }
 }
 
@@ -72,5 +71,10 @@ async function processLoca(file, targetExt) {
 }
 
 lslib_load();
-module.exports = { isLoca, processLoca, getLocaOutputPath, to_loca };
+module.exports = { 
+    isLoca, 
+    processLoca, 
+    getLocaOutputPath, 
+    to_loca 
+};
 

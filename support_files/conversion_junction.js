@@ -210,4 +210,8 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
 }
 
 
-module.exports = { convert, jobs, createConversionWorkers };
+module.exports = { 
+    convert, 
+    jobs, 
+    createConversionWorkers 
+};

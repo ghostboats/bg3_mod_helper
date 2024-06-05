@@ -175,4 +175,11 @@ function loadConfigFile(reset = false, get = true, worker = true) {
 }
 
 
-module.exports = { setConfig, getConfig, getModName, loadConfigFile, setModName, startUpConfig };
+module.exports = { 
+    setConfig, 
+    getConfig, 
+    getModName, 
+    loadConfigFile, 
+    setModName, 
+    startUpConfig 
+};

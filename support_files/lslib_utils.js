@@ -332,4 +332,16 @@ function getModNameSync() {
 }
 
 
-module.exports = { LSLIB, LOAD_LSLIB, FIND_FILES, FIND_FILES_SYNC, FILTER_PATHS, getFormats, moveFileAcrossDevices, baseNamePath, dirSeparator, compatRootModPath, getModNameSync };
+module.exports = { 
+    LSLIB, 
+    LOAD_LSLIB, 
+    FIND_FILES, 
+    FIND_FILES_SYNC, 
+    FILTER_PATHS, 
+    getFormats, 
+    moveFileAcrossDevices, 
+    baseNamePath, 
+    dirSeparator, 
+    compatRootModPath, 
+    getModNameSync 
+};
