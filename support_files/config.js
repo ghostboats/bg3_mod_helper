@@ -92,7 +92,7 @@ function getConfig() {
         hoverMaxFiles: config.get('hoverMaxFiles'),
         hoverEnabled: config.get('hoverEnabled'),
         hoverShowPath: config.get('hoverShowPath'),
-        maxCacheSize: config.get('general.maxCacheSize'),
+        maxCacheSize: config.get('maxCacheSize'),
         rootModPath: path.normalize(config.get('rootModPath')),
         modDestPath: path.normalize(config.get('modDestPath')),
         lslibPath: path.normalize(config.get('lslibPath')),
@@ -144,7 +144,7 @@ function setModName(rootPath = getConfig().rootModPath) {
 
 
 function getModName() {
-    return config.get('modName') || config.get('bg3ModHelper.modName');
+    return config.get('modName');
 }
 
 

@@ -7,7 +7,7 @@ const path = require('path');
 const LSLIB_DLL = 'LSLib.dll';
 const TOOL_SUBDIR = 'Tools\\';
 
-const { getConfig, loadConfigFile, saveConfigFile, setModName, setConfig } = require('../support_files/config');
+const { getConfig, loadConfigFile, setModName, setConfig } = require('../support_files/config');
 const { lslibPath, rootModPath,  gameInstallLocation } = getConfig();
 const compatRootModPath = path.join(rootModPath + "\\");
 const lslibToolsPath = path.join(lslibPath, TOOL_SUBDIR);
