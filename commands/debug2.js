@@ -27,7 +27,7 @@ const { jobs } = require('../support_files/conversion_junction');
 
  
 const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', async function () {
-    // raiseInfo("hi dipshit! 💩");
+    raiseInfo("you little fucking 💩");
 });
 
 
