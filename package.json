@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.2.3",
+    "version": "2.2.42",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.86.0"
@@ -161,8 +161,8 @@
                 "category": "BG3 Mod Helper"
             },
             {
-                "command": "bg3-mod-helper.debugCommand",
-                "title": "For dev use, dont press the button"
+                "command": "bg3-mod-helper.xmlMerger",
+                "title": "XML Merger"
             },
             {
                 "command": "bg3-mod-helper.debug2Command",
@@ -204,7 +204,23 @@
                 "command": "bg3-mod-helper.addDependencies",
                 "title": "Add Dependencies",
                 "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.symlinker",
+                "title": "Symlink your current mod",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.generateReplaceAllUUIDs",
+                "title": "Generate and Replace All UUIDs",
+                "category": "BG3 Mod Helper"
+            },
+            {
+                "command": "bg3-mod-helper.packModZip",
+                "title": "Pack Mod as ZIP",
+                "category": "BG3 Mod Helper"
             }
+            
         ],
         "configuration": {
             "title": "BG3 Mod Helper",
@@ -404,6 +420,11 @@
                 {
                     "command": "bg3-mod-helper.createFileFromTemplate",
                     "group": "navigation@2"
+                },
+                {
+                    "when": "editorTextFocus && editorHasSelection",
+                    "command": "bg3-mod-helper.generateReplaceAllUUIDs",
+                    "group": "navigation@0"
                 }
             ],
             "bg3ModHelper.exportToolsSubmenu": [

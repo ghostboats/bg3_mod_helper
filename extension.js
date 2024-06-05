@@ -46,7 +46,7 @@ let packModImport,
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
-const setupUuidsHandlesHoverProvider = require('./hovers/uuidsHandlesCollector');
+const { setupUuidsHandlesHoverProvider, registerTextEditCommand }= require('./hovers/uuidsHandlesCollector');
 
 const { getFullPath } = require('./support_files/helper_functions');
 
@@ -167,6 +167,7 @@ function activate(context) {
     ));
 
     let uuidsHandlesHoverProvider = setupUuidsHandlesHoverProvider();
+    let uuidsHandlesHoverProviderr = registerTextEditCommand();
 
     let functionsHoverProvider = setupFunctionDescriptionHoverProvider();
 
@@ -208,9 +209,12 @@ function aSimpleDataProvider() {
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Configuration Options',  id: 'config' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
+                    { label: 'Add/Remove Symlink (linux testing required)', command: 'bg3-mod-helper.symlinker' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
+                    { label: 'Merge Xmls', command: 'bg3-mod-helper.xmlMerger' },
+                    { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
                     { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
@@ -221,8 +225,9 @@ function aSimpleDataProvider() {
             } else if (element.id === 'packer') {
                 return Promise.resolve([
                     { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
+                    { label: 'Pack Mod and ZIP(gz)', command: 'bg3-mod-helper.packModZip' },
                     { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' },
-                    { label: 'Unpack Game Data', command: 'bg3-mod-helper.unpackGameDataCommand' }
+                    { label: 'Unpack Game Data (in development)', command: 'bg3-mod-helper.unpackGameDataCommand' }
                 ]);
             } else if (element.id === 'config') {
                 return Promise.resolve([
