@@ -44,6 +44,8 @@ function getLocaOutputPath(filePath) {
 
 
 async function processLoca(file, targetExt) {
+    await lslib_load();
+    
     var LocaUtils = LSLIB.LocaUtils;
     var file_output;
     var temp_loca;

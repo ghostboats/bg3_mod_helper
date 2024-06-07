@@ -144,7 +144,7 @@ function getDynamicPath(filePath) {
 
 
 // at the moment this has all the functionality i planned for it, ie lsf, loca, and paks. for any other conversions we can make separate functions
-async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), modName = getConfig.getModName) {
+async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
     let rootModPath = getConfig.rootModPath;
 
     // checks if the convertPath was undefined and halts the function before it goes any further

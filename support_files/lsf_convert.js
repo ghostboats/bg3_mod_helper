@@ -93,6 +93,8 @@ function getLsfOutputPath(filePath) {
 
 
 async function processLsf(file, targetExt) {
+    await lslib_load();
+
     const ResourceConversionParameters = LSLIB.ResourceConversionParameters;
     const ResourceLoadParameters = LSLIB.ResourceLoadParameters;
     const Game = LSLIB.Enums.Game;

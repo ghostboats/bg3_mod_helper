@@ -52,3 +52,5 @@ const unpackModCommand = vscode.commands.registerCommand('bg3-mod-helper.unpackM
         vscode.window.showErrorMessage(`Failed to unpack .pak file: ${error.message}`);
     }
 });
+
+module.exports = { unpackModCommand };
