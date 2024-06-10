@@ -1,34 +1,47 @@
 const vscode = require('vscode');
-const fs = require('fs');
-const os = require('os');
+const dotMap = require('../support_files/templates/dotFile');  // Assuming this path is correct
 
-const path = require('path');
+const debug = vscode.commands.registerCommand('bg3-mod-helper.debugCommand', function () {
+    const panel = vscode.window.createWebviewPanel(
+        'dotMap',
+        'BG3 Map Helper',
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true
+        }
+    );
 
-const LSLIB_DLL = 'LSLib.dll';
-const TOOL_SUBDIR = 'Tools\\';
-
-const { getConfig, loadConfigFile, setModName, setConfig } = require('../support_files/config');
-const { lslibPath, rootModPath,  gameInstallLocation } = getConfig();
-const compatRootModPath = path.join(rootModPath + "\\");
-const lslibToolsPath = path.join(lslibPath, TOOL_SUBDIR);
-
-const {  } = require('../support_files/helper_functions')
-
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
-var bg3mh_logger = CREATE_LOGGER();
-
-const { FIND_FILES, getFormats, dirSeparator, LOAD_LSLIB } = require('../support_files/lslib_utils.js');
-const { pak } = getFormats();
-const { processPak } = require('../support_files/process_pak.js');
-
-const { isMainThread, parentPort, Worker } = require('node:worker_threads');
-
-const { jobs } = require('../support_files/conversion_junction');
-
- 
-const debug = vscode.commands.registerCommand('bg3-mod-helper.debugCommand', async function () {
-    raiseInfo("hi dipshit! 💩");
+    // Since dotMap is directly an array, we can use it directly
+    panel.webview.html = getWebviewContent(dotMap);
 });
 
+function getWebviewContent(coordinates) {
+    const dotsScript = coordinates.map(coordinate => `
+        // Draw each dot
+        ctx.beginPath();
+        ctx.arc(${coordinate.x}, ${coordinate.y}, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillText('${coordinate.info}', ${coordinate.x + 10}, ${coordinate.y});
+    `).join('');
 
-module.exports = { debug }
+    return `
+        <html>
+            <head>
+                <style>
+                    canvas { width: 500px; height: 500px; }
+                </style>
+            </head>
+            <body>
+                <canvas id="mapCanvas"></canvas>
+                <script>
+                    const canvas = document.getElementById('mapCanvas');
+                    const ctx = canvas.getContext('2d');
+                    ${dotsScript}
+                    // Handle canvas clicks or other interactions here
+                </script>
+            </body>
+        </html>
+    `;
+}
+
+module.exports = { debug };
