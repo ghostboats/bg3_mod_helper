@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-const dotMap = require('../support_files/templates/dotFile');  // Assuming this path is correct
+const dotMap = require('../support_files/templates/dotFile');
 
 const debug = vscode.commands.registerCommand('bg3-mod-helper.debugCommand', function () {
     const panel = vscode.window.createWebviewPanel(
@@ -11,7 +11,6 @@ const debug = vscode.commands.registerCommand('bg3-mod-helper.debugCommand', fun
         }
     );
 
-    // Since dotMap is directly an array, we can use it directly
     panel.webview.html = getWebviewContent(dotMap);
 });
 
