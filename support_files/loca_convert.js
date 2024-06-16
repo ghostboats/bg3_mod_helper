@@ -1,5 +1,4 @@
-const path = require('path');
-
+const os = require('os');
 const { isMainThread } = require('worker_threads');
 
 const { getFormats, baseNamePath, LOAD_LSLIB } = require('./lslib_utils');
@@ -10,6 +9,15 @@ const { xml, loca } = getFormats();
 
 var to_loca;
 var LSLIB;
+var path = setPathPlatform();
+
+
+function setPathPlatform() {
+    if (os.platform() === 'win32') {
+        return require('path');
+    }
+    return require('path').posix;
+}
 
 async function lslib_load() {
     if (LSLIB === undefined) {
