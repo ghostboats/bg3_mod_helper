@@ -242,7 +242,7 @@
                 "bg3ModHelper.packingPriority": {
                     "type": "number",
                     "default": 0,
-                    "description": "Maximum number of file instances to show on hover."
+                    "description": "Priority to pack with. Good to leave at 0 if you don't need it for anything else or know what it does."
                 },
                 "bg3ModHelper.hoverEnabled": {
                     "type": "boolean",
