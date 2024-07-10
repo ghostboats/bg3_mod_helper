@@ -85,6 +85,7 @@ function dirSeparator(filePath) {
     return filePath.toString();
 }
 
+
 // returns the given path, minus the file extension (ie. \home\shiela\doc.txt > \home\shiela\doc)
 function baseNamePath(filePath, ext) {
     return filePath.substring(0, (filePath.length - ext.length));
