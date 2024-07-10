@@ -49,7 +49,7 @@ let createFileFromTemplateCommand = vscode.commands.registerCommand('bg3-mod-hel
     }
 
     let fileName = selectedTemplateName;
-    if (selectedTemplateName === 'Localization loca.xml') {
+    if (selectedTemplateName === 'Localization xml') {
         const { fileName: localeFileName, fileContent: localeFileContent, selectedLocale } = await handleLocalizationTemplate(fileContent);
         if (!localeFileName) {
             return;
@@ -64,7 +64,7 @@ let createFileFromTemplateCommand = vscode.commands.registerCommand('bg3-mod-hel
 
 async function handleLocalizationTemplate(fileContent) {
     const selectedLocale = await vscode.window.showQuickPick(locales, {
-        placeHolder: 'Select a locale for the .loca.xml file'
+        placeHolder: 'Select a locale for the xml file'
     });
 
     if (!selectedLocale) {
@@ -73,7 +73,7 @@ async function handleLocalizationTemplate(fileContent) {
     }
 
     const modName = await getModName();
-    const fileName = `${modName}_${selectedLocale}.loca.xml`;
+    const fileName = `${modName}_${selectedLocale}.xml`;
     return { fileName, fileContent, selectedLocale };
 }
 
