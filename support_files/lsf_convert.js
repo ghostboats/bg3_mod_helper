@@ -122,6 +122,7 @@ async function processLsf(file, targetExt) {
     }
     catch (Error) {
         if (isMainThread) {
+            vscode = require('vscode');
             vscode.window.showErrorMessage(Error);
         } else {
             bg3mh_logger.info(Error);
