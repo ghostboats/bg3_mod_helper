@@ -25,9 +25,24 @@ const { isMainThread, parentPort, Worker } = require('node:worker_threads');
 
 const { jobs } = require('../support_files/conversion_junction');
 
- 
+var LSLIB;
+
+
+async function lslib_load() {
+    if (LSLIB === undefined) {
+        bg3mh_logger.info("lslib not found. loading...");
+        LSLIB = await LOAD_LSLIB();
+    } else {
+        bg3mh_logger.info("lslib is already loaded!");
+    }
+}
+
+
 const debug2 = vscode.commands.registerCommand('bg3-mod-helper.debug2Command', async function () {
-    raiseInfo("you little fucking 💩");
+    // raiseInfo("you little fucking 💩");
+    lslib_load();
+    raiseInfo(`${os.platform()}`);
+    
 });
 
 

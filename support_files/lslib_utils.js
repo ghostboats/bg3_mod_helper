@@ -5,6 +5,7 @@
 */
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 
 // loads the api
@@ -16,7 +17,7 @@ const dotnet = require('node-api-dotnet/net8.0');
 */
 
 const LSLIB_DLL = 'LSLib.dll';
-const TOOL_SUBDIR = 'Tools\\';
+const TOOL_SUBDIR = path.join('Tools', path.sep);
 const { CREATE_LOGGER } = require('./log_utils.js')
 const bg3mh_logger = CREATE_LOGGER();
 
@@ -46,7 +47,7 @@ var getConfig;
 if (isMainThread) {
     getConfig = require('./config.js').getConfig;
     lslibPath = getConfig().lslibPath;
-    compatRootModPath = path.join(getConfig().rootModPath + "\\");
+    compatRootModPath = path.join(getConfig().rootModPath + path.sep);
     lslibToolsPath = path.join(getConfig().lslibPath, TOOL_SUBDIR);
     vscode = require('vscode');
     findFiles = vscode.workspace.findFiles;
@@ -54,7 +55,7 @@ if (isMainThread) {
 } else {
     getConfig = workerData.workerConfig;
     lslibPath = getConfig.lslibPath;
-    compatRootModPath = path.join(getConfig.rootModPath + "\\");
+    compatRootModPath = path.join(getConfig.rootModPath + path.sep);
     lslibToolsPath = path.join(getConfig.lslibPath, TOOL_SUBDIR);
 }
 
@@ -78,7 +79,7 @@ function getFormats() {
 
 function dirSeparator(filePath) {
     filePath = path.normalize(filePath);
-    if (filePath[0] == "/" || filePath[0] == "\\") {
+    if ((filePath[0] == "/" || filePath[0] == "\\" ) && os.platform() === 'win32') {
         return filePath.slice(1, filePath.length).toString();
     }
     return filePath.toString();
@@ -135,9 +136,9 @@ async function LOAD_LSLIB() {
     // normalize the paths and load them into the dotnet api variable
     await loadDlls();
     if (isMainThread) {
-        bg3mh_logger.info(`${DLL_PATHS} \n.dlls loaded`);
+        // bg3mh_logger.info(`${DLL_PATHS} \n.dlls loaded`);
     } else {
-        bg3mh_logger.info(`.dlls loaded into worker ${workerData.workerId}`)
+        // bg3mh_logger.info(`.dlls loaded into worker ${workerData.workerId}`)
     }
     
     // have to ignore this because the ts-linter doesn't know 'LSLib' exists :starege:

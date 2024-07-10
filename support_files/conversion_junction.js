@@ -1,5 +1,4 @@
 // what's your function
-const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
@@ -15,7 +14,16 @@ const { processPak, prepareTempDir } = require('./process_pak');
 
 const { isMainThread, workerData, Worker } = require('node:worker_threads');
 
-let getConfig;
+var getConfig;
+var path = setPathPlatform();
+
+
+function setPathPlatform() {
+    if (os.platform() === 'win32') {
+        return require('path');
+    }
+    return require('path').posix;
+}
 
 
 // need this outside a function so it's run on load. 

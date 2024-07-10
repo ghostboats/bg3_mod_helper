@@ -12,6 +12,7 @@ var bg3mh_logger = CREATE_LOGGER();
 
 var to_lsf;
 var LSLIB;
+var vscode;
 
 async function lslib_load() {
     if (LSLIB === undefined) {
@@ -113,7 +114,7 @@ async function processLsf(file, targetExt) {
         ResourceUtils.SaveResource(temp_lsf, file_output, conversion_params);
 
         if (isMainThread) {
-            const vscode = require('vscode');
+            vscode = require('vscode');
             vscode.window.showInformationMessage(`Exported ${to_lsf} file: ${file_output}`);
         } else {
             bg3mh_logger.info(`Exported ${to_lsf} file: ${file_output}`);
