@@ -28,7 +28,8 @@ if (isMainThread) {
     const vscode = require('vscode');
     const config = vscode.workspace.getConfiguration('bg3ModHelper');
     lslibPath = config.get('lslibPath');
-    logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + ".log");
+    let logName = ("bg3mh_log_" + LOGDATE() + ".log").concat();
+    logPath = path.join(lslibPath, "logs", path.sep, logName);
 
     CREATE_LOGGER = () => {
         var log4js = require('log4js');
@@ -89,7 +90,8 @@ if (isMainThread) {
     }
 } else {
     lslibPath = workerData.workerConfig.lslibPath;
-    logPath = path.normalize(lslibPath + "\\logs\\bg3mh_log_" + LOGDATE() + "_worker_thread.log");
+    let logName = ("bg3mh_log_" + LOGDATE() + ".log").concat();
+    logPath = path.join(lslibPath, "logs", logName);
 
     CREATE_LOGGER = () => {
         var log4js = require('log4js');
