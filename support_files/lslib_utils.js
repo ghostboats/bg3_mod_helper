@@ -79,7 +79,7 @@ function getFormats() {
 
 function dirSeparator(filePath) {
     filePath = path.normalize(filePath);
-    if ((filePath[0] == "/" || filePath[0] == "\\" ) && os.platform() === 'win32') {
+    if ((filePath[0] == path.sep) && os.platform() === 'win32') {
         return filePath.slice(1, filePath.length).toString();
     }
     return filePath.toString();

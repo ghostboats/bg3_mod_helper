@@ -12,7 +12,7 @@ const { isMainThread, workerData } = require('node:worker_threads');
 const { CREATE_LOGGER } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
 
-const temp_folder = "\\temp_folder";
+const temp_folder = path.join(path.sep, "temp_folder");
 
 let LSLIB, 
     getConfig, 

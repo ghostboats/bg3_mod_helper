@@ -179,8 +179,7 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
                 processPak(convertPath);
             } else {
                 processPak(convertPath, workerData.jobDestPath);
-            }
-            
+            } 
         }
     } 
     // this function works best on single files, so we need to process that array and re-run this function with each of its elements

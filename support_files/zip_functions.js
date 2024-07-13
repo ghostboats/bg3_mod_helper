@@ -8,7 +8,7 @@ const { pipeline } = require('stream');
 const { promisify } = require('util');
 const streamPipeline = promisify(pipeline);
 
-
+const JSZip = require('jszip');
 
 const { pak } = require('./lslib_utils').getFormats();
 
@@ -29,10 +29,12 @@ if (isMainThread) {
 
 let zipOnPack = getConfig.zipOnPack;
 
+let zip = new JSZip();
+
 async function zipUpPak(zipPak = zipOnPack) {
     let rootModPath = getConfig.rootModPath;
 
-    const temp_folder = "\\temp_folder";
+    const temp_folder = path.join(path.sep, "temp_folder");
     const lastFolderName = path.basename(rootModPath);
     const rootParentPath = path.dirname(rootModPath);
     const temp_path = path.join(rootParentPath, temp_folder);
