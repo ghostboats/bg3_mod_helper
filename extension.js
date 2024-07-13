@@ -4,6 +4,7 @@ const { startUpConfig } = require('./support_files/config');
 
 const { CREATE_LOGGER } = require('./support_files/log_utils');
 var bg3mh_logger = CREATE_LOGGER();
+const updateManager = require('./support_files/release_notes');
 
 let packModImport,
     unpackModCommand,
@@ -138,6 +139,7 @@ async function removeFromExcludeList(fileUri) {
  */
 function activate(context) {
     bg3mh_logger.info('Displaying extension activation message');
+    updateManager.checkForUpdates(context);
 
     startUpConfig();
 
