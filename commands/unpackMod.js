@@ -1,7 +1,6 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const { getConfig } = require('../support_files/config');
 const { processPak } = require('../support_files/process_pak.js');
 
 const unpackModCommand = vscode.commands.registerCommand('bg3-mod-helper.unpackMod', async function (fileUri) {
@@ -41,8 +40,7 @@ const unpackModCommand = vscode.commands.registerCommand('bg3-mod-helper.unpackM
     }
 
     const baseOutputFolderPath = outputFolderUri[0].fsPath;
-    const pakFileName = path.basename(pakFilePath, path.extname(pakFilePath));
-    const outputFolderPath = path.join(baseOutputFolderPath, `${pakFileName}_unpacked`);
+    const outputFolderPath = path.join(baseOutputFolderPath, ".pak");
 
     try {
         await fs.promises.mkdir(outputFolderPath, { recursive: true });

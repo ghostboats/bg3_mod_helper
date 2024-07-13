@@ -77,9 +77,6 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
     build.ExcludeHidden = getConfig.excludeHidden;
     build.Priority = packingPriority;
 
-    console.log(build.ExcludeHidden);
-    console.log(getConfig.excludeHidden);
-
     const lastFolderName = path.basename(rootModPath);
     const rootParentPath = path.dirname(rootModPath);
     const temp_path = path.join(rootParentPath, temp_folder);

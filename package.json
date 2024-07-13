@@ -504,6 +504,7 @@
         "dependencies": "npm install"
     },
     "dependencies": {
+        "jszip": "^3.10.1",
         "log4js": "^6.9.1",
         "marked": "^12.0.2",
         "node-api-dotnet": "^0.7.8",
