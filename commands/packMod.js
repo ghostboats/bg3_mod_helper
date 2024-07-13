@@ -38,13 +38,13 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     }
 
     // Check if modDestPath is blank
-    if (!modDestPath.includes("Larian Studios\\Baldur's Gate 3\\Mods")) {
+    if (!modDestPath.includes(path.join("Larian Studios", path.sep, "Baldur's Gate 3", path.sep, "Mods"))) {
         const useStandardPath = await vscode.window.showInformationMessage(
             'The Mods destination path does not seem to be the standard Baldur\'s Gate 3 Mods folder. Do you want to change it?',
             'Change to Standard', 'Keep Current'
         );
         if (useStandardPath === 'Change to Standard') {
-            const standardPath = path.join(process.env.LOCALAPPDATA, "Larian Studios\\Baldur's Gate 3\\Mods");
+            const standardPath = path.join(process.env.LOCALAPPDATA, (path.join("Larian Studios", path.sep, "Baldur's Gate 3", path.sep, "Mods")));
             const modDestPath = standardPath
             await vscode.workspace.getConfiguration('bg3ModHelper').update('modDestPath', standardPath, vscode.ConfigurationTarget.Global);
         }
@@ -132,6 +132,7 @@ function isGameRunning() {
                 return;
             }
 
+            // need to add a check for linux as well
             const isRunning = stdout.toLowerCase().includes('bg3.exe');
             resolve(isRunning);
         });

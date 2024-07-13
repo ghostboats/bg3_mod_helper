@@ -4,7 +4,7 @@ const fs = require('fs');
 const { getFormats, moveFileAcrossDevices, compatRootModPath, LOAD_LSLIB } = require('./lslib_utils');
 const { pak } = getFormats();
 
-const { zipUpPak } = require('./zip_functions');
+const { zipUpPak } = require('./gzip_functions');
 const { xmlUpdate } = require('./xml_functions');
 
 const { isMainThread, workerData } = require('node:worker_threads');
