@@ -45,9 +45,16 @@ async function autoSortFiles(sortOption) {
 
     const statsPath = path.join(rootModPath, 'Public', modName, 'Stats', 'Generated', 'Data');
 
+    if (!fs.existsSync(statsPath)) {
+        raiseError(`Data directory does not exist: ${statsPath}`);
+        vscode.window.showErrorMessage(`Data directory does not exist: ${statsPath}`);
+        return;
+    }
+
     fs.readdir(statsPath, async (err, files) => {
         if (err) {
             raiseError(`Failed to read directory: ${err.message}`);
+            vscode.window.showErrorMessage(`Failed to read directory: ${err.message}`);
             return;
         }
 
@@ -91,6 +98,7 @@ async function autoSortFiles(sortOption) {
     });
 }
 
+// Add this function to be called after raiseInfo in the debug command
 const debug = vscode.commands.registerCommand('bg3-mod-helper.debugCommand', async function () {
     const sortOption = await vscode.window.showQuickPick(
         ['Order entries and their respective data', 'Order each data entry within entries'],
