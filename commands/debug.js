@@ -1,34 +1,109 @@
 const vscode = require('vscode');
 const fs = require('fs');
-const os = require('os');
-
 const path = require('path');
-
-const LSLIB_DLL = 'LSLib.dll';
-const TOOL_SUBDIR = 'Tools\\';
-
+const os = require('os');
+const { raiseError, raiseInfo } = require('../support_files/log_utils');
 const { getConfig, loadConfigFile, setModName, setConfig } = require('../support_files/config');
-const { lslibPath, rootModPath,  gameInstallLocation } = getConfig();
-const compatRootModPath = path.join(rootModPath + "\\");
-const lslibToolsPath = path.join(lslibPath, TOOL_SUBDIR);
 
-const {  } = require('../support_files/helper_functions')
+function sortEntriesInFile(filePath, sortEntireEntries) {
+    if (!fs.existsSync(filePath)) {
+        return null;
+    }
 
-const { CREATE_LOGGER, raiseError, raiseInfo } = require('../support_files/log_utils');
-var bg3mh_logger = CREATE_LOGGER();
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const entries = fileContent.split(/(?:\r\n|\r|\n)(?=new entry )/).filter(entry => entry.trim() !== '');
 
-const { FIND_FILES, getFormats, dirSeparator, LOAD_LSLIB } = require('../support_files/lslib_utils.js');
-const { pak } = getFormats();
-const { processPak } = require('../support_files/process_pak.js');
+    const sortedEntries = entries.map(entry => {
+        const lines = entry.split(/(?:\r\n|\r|\n)/).filter(line => line.trim() !== '');
+        const newEntry = lines.shift(); // Extract "new entry" line
+        const typeLine = lines.shift(); // Extract "type" line
+        const dataLines = lines.sort(); // Sort data lines alphabetically
 
-const { isMainThread, parentPort, Worker } = require('node:worker_threads');
+        if (sortEntireEntries) {
+            return `${newEntry}\r\n${typeLine}\r\n${dataLines.join('\r\n')}`;
+        } else {
+            return `new entry ${newEntry}\r\n${typeLine}\r\n${dataLines.join('\r\n')}`;
+        }
+    });
 
-const { jobs } = require('../support_files/conversion_junction');
+    const sortedContent = sortEntireEntries
+        ? sortedEntries.sort().join('\r\n\r\n')
+        : sortedEntries.join('\r\n\r\n');
 
- 
+    // Write sorted content to a temporary file
+    const tempFilePath = path.join(os.tmpdir(), path.basename(filePath));
+    fs.writeFileSync(tempFilePath, sortedContent);
+
+    return { sortedContent, tempFilePath };
+}
+
+async function autoSortFiles(sortOption) {
+    const config = getConfig();
+    const rootModPath = config.rootModPath;
+    const modName = config.modName;
+    let saveAll = false;
+
+    const statsPath = path.join(rootModPath, 'Public', modName, 'Stats', 'Generated', 'Data');
+
+    fs.readdir(statsPath, async (err, files) => {
+        if (err) {
+            raiseError(`Failed to read directory: ${err.message}`);
+            return;
+        }
+
+        for (const file of files) {
+            const filePath = path.join(statsPath, file);
+            const sortEntireEntries = sortOption === 'Order entries and their respective data';
+            const result = sortEntriesInFile(filePath, sortEntireEntries);
+
+            if (result) {
+                const { sortedContent, tempFilePath } = result;
+                const leftUri = vscode.Uri.file(filePath);
+                const rightUri = vscode.Uri.file(tempFilePath);
+                const title = `Compare: ${path.basename(filePath)}`;
+
+                await vscode.commands.executeCommand('vscode.diff', leftUri, rightUri, title);
+
+                if (saveAll) {
+                    fs.writeFileSync(filePath, sortedContent);
+                    raiseInfo(`File ${filePath} has been overwritten with sorted content.`);
+                } else {
+                    const confirm = await vscode.window.showInformationMessage(
+                        `Do you want to overwrite the original file with the sorted content for ${path.basename(filePath)}?`,
+                        'Yes', 'No', 'Save All'
+                    );
+
+                    if (confirm === 'Yes') {
+                        fs.writeFileSync(filePath, sortedContent);
+                        raiseInfo(`File ${filePath} has been overwritten with sorted content.`);
+                    } else if (confirm === 'Save All') {
+                        saveAll = true;
+                        fs.writeFileSync(filePath, sortedContent);
+                        raiseInfo(`File ${filePath} has been overwritten with sorted content.`);
+                    } else {
+                        raiseInfo(`File ${filePath} was not overwritten.`);
+                    }
+                }
+            }
+        }
+
+        raiseInfo('File sorting process completed.');
+    });
+}
+
 const debug = vscode.commands.registerCommand('bg3-mod-helper.debugCommand', async function () {
-    raiseInfo("hi dipshit! 💩");
+    const sortOption = await vscode.window.showQuickPick(
+        ['Order entries and their respective data', 'Order each data entry within entries'],
+        {
+            placeHolder: 'Select sorting option'
+        }
+    );
+
+    if (!sortOption) {
+        return; // User cancelled the quick pick
+    }
+
+    await autoSortFiles(sortOption);
 });
 
-
-module.exports = { debug }
+module.exports = { debug };
