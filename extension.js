@@ -35,6 +35,8 @@ let packModImport,
     openLogsFolderCommand,
     openWorkspaceFolderCommand,
     organizeDataFilesCommand,
+    xmlMergerCommand,
+    symlinkerCommand,
     debugCommand,
     debug2Command,
     unpackGameDataCommand,
@@ -98,7 +100,10 @@ function setCommands() {
     // launch the game
     launchGameImport = require('./commands/launchGame');
 
+    // Need to be placed somewhere
+    xmlMergerCommand = require('./commands/xmlMerger');
     organizeDataFilesCommand = require('./commands/organizeDataFiles');
+    symlinkerCommand = require('./commands/symlinker');
 
     // debug commands
     debugCommand = require('./commands/debug');
@@ -230,8 +235,9 @@ function aSimpleDataProvider() {
                 ]);
             } else if (element.id === 'packer') {
                 return Promise.resolve([
-                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod' },
-                    { label: 'Pack Mod and ZIP(gz)', command: 'bg3-mod-helper.packModZip' },
+                    { label: 'Pack Mod', command: 'bg3-mod-helper.packMod', arguments: 'pack' },
+                    { label: 'Pack and Play Mod', command: 'bg3-mod-helper.packMod', arguments: 'packAndPlay' },
+                    { label: 'Pack and Zip Mod', command: 'bg3-mod-helper.packMod', arguments: 'packAndZip' },
                     { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' },
                     { label: 'Unpack Game Data (in development)', command: 'bg3-mod-helper.unpackGameDataCommand' }
                 ]);

@@ -216,11 +216,6 @@
                 "category": "BG3 Mod Helper"
             },
             {
-                "command": "bg3-mod-helper.packModZip",
-                "title": "Pack Mod and ZIP",
-                "category": "BG3 Mod Helper"
-            },
-            {
                 "command": "bg3-mod-helper.textEditorTool",
                 "title": "See text preview",
                 "category": "BG3 Mod Helper"
@@ -268,16 +263,6 @@
                     "type": "string",
                     "default": "",
                     "description": "(Requires reload- Configuration Options > Reload Window) Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5\\Packed]:"
-                },
-                "bg3ModHelper.autoLaunchOnPack": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "(Requires reload- Configuration Options > Reload Window) Automatically launch the game after you pack your mod"
-                },
-                "bg3ModHelper.zipOnPack": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Zip up your mod in a .gz (.gzip) format, for distribution on other platforms."
                 },
                 "bg3ModHelper.launchContinueGame": {
                     "type": "boolean",

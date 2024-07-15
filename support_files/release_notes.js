@@ -68,8 +68,17 @@ function generateReleaseNotes(version) {
                     details: [
                         "Modname changes complete, add details here",
                         "Configuration Options Data Provider complete, add details here",
-                        "New setting to add files to be excluded when packing (todo)",
-                        "Conversion exclusion list UI changes to show difference between this and packing exclusion list (todo)"
+                        "New setting to add files to be excluded when packing (maybe this mixes with stuff below regarding exclude hidden(todo))",
+                        "Conversion exclusion list UI changes to show difference between this and packing exclusion list (todo)",
+                        "Exclude Hidden (not sure if working yet so putting as (todo), need to talk to beans)",
+                        "Auto Launch Game and Zip options removed as settings. This is now handled via the dropdown data provider, the 'Pack and Play' and 'Pack and Zip' options respectivly."
+                    ]
+                },
+                {
+                    title: ".helperignore used [IMPORTANT]",
+                    details: [
+                        "Similar to other . files like .gitignore or .vscode, you can now use a .helperignore (should be in same dir as rootmodfolder (Public, Localizations, etc)(todo)",
+                        "Will ask if you want one generated for you for the first time on a new release on launch (todo)"
                     ]
                 },
                 {
@@ -81,18 +90,26 @@ function generateReleaseNotes(version) {
                 },
                 {
                     title: "Symlink Fixes",
-                    details: ["Symlink will no longer create 'random' folders when linking/unlinking (todo)"]
+                    details: ["Symlink will no longer create 'random' folders when linking/unlinking (seems to be working, will leave in development tag for now while users test. No errors when personally testing, maybe its a linux only issue?)"]
                 },
                 {
                     title: "Zipping Fixes",
                     details: [
-                        "Will now correctly zip .pak in a .zip folder (which Nexus accepts) instead of a .gz folder (which Nexus does not accept) (todo)"
+                        "Will now correctly zip .pak in a .zip folder (which Nexus accepts) instead of a .gz folder (which Nexus does not accept)",
+                        "Zipping files is now done thru the data provider menu, expand the dropdown for packing and select Pack and Zip"
                     ]
                 },
                 {
                     title: "BBCode/Markdown Previewer Added",
                     details: [
                         "Test out how your mod page will look using a built-in BBCode/Markdown previewer via the Data Provider (need to add finishing touches) (todo)"
+                    ]
+                },
+                {
+                    title: "Minor Changes",
+                    details: [
+                        "Extension confirmed to work on Linux (ty satan!)",
+                        "Check if game is lauched for linus in packing(todo)"
                     ]
                 }
             ]
