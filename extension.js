@@ -34,6 +34,7 @@ let packModImport,
     openGameFolderCommand,
     openLogsFolderCommand,
     openWorkspaceFolderCommand,
+    organizeDataFilesCommand,
     debugCommand,
     debug2Command,
     unpackGameDataCommand,
@@ -96,6 +97,8 @@ function setCommands() {
 
     // launch the game
     launchGameImport = require('./commands/launchGame');
+
+    organizeDataFilesCommand = require('./commands/organizeDataFiles');
 
     // debug commands
     debugCommand = require('./commands/debug');
@@ -209,6 +212,7 @@ function aSimpleDataProvider() {
                     { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool[tool is in development])', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
                     { label: 'Configuration Options',  id: 'config' },
+                    { label: 'File Formatting/Cleaning',  id: 'formatting' },
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
@@ -230,6 +234,10 @@ function aSimpleDataProvider() {
                     { label: 'Pack Mod and ZIP(gz)', command: 'bg3-mod-helper.packModZip' },
                     { label: 'Unpack Mod', command: 'bg3-mod-helper.unpackMod' },
                     { label: 'Unpack Game Data (in development)', command: 'bg3-mod-helper.unpackGameDataCommand' }
+                ]);
+            } else if (element.id === 'formatting') {
+                return Promise.resolve([
+                    { label: 'Organize Data Files (Alphabetically)', command: 'bg3-mod-helper.organizeDataFilesCommand' }
                 ]);
             } else if (element.id === 'config') {
                 return Promise.resolve([
