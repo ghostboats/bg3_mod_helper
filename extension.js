@@ -34,9 +34,11 @@ let packModImport,
     openGameFolderCommand,
     openLogsFolderCommand,
     openWorkspaceFolderCommand,
+    openPlayerProfilesFolderCommand,
     organizeDataFilesCommand,
     xmlMergerCommand,
     symlinkerCommand,
+    indentXmlFilesCommand,
     debugCommand,
     debug2Command,
     unpackGameDataCommand,
@@ -85,6 +87,7 @@ function setCommands() {
     openGameFolderCommand = require('./commands/folderShortcuts').openGameFolderCommand;
     openLogsFolderCommand = require('./commands/folderShortcuts').openLogsFolderCommand;
     openWorkspaceFolderCommand = require('./commands/folderShortcuts').openWorkspaceFolderCommand;
+    openPlayerProfilesFolderCommand = require('./commands/folderShortcuts').openPlayerProfilesFolderCommand;
 
     // image commands
     resizeImageTooltip = require('./commands/resizeImage').resizeImageTooltip;
@@ -104,6 +107,7 @@ function setCommands() {
     xmlMergerCommand = require('./commands/xmlMerger');
     organizeDataFilesCommand = require('./commands/organizeDataFiles');
     symlinkerCommand = require('./commands/symlinker');
+    indentXmlFilesCommand = require('./commands/indentXmlFiles');
 
     // debug commands
     debugCommand = require('./commands/debug');
@@ -194,7 +198,7 @@ function activate(context) {
     let createModTemplateCommand = vscode.commands.registerCommand('bg3-mod-helper.createModTemplate', createModTemplateImport);
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.addToExcludeList', addToExcludeList));
     context.subscriptions.push(vscode.commands.registerCommand('bg3-mod-helper.removeFromExcludeList', removeFromExcludeList));
-    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNGCommand, PNGToDDSCommand, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand);
+    context.subscriptions.push(uuidsHandlesHoverProvider, functionsHoverProvider, DDSToPNGCommand, PNGToDDSCommand, resizeTooltipCommand, resizeControllerCommand, resizeHotbarCommand, resizeCustomCommand, createModTemplateCommand, addIconBackgroundCommand, openConverterCommand, versionGeneratorCommand, rotationToolCommand, openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand, openPlayerProfilesFolderCommand);
 }
 
 
@@ -224,7 +228,6 @@ function aSimpleDataProvider() {
                     { label: 'BBCode/Markdown Editor ', command: 'bg3-mod-helper.textEditorTool'},
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Merge Xmls', command: 'bg3-mod-helper.xmlMerger' },
-                    { label: 'Add Dependencies to Meta via modsettings.lsx', command: 'bg3-mod-helper.addDependencies'},
                     { label: 'Add/Remove Symlink (in development)', command: 'bg3-mod-helper.symlinker' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },
                     { label: 'DDS Viewer (in development)', command: 'bg3-mod-helper.DDSViewer' },
@@ -243,7 +246,8 @@ function aSimpleDataProvider() {
                 ]);
             } else if (element.id === 'formatting') {
                 return Promise.resolve([
-                    { label: 'Organize Data Files (Alphabetically)', command: 'bg3-mod-helper.organizeDataFilesCommand' }
+                    { label: 'Organize Data Files (Alphabetically)', command: 'bg3-mod-helper.organizeDataFilesCommand' },
+                    { label: 'Mass Indent LSX Files', command: 'bg3-mod-helper.indentXmlFilesCommand'}
                 ]);
             } else if (element.id === 'config') {
                 return Promise.resolve([
@@ -264,6 +268,7 @@ function aSimpleDataProvider() {
                     { label: 'Workspace Folder', command: 'bg3-mod-helper.openWorkspaceFolder' },
                     { label: 'Extension Logs Folder', command: 'bg3-mod-helper.openLogsFolder' },
                     { label: 'Game Data Folder', command: 'bg3-mod-helper.openGameFolder' },
+                    { label: 'Player Profiles Folder', command: 'bg3-mod-helper.openPlayerProfilesFolder' },
                 ]);
             } else {
                 return Promise.resolve([]);

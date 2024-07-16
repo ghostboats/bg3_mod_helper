@@ -91,7 +91,6 @@ function getConfig() {
     return {
         hoverMaxFiles: config.get('hoverMaxFiles'),
         hoverEnabled: config.get('hoverEnabled'),
-        hoverShowPath: config.get('hoverShowPath'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: path.normalize(config.get('rootModPath')),
         modDestPath: path.normalize(config.get('modDestPath')),

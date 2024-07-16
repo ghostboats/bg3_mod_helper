@@ -244,11 +244,6 @@
                     "default": true,
                     "description": "Enable or disable hover feature."
                 },
-                "bg3ModHelper.hoverShowPath": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Toggle file path in hover message (not working in current update)."
-                },
                 "bg3ModHelper.rootModPath": {
                     "type": "string",
                     "default": "",

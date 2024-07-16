@@ -66,19 +66,21 @@ function generateReleaseNotes(version) {
                 {
                     title: "Mod Setting Changes [IMPORTANT]",
                     details: [
-                        "Modname changes complete, add details here",
-                        "Configuration Options Data Provider complete, add details here",
-                        "New setting to add files to be excluded when packing (maybe this mixes with stuff below regarding exclude hidden(todo))",
+                        "Modname Setting Added. This value should be autoset on launch as long as you only have one folder in your rootmodpath's Mods folder. If you have multiple it will need to be set!",
+                        "Configuration Options Data Provider complete, see below",
                         "Conversion exclusion list UI changes to show difference between this and packing exclusion list (todo)",
-                        "Exclude Hidden (not sure if working yet so putting as (todo), need to talk to beans)",
-                        "Auto Launch Game and Zip options removed as settings. This is now handled via the dropdown data provider, the 'Pack and Play' and 'Pack and Zip' options respectivly."
+                        "Exclude Hidden (implemented but requires new lslib which is unreleased atm) setting added, possible remove as setting and make it always check files for .(todo)",
+                        "Auto Launch Game and Zip options removed as settings. This is now handled via the dropdown data provider, the 'Pack and Play' and 'Pack and Zip' options respectivly.",
+                        "Remove hover enabled setting to remvoe dead setting"
                     ]
                 },
                 {
-                    title: ".helperignore used [IMPORTANT]",
+                    title: "Configuration Options Data Provider",
                     details: [
-                        "Similar to other . files like .gitignore or .vscode, you can now use a .helperignore (should be in same dir as rootmodfolder (Public, Localizations, etc)(todo)",
-                        "Will ask if you want one generated for you for the first time on a new release on launch (todo)"
+                        "Contains several quick actions revolving around modSetting which are accessed from the data provider:",
+                        "Reload Window: Will refresh the current vscode window, allowing for new settings to take effect (For example, if you change things like lslib path, you should reload)",
+                        "Extension Setting: Opens the settings page, filtering the bg3 mod helper settings for quick access",
+                        "Update Settings: (todo, overwrites workspace, need to confirm with beans this is the desired effect)"
                     ]
                 },
                 {
@@ -90,7 +92,7 @@ function generateReleaseNotes(version) {
                 },
                 {
                     title: "Symlink Fixes",
-                    details: ["Symlink will no longer create 'random' folders when linking/unlinking (seems to be working, will leave in development tag for now while users test. No errors when personally testing, maybe its a linux only issue?)"]
+                    details: ["Symlink will no longer create 'random' folders when linking/unlinking (seems to be working, will leave in development tag for now while users test. No errors when personally testing, please send paths/screenshots/info/etc if you have any issues)"]
                 },
                 {
                     title: "Zipping Fixes",
@@ -109,7 +111,9 @@ function generateReleaseNotes(version) {
                     title: "Minor Changes",
                     details: [
                         "Extension confirmed to work on Linux (ty satan!)",
-                        "Check if game is lauched for linus in packing(todo)"
+                        "Check if game is lauched for linus in packing(todo)",
+                        "Shortcut to PlayerProfiles Folder added in folder shortcuts",
+                        "Atlas Fix if .lsx file doenst exist yet (todo)"
                     ]
                 }
             ]
