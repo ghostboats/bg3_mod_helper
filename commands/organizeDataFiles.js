@@ -17,12 +17,19 @@ function sortEntriesInFile(filePath, sortEntireEntries) {
         const lines = entry.split(/(?:\r\n|\r|\n)/).filter(line => line.trim() !== '');
         const newEntry = lines.shift(); // Extract "new entry" line
         const typeLine = lines.shift(); // Extract "type" line
-        const dataLines = lines.sort(); // Sort data lines alphabetically
+        let usingLine = '';
+        const dataLines = lines.filter(line => {
+            if (line.startsWith('using ')) {
+                usingLine = line;
+                return false;
+            }
+            return true;
+        }).sort(); // Sort data lines alphabetically
 
         if (sortEntireEntries) {
-            return `${newEntry}\r\n${typeLine}\r\n${dataLines.join('\r\n')}`;
+            return `${newEntry}\r\n${typeLine}\r\n${usingLine ? usingLine + '\r\n' : ''}${dataLines.join('\r\n')}`;
         } else {
-            return `new entry ${newEntry}\r\n${typeLine}\r\n${dataLines.join('\r\n')}`;
+            return `new entry ${newEntry}\r\n${typeLine}\r\n${usingLine ? usingLine + '\r\n' : ''}${dataLines.join('\r\n')}`;
         }
     });
 
