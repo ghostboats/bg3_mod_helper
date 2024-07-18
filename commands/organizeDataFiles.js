@@ -5,7 +5,7 @@ const os = require('os');
 const { raiseError, raiseInfo } = require('../support_files/log_utils');
 const { getConfig, loadConfigFile, setModName, setConfig } = require('../support_files/config');
 
-function sortEntriesInFile(filePath, sortEntireEntries) {
+function sortEntriesInFile(filePath) {
     if (!fs.existsSync(filePath)) {
         return null;
     }
@@ -26,16 +26,11 @@ function sortEntriesInFile(filePath, sortEntireEntries) {
             return true;
         }).sort(); // Sort data lines alphabetically
 
-        if (sortEntireEntries) {
-            return `${newEntry}\r\n${typeLine}\r\n${usingLine ? usingLine + '\r\n' : ''}${dataLines.join('\r\n')}`;
-        } else {
-            return `new entry ${newEntry}\r\n${typeLine}\r\n${usingLine ? usingLine + '\r\n' : ''}${dataLines.join('\r\n')}`;
-        }
+        // Construct the sorted entry
+        return `${newEntry}\r\n${typeLine}\r\n${usingLine ? usingLine + '\r\n' : ''}${dataLines.join('\r\n')}`;
     });
 
-    const sortedContent = sortEntireEntries
-        ? sortedEntries.sort().join('\r\n\r\n')
-        : sortedEntries.join('\r\n\r\n');
+    const sortedContent = sortedEntries.join('\r\n\r\n');
 
     // Write sorted content to a temporary file
     const tempFilePath = path.join(os.tmpdir(), path.basename(filePath));
@@ -44,7 +39,7 @@ function sortEntriesInFile(filePath, sortEntireEntries) {
     return { sortedContent, tempFilePath };
 }
 
-async function autoSortFiles(sortOption) {
+async function autoSortFiles() {
     const config = getConfig();
     const rootModPath = config.rootModPath;
     const modName = config.modName;
@@ -72,8 +67,7 @@ async function autoSortFiles(sortOption) {
             }
 
             const filePath = path.join(statsPath, file);
-            const sortEntireEntries = sortOption === 'Order entries and their respective data';
-            const result = sortEntriesInFile(filePath, sortEntireEntries);
+            const result = sortEntriesInFile(filePath);
 
             if (result) {
                 const { sortedContent, tempFilePath } = result;
@@ -115,18 +109,7 @@ async function autoSortFiles(sortOption) {
 }
 
 const organizeDataFiles = vscode.commands.registerCommand('bg3-mod-helper.organizeDataFilesCommand', async function () {
-    const sortOption = await vscode.window.showQuickPick(
-        ['Order entries and their respective data', 'Order each data entry within entries'],
-        {
-            placeHolder: 'Select sorting option'
-        }
-    );
-
-    if (!sortOption) {
-        return; // User cancelled the quick pick
-    }
-
-    await autoSortFiles(sortOption);
+    await autoSortFiles();
 });
 
 module.exports = { organizeDataFiles };
