@@ -103,6 +103,59 @@ let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHan
     }
 });
 
+// Command to generate and replace all handles
+let handleReplaceDisposable = vscode.commands.registerCommand('bg3-mod-helper.generateReplaceAllHandles', async function () {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        vscode.window.showInformationMessage('You need to open an editor window to use this command');
+        return;
+    }
+
+    const document = editor.document;
+    const selection = editor.selection;
+    const selectedText = document.getText(selection);
+
+    // Validate the selected text as handle
+    const handleRegex = /^h[0-9a-fA-Fg]{32}[0-9a-fA-Fg]{4}$/i;
+    console.log(handleRegex)
+    console.log(selectedText)
+    if (!handleRegex.test(selectedText)) {
+        vscode.window.showErrorMessage('The selected text is not a valid handle.');
+        return;
+    }
+
+    const newHandle = generateHandle();
+    const globalRegex = new RegExp(selectedText, 'gi'); // Global case-insensitive search
+    const workspaceEdit = new vscode.WorkspaceEdit();
+    let documentsToSave = new Set();
+
+    // Search across all text files in the workspace
+    const files = await vscode.workspace.findFiles('**/*.{txt,lsx,lsj,xml}');
+    for (const file of files) {
+        const textDoc = await vscode.workspace.openTextDocument(file);
+        const text = textDoc.getText();
+        let match;
+        while ((match = globalRegex.exec(text)) !== null) {
+            const startPos = textDoc.positionAt(match.index);
+            const endPos = textDoc.positionAt(match.index + match[0].length);
+            const range = new vscode.Range(startPos, endPos);
+            workspaceEdit.replace(file, range, newHandle);
+            documentsToSave.add(textDoc);
+        }
+    }
+
+    // Apply/save all collected edits
+    if (await vscode.workspace.applyEdit(workspaceEdit)) {
+
+        for (const doc of documentsToSave) {
+            await doc.save();
+        }
+        vscode.window.showInformationMessage(`Replaced all occurrences of the handle '${selectedText}' with '${newHandle}' and saved changes. Use undo keyboard shortcut to revert all changes back at once (dont forget to save the files if you do).`);
+    } else {
+        vscode.window.showErrorMessage('Failed to replace the handles.');
+    }
+});
+
 // Function to update all .loca.xml files in the workspace with the given changes
 async function updateLocaXmlFiles(changes) {
     const { addHandlesToAllLocas } = getConfig();

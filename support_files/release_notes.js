@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 
-const showAlways = true;  // Toggle this variable for testing
+const showAlways = true;  // Keep this false on release
 
 function checkForUpdates(context) {
     const extensionId = 'ghostboats.bg3-mod-helper';
@@ -113,7 +113,8 @@ function generateReleaseNotes(version) {
                         "Extension confirmed to work on Linux (ty satan!)",
                         "Check if game is lauched for linus in packing(todo)",
                         "Shortcut to PlayerProfiles Folder added in folder shortcuts",
-                        "Atlas Fix if .lsx file doenst exist yet (todo)"
+                        "Atlas Fix if .lsx file doenst exist yet (todo)",
+                        "Generate and Replace Handle option added when highlighting a handle and rightclicking"
                     ]
                 }
             ]
