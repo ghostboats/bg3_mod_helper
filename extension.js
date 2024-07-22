@@ -39,6 +39,7 @@ let packModImport,
     xmlMergerCommand,
     symlinkerCommand,
     indentXmlFilesCommand,
+    convertVideoToGifCommand,
     debugCommand,
     debug2Command,
     unpackGameDataCommand,
@@ -108,6 +109,7 @@ function setCommands() {
     organizeDataFilesCommand = require('./commands/organizeDataFiles');
     symlinkerCommand = require('./commands/symlinker');
     indentXmlFilesCommand = require('./commands/indentXmlFiles');
+    convertVideoToGifCommand = require('./commands/convertVideoToGif');
 
     // debug commands
     debugCommand = require('./commands/debug');
@@ -226,6 +228,7 @@ function aSimpleDataProvider() {
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'BBCode/Markdown Editor ', command: 'bg3-mod-helper.textEditorTool'},
+                    { label: 'Convert Video to GIF', command: 'bg3-mod-helper.convertVideoToGif' },
                     { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Merge Xmls', command: 'bg3-mod-helper.xmlMerger' },
                     { label: 'Add/Remove Symlink (in development)', command: 'bg3-mod-helper.symlinker' },

@@ -494,6 +494,8 @@
         "dependencies": "npm install"
     },
     "dependencies": {
+        "ffmpeg-static": "^5.2.0",
+        "fluent-ffmpeg": "^2.1.3",
         "jszip": "^3.10.1",
         "log4js": "^6.9.1",
         "magickwand.js": "^1.1.0",
