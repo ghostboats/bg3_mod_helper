@@ -7,7 +7,6 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-
 // loads the api
 const dotnet = require('node-api-dotnet/net8.0');
 /*
@@ -28,7 +27,7 @@ const converterAppDll = ['ConverterApp.dll'];
 const illegalDlls = [].concat(elasticDlls, storyCompilerDlls, converterAppDll);
 
 // the list of directories that need lsx > lsf conversion
-const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInfos", "Assets", "UI", "Effects", "LevelMapValues", "Localization"];
+const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "[PAK]", "RootTemplates", "MultiEffectInfos", "Assets", "UI", "Effects", "LevelMapValues", "Localization"];
 
 // excluding this because it will match to "UI" in convertDirs
 const illegalFiles = ["Icons_Items.lsx"];
