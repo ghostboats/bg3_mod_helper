@@ -28,7 +28,7 @@ const converterAppDll = ['ConverterApp.dll'];
 const illegalDlls = [].concat(elasticDlls, storyCompilerDlls, converterAppDll);
 
 // the list of directories that need lsx > lsf conversion
-const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "RootTemplates", "MultiEffectInfos", "Assets", "UI", "Effects", "LevelMapValues", "Localization"];
+const convertDirs = ["[PAK]_UI", "[PAK]_Armor", "[PAK]_Effects", "RootTemplates", "MultiEffectInfos", "Assets", "UI", "Effects", "LevelMapValues", "Localization", "Shapeshift"];
 
 // excluding this because it will match to "UI" in convertDirs
 const illegalFiles = ["Icons_Items.lsx"];
