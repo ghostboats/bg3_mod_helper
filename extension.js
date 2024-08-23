@@ -250,7 +250,7 @@ function aSimpleDataProvider() {
             } else if (element.id === 'formatting') {
                 return Promise.resolve([
                     { label: 'Organize Data Files (Alphabetically)', command: 'bg3-mod-helper.organizeDataFilesCommand' },
-                    { label: 'Mass Indent LSX Files', command: 'bg3-mod-helper.indentXmlFilesCommand'}
+                    { label: 'Mass Indent LSX Files (Not working)', command: 'bg3-mod-helper.indentXmlFilesCommand'}
                 ]);
             } else if (element.id === 'config') {
                 return Promise.resolve([

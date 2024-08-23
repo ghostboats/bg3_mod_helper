@@ -22,7 +22,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     const modsDirPath = path.join(rootModPath, "Mods");
     const metaPath = path.join(modsDirPath, modName, "meta.lsx");
 
-    // Check if BG3 is running
+    // Check if BG3 is running might not need anymore i cant rememebr
     const isRunning = await isGameRunning();
 
     if (isRunning) {

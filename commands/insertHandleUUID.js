@@ -90,6 +90,14 @@ let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHan
 
             // Update localization files with the handle
             await updateLocaXmlFiles(changes);
+
+            // Save the updated localization files
+            const locaFiles = await vscode.workspace.findFiles('**/Localization/**/*.xml');
+            for (const locaFile of locaFiles) {
+                const document = await vscode.workspace.openTextDocument(locaFile);
+                await document.save();  // Save each localization XML file directly
+            }
+            
             console.log(`Handle ${handle} created with initial value: ${userText}`);
         }
     }
@@ -99,7 +107,7 @@ let handleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHan
         vscode.window.showInformationMessage('Handles inserted and localization files updated successfully.');
     } else {
         console.error('Apply Edit failed:', workspaceEdit);
-        vscode.window.showErrorMessage('Failed to replace the UUIDs.');
+        vscode.window.showErrorMessage('Failed to replace the handle.');
     }
 });
 
@@ -171,7 +179,7 @@ async function updateLocaXmlFiles(changes) {
     }
 
     const locaFilePattern = new vscode.RelativePattern(workspaceFolder, '**/Localization/**/*.xml');
-    const locaFiles = await vscode.workspace.findFiles(locaFilePattern, '**/node_modules/**');
+    const locaFiles = await vscode.workspace.findFiles(locaFilePattern);
     if (locaFiles.length === 0) {
         vscode.window.showWarningMessage(`No .xml files found under Localization/. You can create one with the 'Create BG3 File' command.`, 'Create BG3 File').then(selection => {
             if (selection === 'Create BG3 File') {

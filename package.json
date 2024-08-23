@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.2.53",
+    "version": "2.2.55",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.86.0"
@@ -271,7 +271,7 @@
                 },
                 "bg3ModHelper.excludedFiles": {
                     "type": "array",
-                    "description": "List of files to exclude from conversion. You can quick add items to this via right click on a file in the file tree ->  Add to Conversion Exclusion List.  Example: [c:/path/to/ur/file.lsx]",
+                    "description": "When you pack a mod, the bg3 mod helper will autoconvert your lsx and xml files. If you wish to exclude an lxs/xml for some reason from auto convertin, add it to the list below. You can quick add items to this via right click on a file in the file tree ->  Add to Conversion Exclusion List.  Example: [c:/path/to/ur/file.lsx]",
                     "default": [],
                     "items": {
                         "type": "string"
@@ -295,7 +295,7 @@
                 "bg3ModHelper.excludeHidden": {
                     "type": "boolean",
                     "default": true,
-                    "description": "If, when packing mods, files and folders starting with a '.' should be excluded, ie the '.vscode' folder or a .gitignore file."
+                    "description": "If, when packing mods, files and folders starting with a '.' should be excluded, ie the '.vscode' folder or a .gitignore file (not enabled atm)."
                 }
             }
         },
