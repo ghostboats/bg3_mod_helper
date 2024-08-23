@@ -14,22 +14,15 @@ const { convert } = require('../support_files/conversion_junction.js');
 const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
-
-const packModZipCommand = vscode.commands.registerCommand('bg3-mod-helper.packModZip', async function () {
-    // You can call the existing packMod function with additional parameters
-    await vscode.commands.executeCommand('bg3-mod-helper.packMod', { packAsZip: true });
-});
-
-// i think we should separate out the functions here if possible- maybe put some of them in helper_functions?
-const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function (options =  {}) {
+const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function (action) {
     bg3mh_logger.info("pack button clicked", false);
-    const { rootModPath, modDestPath, lslibPath, autoLaunchOnPack } = getConfig();
+    const { rootModPath, modDestPath, lslibPath } = getConfig();
     const modName = await getModName();
 
     const modsDirPath = path.join(rootModPath, "Mods");
     const metaPath = path.join(modsDirPath, modName, "meta.lsx");
 
-    // Check if BG3 is running
+    // Check if BG3 is running might not need anymore i cant rememebr
     const isRunning = await isGameRunning();
 
     if (isRunning) {
@@ -87,9 +80,11 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     }
 
     // send the directory to the convert() function, and let it know it's a pak
-    await convert(rootModPath, pak);
+    await convert(rootModPath, pak, action);
 
-    if (autoLaunchOnPack) {
+    console.log(action)
+    if (action === 'packAndPlay') {
+        console.log('rrr')
         vscode.commands.executeCommand('bg3-mod-helper.launchGame');
     }
 });
@@ -139,4 +134,4 @@ function isGameRunning() {
     });
 }
 
-module.exports = { packModZipCommand, packModCommand };
+module.exports = { packModCommand };

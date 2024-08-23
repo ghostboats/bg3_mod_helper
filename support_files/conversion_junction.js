@@ -152,7 +152,7 @@ function getDynamicPath(filePath) {
 
 
 // at the moment this has all the functionality i planned for it, ie lsf, loca, and paks. for any other conversions we can make separate functions
-async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath))) {
+async function convert(convertPath, targetExt = path.extname(getDynamicPath(convertPath)), action = null) {
     let rootModPath = getConfig.rootModPath;
 
     // checks if the convertPath was undefined and halts the function before it goes any further
@@ -171,14 +171,14 @@ async function convert(convertPath, targetExt = path.extname(getDynamicPath(conv
             await convert(rootModPath, lsx)
                 .then(() => bg3mh_logger.info(`lsx conversion done`, false));
 
-            processPak(rootModPath);
+            processPak(rootModPath, action);
         }
         // has a check for main thread here because when a worker thread calls this function, it's batch unpacking and has a specific place it needs the files inside to go, but can't rely on vscode module functions to get them
         else if (fs.statSync(convertPath).isFile()) {
             if (isMainThread) {
-                processPak(convertPath);
+                processPak(convertPath, action);
             } else {
-                processPak(convertPath, workerData.jobDestPath);
+                processPak(convertPath, action, workerData.jobDestPath);
             } 
         }
     } 

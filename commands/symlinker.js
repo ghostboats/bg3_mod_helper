@@ -29,9 +29,11 @@ const symlinkCommand = vscode.commands.registerCommand('bg3-mod-helper.symlinker
 
     // Handle localization directories
     const localizationPath = path.join(rootModPath, 'Localization');
-    const locDirectories = fs.readdirSync(localizationPath, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name);
+    const locDirectories = fs.existsSync(localizationPath)
+        ? fs.readdirSync(localizationPath, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name)
+        : [];
 
     const selectedLocDirs = await vscode.window.showQuickPick(locDirectories, {
         canPickMany: true,
@@ -47,7 +49,7 @@ const symlinkCommand = vscode.commands.registerCommand('bg3-mod-helper.symlinker
 
     console.log("Paths to create symlinks for:", paths);
 
-    let anyExists = Object.values(paths).some(p => fs.existsSync(p));
+    let anyExists = Object.values(paths).some(p => fs.existsSync(p) && !p.includes('GustavDev'));
 
     if (anyExists) {
         const response = await vscode.window.showWarningMessage(
@@ -59,7 +61,7 @@ const symlinkCommand = vscode.commands.registerCommand('bg3-mod-helper.symlinker
             return;
         } else if (response === 'Remove All' || response === 'Replace All') {
             Object.values(paths).forEach(p => {
-                if (fs.existsSync(p)) {
+                if (fs.existsSync(p) && !p.includes('GustavDev')) {
                     console.log("Removing existing path:", p);
                     fs.rmdirSync(p, { recursive: true });
                 }
@@ -80,6 +82,13 @@ const symlinkCommand = vscode.commands.registerCommand('bg3-mod-helper.symlinker
         vscode.window.showInformationMessage("Symlinks created successfully.");
     } catch (error) {
         vscode.window.showErrorMessage(`Failed to create symlinks: ${error.message}`);
+    }
+
+    // Special handling for the GustavDev folder
+    const modsPath = path.join(rootModPath, 'Mods');
+    const gustavDevPath = path.join(modsPath, 'GustavDev');
+    if (fs.existsSync(gustavDevPath)) {
+        console.log("Ignoring GustavDev folder in Mods directory.");
     }
 });
 

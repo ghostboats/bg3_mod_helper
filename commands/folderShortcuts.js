@@ -49,4 +49,16 @@ const openWorkspaceFolderCommand = vscode.commands.registerCommand('bg3-mod-help
     }
 });
 
-module.exports = { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand };
+const openPlayerProfilesFolderCommand = vscode.commands.registerCommand('bg3-mod-helper.openPlayerProfilesFolder', async () => {
+    const appDataPath = process.env.LOCALAPPDATA;
+    const playerProfilesPath = path.join(appDataPath, 'Larian Studios', "Baldur's Gate 3", 'PlayerProfiles');
+
+    try {
+        await fs.access(playerProfilesPath);
+        vscode.env.openExternal(vscode.Uri.file(playerProfilesPath));
+    } catch (error) {
+        vscode.window.showInformationMessage('PlayerProfiles folder not found.');
+    }
+});
+
+module.exports = { openModsFolderCommand, openGameFolderCommand, openLogsFolderCommand, openWorkspaceFolderCommand, openPlayerProfilesFolderCommand };

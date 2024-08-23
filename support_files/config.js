@@ -91,13 +91,10 @@ function getConfig() {
     return {
         hoverMaxFiles: config.get('hoverMaxFiles'),
         hoverEnabled: config.get('hoverEnabled'),
-        hoverShowPath: config.get('hoverShowPath'),
         maxCacheSize: config.get('maxCacheSize'),
         rootModPath: path.normalize(config.get('rootModPath')),
         modDestPath: path.normalize(config.get('modDestPath')),
         lslibPath: path.normalize(config.get('lslibPath')),
-        autoLaunchOnPack: config.get('autoLaunchOnPack'),
-        zipOnPack: config.get('zipOnPack'),
         launchContinueGame: config.get('launchContinueGame'),
         addHandlesToAllLocas: config.get('addHandlesToAllLocas'),
         excludedFiles: normalizeExcludedFiles(config.get('excludedFiles')),
