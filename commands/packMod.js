@@ -23,25 +23,31 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     const metaPath = path.join(modsDirPath, modName, "meta.lsx");
 
     // Check if BG3 is running might not need anymore i cant rememebr
-    const isRunning = await isGameRunning();
+    const gameRunning = await handleGameRunning();
 
-    if (isRunning) {
-        vscode.window.showErrorMessage('Baldur\'s Gate 3 is currently running. Please close the game before packing the mod.');
+    if (gameRunning) {
+        vscode.window.showErrorMessage('Baldur\'s Gate 3 is currently running. Please close the game before packing the mod or enable autoclose in settings.');
         return; // Stop further execution
     }
 
-    // Check if modDestPath is blank
-    if (!modDestPath.includes(path.join("Larian Studios", path.sep, "Baldur's Gate 3", path.sep, "Mods"))) {
-        const useStandardPath = await vscode.window.showInformationMessage(
-            'The Mods destination path does not seem to be the standard Baldur\'s Gate 3 Mods folder. Do you want to change it?',
-            'Change to Standard', 'Keep Current'
-        );
-        if (useStandardPath === 'Change to Standard') {
-            const standardPath = path.join(process.env.LOCALAPPDATA, (path.join("Larian Studios", path.sep, "Baldur's Gate 3", path.sep, "Mods")));
-            const modDestPath = standardPath
-            await vscode.workspace.getConfiguration('bg3ModHelper').update('modDestPath', standardPath, vscode.ConfigurationTarget.Global);
+    const workspaceState = vscode.workspace.getConfiguration('bg3ModHelper');
+    const promptedForModDestPath = workspaceState.get('promptedForModDestPath', false);
+
+    if (!promptedForModDestPath) {
+        if (!modDestPath.includes(path.join("Larian Studios", "Baldur's Gate 3", "Mods"))) {
+            const useStandardPath = await vscode.window.showInformationMessage(
+                'The Mods destination path does not seem to be the standard Baldur\'s Gate 3 Mods folder. Do you want to change it?',
+                'Change to Standard', 'Keep Current'
+            );
+            if (useStandardPath === 'Change to Standard') {
+                const standardPath = path.join(process.env.LOCALAPPDATA, "Larian Studios", "Baldur's Gate 3", "Mods");
+                await vscode.workspace.getConfiguration('bg3ModHelper').update('modDestPath', standardPath, vscode.ConfigurationTarget.Global);
+            } else {
+                await workspaceState.update('promptedForModDestPath', true);
+            }
         }
     }
+
 
     bg3mh_logger.info("Grabbed mod name %s from %s.", modName, rootModPath);
     
@@ -118,18 +124,38 @@ function createVersion64(major, minor, build, revision) {
     
 }
 
-function isGameRunning() {
+function handleGameRunning() {
     return new Promise((resolve, reject) => {
-        exec('tasklist', (error, stdout, stderr) => {
+        exec('tasklist', async (error, stdout, stderr) => {
             if (error || stderr) {
-                bg3mh_logger.error("Error checking running processes" + error || stderr);
+                bg3mh_logger.error("Error checking running processes: " + (error || stderr));
                 resolve(false); // Assuming game is not running in case of error
                 return;
             }
 
-            // need to add a check for linux as well
+            // Check if BG3 is running (add Linux check if necessary)
             const isRunning = stdout.toLowerCase().includes('bg3.exe');
-            resolve(isRunning);
+            
+            if (isRunning) {
+                const { autoCloseBG3 } = getConfig();
+                if (autoCloseBG3) {
+                    exec('taskkill /F /IM bg3.exe', (killError, killStdout, killStderr) => {
+                        if (killError || killStderr) {
+                            bg3mh_logger.error("Error closing Baldur's Gate 3: " + (killError || killStderr));
+                            resolve(false); // Return false if there was an error closing the game
+                            return;
+                        }
+
+                        vscode.window.showInformationMessage('Baldur\'s Gate 3 was closed to pack the mod.');
+                        bg3mh_logger.info("Baldur's Gate 3 was successfully closed.");
+                        resolve(false);
+                    });
+                } else {
+                    resolve(true); // Game is running, but user opted not to auto-close
+                }
+            } else {
+                resolve(false); // Game is not running
+            }
         });
     });
 }
