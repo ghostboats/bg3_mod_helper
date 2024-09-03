@@ -101,7 +101,8 @@ function getConfig() {
         gameInstallLocation: path.normalize(config.get('gameInstallLocation')),
         modName: config.get('modName'),
         excludeHidden: config.get('excludeHidden'),
-        packingPriority: config.get('packingPriority')
+        packingPriority: config.get('packingPriority'),
+        autoCloseBG3: config.get('autoCloseBG3')
     };
 }
 
