@@ -70,7 +70,9 @@ function generateReleaseNotes(version) {
                         "Conversion exclusion list UI changes to show difference between this and packing exclusion list",
                         "Exclude Hidden (implemented but requires new lslib which is unreleased atm) setting added, possible remove as setting and make it always check files for .",
                         "Auto Launch Game and Zip options removed as settings. This is now handled via the dropdown data provider, the 'Pack and Play' and 'Pack and Zip' options respectivly.",
-                        "Remove hover enabled setting to remvoe dead setting"
+                        "Remove hover enabled setting to remvoe dead setting",
+                        "Setting added to close the existing bg3 instance when you pack and play for quicker launch if you forgot to close. By default it is off.",
+                        "If you have a unique mod destination path, the prompt will now only appear one time per session to avoid having to confirm each time on pack"
                     ]
                 },
                 {
@@ -100,7 +102,8 @@ function generateReleaseNotes(version) {
                     title: "Zipping Fixes",
                     details: [
                         "Will now correctly zip .pak in a .zip folder (which Nexus accepts) instead of a .gz folder (which Nexus does not accept)",
-                        "Zipping files is now done thru the data provider menu, expand the dropdown for packing and select Pack and Zip"
+                        "Zipping files is now done thru the data provider menu, expand the dropdown for packing and select Pack and Zip",
+                        "Zipped files appear in correct location now"
                     ]
                 },
                 {
@@ -112,6 +115,7 @@ function generateReleaseNotes(version) {
                 {
                     title: "Minor Changes",
                     details: [
+                        "",
                         "Extension confirmed to work on Linux (ty satan!)",
                         "Check if game is lauched for linus in packing(todo)",
                         "Shortcut to PlayerProfiles Folder added in folder shortcuts",
