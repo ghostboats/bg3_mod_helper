@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.2.55",
+    "version": "2.2.56",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.86.0"
@@ -296,6 +296,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "If, when packing mods, files and folders starting with a '.' should be excluded, ie the '.vscode' folder or a .gitignore file (not enabled atm)."
+                },
+                "bg3ModHelper.autoCloseBG3": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically close Baldur's Gate 3 if it is running before packing a mod."
                 }
             }
         },
