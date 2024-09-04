@@ -14,6 +14,8 @@ const { convert } = require('../support_files/conversion_junction.js');
 const { getFormats } = require('../support_files/lslib_utils.js');
 const { pak } = getFormats();
 
+let hasPromptedForModDestPath = false;
+
 const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod', async function (action) {
     bg3mh_logger.info("pack button clicked", false);
     const { rootModPath, modDestPath, lslibPath } = getConfig();
@@ -33,18 +35,20 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     const workspaceState = vscode.workspace.getConfiguration('bg3ModHelper');
     const promptedForModDestPath = workspaceState.get('promptedForModDestPath', false);
 
-    if (!promptedForModDestPath) {
+    // Only show the prompt the first time
+    if (!hasPromptedForModDestPath) {
         if (!modDestPath.includes(path.join("Larian Studios", "Baldur's Gate 3", "Mods"))) {
             const useStandardPath = await vscode.window.showInformationMessage(
                 'The Mods destination path does not seem to be the standard Baldur\'s Gate 3 Mods folder. Do you want to change it?',
-                'Change to Standard', 'Keep Current'
+                'Change to Standard (REQUIRES RELOAD OF VSCODE)', 'Keep Current'
             );
-            if (useStandardPath === 'Change to Standard') {
+            if (useStandardPath === 'Change to Standard (REQUIRES RELOAD OF VSCODE)') {
                 const standardPath = path.join(process.env.LOCALAPPDATA, "Larian Studios", "Baldur's Gate 3", "Mods");
                 await vscode.workspace.getConfiguration('bg3ModHelper').update('modDestPath', standardPath, vscode.ConfigurationTarget.Global);
-            } else {
-                await workspaceState.update('promptedForModDestPath', true);
             }
+
+            // Set the flag to true to prevent the prompt from appearing again
+            hasPromptedForModDestPath = true;
         }
     }
 

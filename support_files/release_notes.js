@@ -103,7 +103,8 @@ function generateReleaseNotes(version) {
                     details: [
                         "Will now correctly zip .pak in a .zip folder (which Nexus accepts) instead of a .gz folder (which Nexus does not accept)",
                         "Zipping files is now done thru the data provider menu, expand the dropdown for packing and select Pack and Zip",
-                        "Zipped files appear in correct location now"
+                        "Zipped files appear in correct location now",
+                        "Pak file is deleted now if zip is made"
                     ]
                 },
                 {

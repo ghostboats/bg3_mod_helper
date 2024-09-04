@@ -21,8 +21,9 @@ let zip = new JSZip();
 
 async function zipUpPak(zipPak) {
     let rootModPath = getConfig.rootModPath;
+    let modDestPath = getConfig.modDestPath;
     let lastFolderName = path.basename(rootModPath);
-    let zipPath = path.join(rootModPath, `${lastFolderName}.zip`);
+    let zipPath = path.join(modDestPath, `${lastFolderName}.zip`);
 
     let temp_folder = path.join(path.sep, "temp_folder");
     let pakFilePath = path.join(path.join(path.dirname(rootModPath), temp_folder), lastFolderName + pak);
@@ -36,6 +37,9 @@ async function zipUpPak(zipPak) {
         await promisify(fs.writeFile)(zipPath, content);
 
         bg3mh_logger.info(`Zip file has been created at ${zipPath}`, false);
+
+        await promisify(fs.unlink)(pakFilePath);
+        bg3mh_logger.info(`Original .pak file has been deleted at ${pakFilePath}`, false);
 
         if (isMainThread) {
             vscode.window.showInformationMessage(`${lastFolderName}.zip created`);
