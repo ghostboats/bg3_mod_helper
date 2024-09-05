@@ -136,14 +136,15 @@ function handleGameRunning() {
                 resolve(false); // Assuming game is not running in case of error
                 return;
             }
+            const { autoCloseBG3, laucherAPI } = getConfig();
+            const exeName = laucherAPI === 'DirectX' ? 'bg3_dx11.exe' : 'bg3.exe';
 
             // Check if BG3 is running (add Linux check if necessary)
-            const isRunning = stdout.toLowerCase().includes('bg3.exe');
+            const isRunning = stdout.toLowerCase().includes(exeName);
             
             if (isRunning) {
-                const { autoCloseBG3 } = getConfig();
                 if (autoCloseBG3) {
-                    exec('taskkill /F /IM bg3.exe', (killError, killStdout, killStderr) => {
+                    exec(`taskkill /F /IM ${exeName}`, (killError, killStdout, killStderr) => {
                         if (killError || killStderr) {
                             bg3mh_logger.error("Error closing Baldur's Gate 3: " + (killError || killStderr));
                             resolve(false); // Return false if there was an error closing the game

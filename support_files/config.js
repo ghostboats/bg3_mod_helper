@@ -102,7 +102,8 @@ function getConfig() {
         modName: config.get('modName'),
         excludeHidden: config.get('excludeHidden'),
         packingPriority: config.get('packingPriority'),
-        autoCloseBG3: config.get('autoCloseBG3')
+        autoCloseBG3: config.get('autoCloseBG3'),
+        laucherAPI: config.get('laucherAPI')
     };
 }
 
