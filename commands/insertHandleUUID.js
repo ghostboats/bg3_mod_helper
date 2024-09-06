@@ -8,6 +8,10 @@ let uuidDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertUUID'
     insertText(uuidv4());
 });
 
+let insertHandleDisposable = vscode.commands.registerCommand('bg3-mod-helper.insertHandleDisposable', function () {
+    insertText(generateHandle());
+});
+
 let uuidReplaceDisposable = vscode.commands.registerCommand('bg3-mod-helper.generateReplaceAllUUIDs', async function () {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {

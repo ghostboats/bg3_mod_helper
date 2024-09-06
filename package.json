@@ -47,6 +47,11 @@
                 "iconPath": "$(chip)"
             },
             {
+                "command": "bg3-mod-helper.insertHandleDisposable",
+                "title": "Generate Handle Here",
+                "iconPath": "$(chip)"
+            },
+            {
                 "command": "bg3-mod-helper.openStatsValidator",
                 "title": "Stats Validator",
                 "category": "BG3 Mod Helper"
@@ -321,7 +326,7 @@
                 "when": "editorTextFocus"
             },
             {
-                "command": "bg3-mod-helper.insertHandle",
+                "command": "bg3-mod-helper.insertHandleDisposable",
                 "key": "ctrl+shift+h",
                 "when": "editorTextFocus"
             },
@@ -414,6 +419,11 @@
                 {
                     "when": "editorTextFocus",
                     "command": "bg3-mod-helper.insertHandle",
+                    "group": "navigation@0"
+                },
+                {
+                    "when": "editorTextFocus",
+                    "command": "bg3-mod-helper.insertHandleDisposable",
                     "group": "navigation@0"
                 },
                 {
