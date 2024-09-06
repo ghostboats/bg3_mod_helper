@@ -6,4 +6,3 @@ vsc-extension-quickstart.md
 **/*.map
 **/.eslintrc.json
 **/update_notes.txt
-node_modules/**

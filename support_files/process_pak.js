@@ -4,7 +4,7 @@ const fs = require('fs');
 const { getFormats, moveFileAcrossDevices, compatRootModPath, LOAD_LSLIB } = require('./lslib_utils');
 const { pak } = getFormats();
 
-const { zipUpPak } = require('./gzip_functions');
+const { zipUpPak } = require('./zip_functions');
 const { xmlUpdate } = require('./xml_functions');
 
 const { isMainThread, workerData } = require('node:worker_threads');
@@ -52,14 +52,13 @@ function prepareTempDir(movedPak = false) {
 
 
 // btw, sometimes this will log things before others because it's async.
-async function processPak(modPath, unpackLocation = path.join(path.dirname(modPath), path.basename(modPath, pak))) {
+async function processPak(modPath, action, unpackLocation = path.join(path.dirname(modPath), path.basename(modPath, pak))) {
     await lslib_load();
     var build = new LSLIB.PackageBuildData();
     var Packager = new LSLIB.Packager();
 
     let rootModPath, 
         modDestPath,
-        zipOnPack,
         packingPriority;
 
     if (isMainThread) {
@@ -71,7 +70,6 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
 
     rootModPath = getConfig.rootModPath;
     modDestPath = getConfig.modDestPath;
-    zipOnPack = getConfig.zipOnPack;
     packingPriority = getConfig.packingPriority;
     
     build.ExcludeHidden = getConfig.excludeHidden;
@@ -103,7 +101,9 @@ async function processPak(modPath, unpackLocation = path.join(path.dirname(modPa
             vscode.window.showInformationMessage(`${lastFolderName + pak} packed`);
         }
 
-        zipUpPak(zipOnPack);
+        if (action === 'packAndZip') {
+            await zipUpPak();
+        }
 
         moveFileAcrossDevices(modTempDestPath, modFinalDestPath);
         prepareTempDir(true);

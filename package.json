@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.2.50",
+    "version": "2.2.58",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.86.0"
@@ -221,8 +221,8 @@
                 "category": "BG3 Mod Helper"
             },
             {
-                "command": "bg3-mod-helper.packModZip",
-                "title": "Pack Mod and ZIP",
+                "command": "bg3-mod-helper.generateReplaceAllHandles",
+                "title": "Generate and Replace All Handles",
                 "category": "BG3 Mod Helper"
             },
             {
@@ -254,11 +254,6 @@
                     "default": true,
                     "description": "Enable or disable hover feature."
                 },
-                "bg3ModHelper.hoverShowPath": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Toggle file path in hover message (not working in current update)."
-                },
                 "bg3ModHelper.rootModPath": {
                     "type": "string",
                     "default": "",
@@ -274,16 +269,6 @@
                     "default": "",
                     "description": "(Requires reload- Configuration Options > Reload Window) Path where your LSLib.dll file lives, ie [C:\\Documents\\ExportTool-v1.19.5\\Packed]:"
                 },
-                "bg3ModHelper.autoLaunchOnPack": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "(Requires reload- Configuration Options > Reload Window) Automatically launch the game after you pack your mod"
-                },
-                "bg3ModHelper.zipOnPack": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Zip up your mod in a .gz (.gzip) format, for distribution on other platforms."
-                },
                 "bg3ModHelper.launchContinueGame": {
                     "type": "boolean",
                     "default": false,
@@ -291,7 +276,7 @@
                 },
                 "bg3ModHelper.excludedFiles": {
                     "type": "array",
-                    "description": "List of files to exclude from conversion. You can quick add items to this via right click on a file in the file tree ->  Add to Conversion Exclusion List.  Example: [c:/path/to/ur/file.lsx]",
+                    "description": "When you pack a mod, the bg3 mod helper will autoconvert your lsx and xml files. If you wish to exclude an lxs/xml for some reason from auto convertin, add it to the list below. You can quick add items to this via right click on a file in the file tree ->  Add to Conversion Exclusion List.  Example: [c:/path/to/ur/file.lsx]",
                     "default": [],
                     "items": {
                         "type": "string"
@@ -315,7 +300,18 @@
                 "bg3ModHelper.excludeHidden": {
                     "type": "boolean",
                     "default": true,
-                    "description": "If, when packing mods, files and folders starting with a '.' should be excluded, ie the '.vscode' folder or a .gitignore file."
+                    "description": "If, when packing mods, files and folders starting with a '.' should be excluded, ie the '.vscode' folder or a .gitignore file (not enabled atm)."
+                },
+                "bg3ModHelper.autoCloseBG3": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically close Baldur's Gate 3 if it is running before packing a mod."
+                },
+                "bg3ModHelper.laucherAPI": {
+                    "type": "string",
+                    "default": "DirectX",
+                    "enum": ["DirectX", "Vulkan"],
+                    "description": "Lauch using directx or vulkan"
                 }
             }
         },
@@ -439,6 +435,11 @@
                     "when": "editorTextFocus && editorHasSelection",
                     "command": "bg3-mod-helper.generateReplaceAllUUIDs",
                     "group": "navigation@0"
+                },
+                {
+                    "when": "editorTextFocus && editorHasSelection",
+                    "command": "bg3-mod-helper.generateReplaceAllHandles",
+                    "group": "navigation@0"
                 }
             ],
             "bg3ModHelper.exportToolsSubmenu": [
@@ -514,6 +515,8 @@
         "dependencies": "npm install"
     },
     "dependencies": {
+        "ffmpeg-static": "^5.2.0",
+        "fluent-ffmpeg": "^2.1.3",
         "jszip": "^3.10.1",
         "log4js": "^6.9.1",
         "magickwand.js": "^1.1.0",
