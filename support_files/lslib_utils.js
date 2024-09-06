@@ -7,7 +7,6 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-
 // loads the api
 const dotnet = require('node-api-dotnet/net8.0');
 /*
