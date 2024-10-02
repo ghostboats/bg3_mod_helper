@@ -53,7 +53,7 @@ const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
 const { setupUuidsHandlesHoverProvider, registerTextEditCommand }= require('./hovers/uuidsHandlesCollector');
 
-const { getFullPath } = require('./support_files/helper_functions');
+const { getFullPath, getVersionNumber } = require('./support_files/helper_functions');
 
 
 function setCommands() {
@@ -218,7 +218,8 @@ function aSimpleDataProvider() {
         },
         getChildren: (element) => {
             if (!element) {
-                return Promise.resolve([
+                const version = getVersionNumber()
+                return getVersionNumber().then(version => [
                     // ideas for more dropdown menus: image utilities, generators, debug
                     { label: 'Pack/Unpacking Tool (Click arrow for quick actions, or text to open the tool[tool is in development])', id: 'packer' },
                     { label: 'Conversion Tool (Click arrow for quick actions, or text to open the tool)', command: 'bg3-mod-helper.openConverter', id: 'conversion' },
@@ -229,7 +230,7 @@ function aSimpleDataProvider() {
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
                     { label: 'BBCode/Markdown Editor ', command: 'bg3-mod-helper.textEditorTool'},
                     { label: 'Convert Video to GIF', command: 'bg3-mod-helper.convertVideoToGif' },
-                    { label: 'Version Generator', command: 'bg3-mod-helper.versionGenerator' },
+                    { label: `Ver. Generator (${version})`, command: 'bg3-mod-helper.versionGenerator' },
                     { label: 'Merge Xmls', command: 'bg3-mod-helper.xmlMerger' },
                     { label: 'Add/Remove Symlink (in development)', command: 'bg3-mod-helper.symlinker' },
                     { label: 'Rotation Tool (in development)', command: 'bg3-mod-helper.rotationTool' },

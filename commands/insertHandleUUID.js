@@ -142,7 +142,7 @@ let handleReplaceDisposable = vscode.commands.registerCommand('bg3-mod-helper.ge
     let documentsToSave = new Set();
 
     // Search across all text files in the workspace
-    const files = await vscode.workspace.findFiles('**/*.{txt,lsx,lsj,xml}');
+    const files = await vscode.workspace.findFiles('**/*.{txt,lsx,lsj,xml,json}');
     for (const file of files) {
         const textDoc = await vscode.workspace.openTextDocument(file);
         const text = textDoc.getText();

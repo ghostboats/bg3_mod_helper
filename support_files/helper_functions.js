@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
+const { getConfig, getModName } = require('../support_files/config');
 
 const { CREATE_LOGGER, raiseInfo } = require('./log_utils');
 var bg3mh_logger = CREATE_LOGGER();
@@ -15,7 +16,6 @@ function insertText(text) {
         });
     }
 }
-
 
 function getFullPath(relativePath) {
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
@@ -35,18 +35,18 @@ function getFullPath(relativePath) {
 // Function to find instances in workspace
 async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
     bg3mh_logger.debug('‾‾findInstanceInWorkspace‾‾');
-    bg3mh_logger.debug('word: ',word,'\ncurrentFilePath: ',currentFilePath,'\nmaxFilesToShow: ',maxFilesToShow);
+    bg3mh_logger.debug('word: ', word, '\ncurrentFilePath: ', currentFilePath, '\nmaxFilesToShow: ', maxFilesToShow);
     let instances = [];
     const workspaceFolder = vscode.workspace.workspaceFolders[0];
     const workspacePath = workspaceFolder.uri.fsPath;
 
-    let searchPath = new vscode.RelativePattern(workspacePath, '{**/*.lsx,**/*.lsj,**/*.xml,**/*.txt}');
+    let searchPath = new vscode.RelativePattern(workspacePath, '{**/*.lsx,**/*.lsj,**/*.xml,**/*.txt,**/*.txt}');
     const excludePattern = '**/*.lsf,**/node_modules/**,**/*.loca';
     const files = await vscode.workspace.findFiles(searchPath, excludePattern);
 
     for (const file of files) {
         if (file.fsPath === currentFilePath) continue;
-        
+
         const relativePath = vscode.workspace.asRelativePath(file.fsPath);
         const document = await vscode.workspace.openTextDocument(file);
 
@@ -60,14 +60,42 @@ async function findInstancesInWorkspace(word, currentFilePath, maxFilesToShow) {
         }
         if (instances.length >= maxFilesToShow) break;
     }
-    bg3mh_logger.debug('Found Instances:\n',instances)
-    bg3mh_logger.debug('__findInstanceInWorkspace__')
+    bg3mh_logger.debug('Found Instances:\n', instances);
+    bg3mh_logger.debug('__findInstanceInWorkspace__');
     return instances;
 }
 
+async function getVersionNumber() {
+    const { rootModPath } = getConfig();
+    const modName = await getModName();
+    const modsDirPath = path.normalize(rootModPath + "\\Mods");
+    const metaPath = path.normalize(modsDirPath + "\\" + modName + "\\meta.lsx");
 
-module.exports = { 
-    insertText, 
-    findInstancesInWorkspace, 
-    getFullPath 
+    if (!fs.existsSync(metaPath)) {
+        vscode.window.showErrorMessage('Version unable to be displayed in data provider, could not find meta.lsx.');
+        return 'N/A';
+    }
+
+    try {
+        let content = fs.readFileSync(metaPath, 'utf8');
+
+        const regex = /<attribute id="Version64" type="int64" value="([^"]*)"\s*\/>/;
+        const match = content.match(regex);
+        const version = BigInt(match[1]);
+        const major = Number((version >> BigInt(55)) & BigInt(0xFF));
+        const minor = Number((version >> BigInt(47)) & BigInt(0xFF));
+        const revision = Number((version >> BigInt(31)) & BigInt(0xFFFF));
+        const build = Number(version & BigInt(0x7FFFFFFF));
+        return `${major}.${minor}.${revision}.${build}`;
+    } catch (error) {
+        vscode.window.showErrorMessage("Error reading meta.lsx: " + error.message);
+        return 'N/A';
+    }
+}
+
+module.exports = {
+    insertText,
+    findInstancesInWorkspace,
+    getFullPath,
+    getVersionNumber
 };

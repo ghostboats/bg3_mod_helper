@@ -57,32 +57,15 @@ function generateReleaseNotes(version) {
             version: version,
             features: [
                 {
-                    title: "Release Page Created",
+                    title: "Changes",
                     details: [
-                        "On launch of newly downloaded version of extension, launch release notes page showing newest updates, like this one :)"
-                    ]
-                },
-                {
-                    title: "Mod Setting Changes [IMPORTANT]",
-                    details: [
-                        "Choose to launch via directx or vulkan in the settings",
-                        "Setting added to close the existing bg3 instance when you pack and play for quicker launch if you forgot to close. By default it is off.",
-                        "If you have a unique mod destination path, the prompt will now only appear one time per session to avoid having to confirm each time on pack"
-                    ]
-                },
-                {
-                    title: "Zipping Fixes",
-                    details: [
-                        "Zipped files appear in correct location now (your set mod destination)",
-                        "Pak file is deleted now if zip is made"
+                        "I DONT REMEMBER, SORRY I DIDNT HAVE MY COMPUTER FOR OVER A MONTH AND FORGOT WHAT I DID"
                     ]
                 },
                 {
                     title: "Minor Changes",
                     details: [
-                        "Atlas Fix if .lsx file doenst exist yet",
-                        "Generate and Replace Handle option added when highlighting a handle and rightclicking",
-                        "Generate Handle will now correctly save the xml files it adds it to",
+                        "Json files will now be recognized for handle hovers (MCM stuff)"
                     ]
                 },
                 {

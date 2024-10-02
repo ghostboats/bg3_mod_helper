@@ -10,7 +10,7 @@ function escapeHtml(str) {
 }
 
 function setupUuidsHandlesHoverProvider() {
-    return vscode.languages.registerHoverProvider({ scheme: 'file' }, {
+    return vscode.languages.registerHoverProvider('*', {
         provideHover(document, position, token) {
             const { hoverEnabled, maxFilesToShow, maxCacheSize } = getConfig();
             if (!hoverEnabled) return;
@@ -49,6 +49,7 @@ function setupUuidsHandlesHoverProvider() {
                                 const normalizedPath = relativePath.replace(/\\/g, '/').toLowerCase();
                                 console.log(relativePath)
                                 console.log(normalizedPath)
+                                const extension = path.extname(relativePath).toLowerCase();
                                 // Check if the file is within the Localization folder
                                 if (normalizedPath.includes('localization/')) {
                                     // Process as a localization-related file
@@ -56,6 +57,10 @@ function setupUuidsHandlesHoverProvider() {
                                     let highlightedLineContent = contentMatch ? escapeHtml(contentMatch[1]) : '';
                                     const commandUri = `command:extension.editText?${encodeURIComponent(JSON.stringify({ word: highlightedLineContent, range: { lineNum, path: relativePath } }))}`;
                                     currentLine = `Loca Content: ***[${highlightedLineContent}](${commandUri})***\nFile: [${relativePath}](command:extension.openFileAtLine?${encodeURIComponent(JSON.stringify({ relativePath, lineNum }))})\n---\n`;
+                                } else if (extension === '.json') {
+                                    // Process as a JSON file
+                                    let highlightedLineContent = escapeHtml(lineContent.trim());
+                                    currentLine = `JSON Line: ${highlightedLineContent}  \nFile: [**${relativePath}**](${openFileCommandUri})  \n---  \n`;
                                 } else {
                                     let modifiedLineContent = lineContent.replace(/^<\/?|\/?>$/g, '');
                                     let highlightedLineContent = modifiedLineContent.replace(/(id="[^"]*")/g, '**$1**');
