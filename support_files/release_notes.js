@@ -57,15 +57,15 @@ function generateReleaseNotes(version) {
             version: version,
             features: [
                 {
-                    title: "Changes",
+                    title: "Dependencies Changes",
                     details: [
-                        "I DONT REMEMBER, SORRY I DIDNT HAVE MY COMPUTER FOR OVER A MONTH AND FORGOT WHAT I DID"
+                        "Add Dependency button should now correctly check your modsettings list (for all profiles) and \ngive you quick access to add them in as dependencies to the mod you are working on"
                     ]
                 },
                 {
                     title: "Minor Changes",
                     details: [
-                        "Json files will now be recognized for handle hovers (MCM stuff)"
+                        "Your mod version now shows in the quick actions next to the version generator button(needs a \nreload of vscode if you update it to update the ui)."
                     ]
                 },
                 {
