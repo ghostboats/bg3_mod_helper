@@ -4,6 +4,7 @@ const path = require('path');
 
 let config;
 
+
 let rootModPath;
 let vscodeDirPath;
 let settingsFilePath;
