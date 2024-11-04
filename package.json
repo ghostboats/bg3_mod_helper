@@ -3,7 +3,7 @@
     "displayName": "bg3_mod_helper",
     "publisher": "ghostboats",
     "description": "This extension is designed to help you make mods in Baldur's Gate 3 by creating UUIDs and handles for you, as well as updating your .loca.xml files as well should they exist. And more to come in the future.",
-    "version": "2.2.61",
+    "version": "2.2.63",
     "icon": "media/marketplace_icon.png",
     "engines": {
         "vscode": "^1.86.0"
@@ -43,12 +43,12 @@
             },
             {
                 "command": "bg3-mod-helper.insertHandle",
-                "title": "Generate Handle",
+                "title": "Generate Handle & Text",
                 "iconPath": "$(chip)"
             },
             {
                 "command": "bg3-mod-helper.insertHandleDisposable",
-                "title": "Generate Handle Here",
+                "title": "Generate Handle",
                 "iconPath": "$(chip)"
             },
             {
@@ -322,7 +322,7 @@
                 "when": "editorTextFocus"
             },
             {
-                "command": "bg3-mod-helper.insertHandleDisposable",
+                "command": "bg3-mod-helper.insertHandle",
                 "key": "ctrl+shift+h",
                 "when": "editorTextFocus"
             },

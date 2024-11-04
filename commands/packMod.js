@@ -29,7 +29,7 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
 
     if (gameRunning) {
         vscode.window.showErrorMessage('Baldur\'s Gate 3 is currently running. Please close the game before packing the mod or enable autoclose in settings.');
-        return; // Stop further execution
+        return;
     }
 
     const workspaceState = vscode.workspace.getConfiguration('bg3ModHelper');
@@ -58,7 +58,6 @@ const packModCommand = vscode.commands.registerCommand('bg3-mod-helper.packMod',
     if (!fs.existsSync(metaPath)) {
         const shouldCreateMeta = await vscode.window.showInformationMessage('meta.lsx not found in ' + metaPath + '. Do you want to create one?', 'Create Meta', 'Close');
         if (shouldCreateMeta === 'Create Meta') {
-            // Check if the directory exists, if not, create it
             const directoryPath = path.join(rootModPath, 'Mods', modName);
             if (!fs.existsSync(directoryPath)) {
                 fs.mkdirSync(directoryPath, { recursive: true });
@@ -133,7 +132,7 @@ function handleGameRunning() {
         exec('tasklist', async (error, stdout, stderr) => {
             if (error || stderr) {
                 bg3mh_logger.error("Error checking running processes: " + (error || stderr));
-                resolve(false); // Assuming game is not running in case of error
+                resolve(false);
                 return;
             }
             const { autoCloseBG3, laucherAPI } = getConfig();
@@ -147,13 +146,15 @@ function handleGameRunning() {
                     exec(`taskkill /F /IM ${exeName}`, (killError, killStdout, killStderr) => {
                         if (killError || killStderr) {
                             bg3mh_logger.error("Error closing Baldur's Gate 3: " + (killError || killStderr));
-                            resolve(false); // Return false if there was an error closing the game
+                            resolve(false);
                             return;
                         }
 
                         vscode.window.showInformationMessage('Baldur\'s Gate 3 was closed to pack the mod.');
                         bg3mh_logger.info("Baldur's Gate 3 was successfully closed.");
-                        resolve(false);
+                        setTimeout(() => {
+                            resolve(false);
+                        }, 1000);
                     });
                 } else {
                     resolve(true); // Game is running, but user opted not to auto-close

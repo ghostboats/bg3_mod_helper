@@ -57,15 +57,28 @@ function generateReleaseNotes(version) {
             version: version,
             features: [
                 {
+                    title: "Assets Metadata.lsx button",
+                    details: [
+                        "Added Assets Metadata.lsx Creation (I know my naming scheme sucks )button that will create a metadata.lsx \nfile based on your pngs/DDS files in your GUI/Assets folders and subfolders."
+                    ]
+                },
+                {
+                    title: "Handle Entry Fixes",
+                    details: [
+                        "Sorry i think I messed something up in a previous handle update. I have swapped around the \ncommands for insertHandle and insertHandleDisposable. Basically this should be that \n when you hit control shift h it will prompt for an intial handle. \nIf you right click you will see Generate Handle which will make a handle but not entry now."
+                    ]
+                },
+                {
                     title: "Dependencies Changes",
                     details: [
-                        "Add Dependency button should now correctly check your modsettings list (for all profiles) and \ngive you quick access to add them in as dependencies to the mod you are working on"
+                        "Add Dependency button should now correctly check your modsettings list (for all profiles) and \ngive you quick access to add them in as dependencies to the mod you are working on."
                     ]
                 },
                 {
                     title: "Minor Changes",
                     details: [
-                        "Your mod version now shows in the quick actions next to the version generator button(needs a \nreload of vscode if you update it to update the ui)."
+                        "Your mod version now shows in the quick actions next to the version generator button(needs a \nreload of vscode if you update it to update the ui).",
+                        "1 second delay if bg3 is open when reopening on pak and play to allow for proper closing and reopening of the game."
                     ]
                 },
                 {

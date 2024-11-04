@@ -47,7 +47,8 @@ let packModImport,
     resizeImageController,
     resizeImageHotbar,
     resizeImageCustom,
-    saveConfigToFile;
+    saveConfigToFile,
+    createAssetsMetadataCommand;
 
 const AutoCompleteProvider = require('./autocomplete/autoCompleteProvider');
 const setupFunctionDescriptionHoverProvider = require('./hovers/functionDescriptions');
@@ -70,6 +71,7 @@ function setCommands() {
     openConverterCommand = require('./commands/openConverter');
     versionGeneratorCommand = require('./commands/versionGenerator');
     textEditorCommand = require('./commands/textEditor');
+    createAssetsMetadataCommand = require('./commands/createAssetsMetadata')
 
     // config commands
     saveConfigToFile = require('./commands/saveConfigToFile')
@@ -228,6 +230,7 @@ function aSimpleDataProvider() {
                     { label: 'Launch Game', command: 'bg3-mod-helper.launchGame' },
                     { label: 'Generate Folder Structure', command: 'bg3-mod-helper.createModTemplate' },
                     { label: 'Atlas Generator (Supply a folder of icons to make an atlas and its corresponding .dds with those icons, as well as its merged.lsx)', command: 'bg3-mod-helper.createAtlas' },
+                    { label: 'Assets MetaData.lsx Creation', command: 'bg3-mod-helper.createAssetsMetadata' },
                     { label: 'BBCode/Markdown Editor ', command: 'bg3-mod-helper.textEditorTool'},
                     { label: 'Convert Video to GIF', command: 'bg3-mod-helper.convertVideoToGif' },
                     { label: `Ver. Generator (${version})`, command: 'bg3-mod-helper.versionGenerator' },
